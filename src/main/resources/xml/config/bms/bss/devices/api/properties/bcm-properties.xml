@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<propertyDefinitions>
+   <component>
+      <name>Bcm</name>
+      <propertyDefinition>
+         <name>CalibrationStatus</name>
+         <type>INTEGER</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>Calibration status of the BCM - 0: Not calibrated/ 1: Calibrated</description>
+      </propertyDefinition>
+   </component>
+</propertyDefinitions>

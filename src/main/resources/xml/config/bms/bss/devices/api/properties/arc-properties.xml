@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<propertyDefinitions>
+   <component>
+      <name>Arc</name>
+      <propertyDefinition>
+         <name>PsCurrent</name>
+         <type>DOUBLE</type>
+         <indexed>false</indexed>
+         <writable>true</writable>
+         <description>Arc Ps Current</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>PsVoltage</name>
+         <type>DOUBLE</type>
+         <indexed>false</indexed>
+         <writable>true</writable>
+         <description>Arc Ps Voltage</description>
+      </propertyDefinition>
+   </component>
+</propertyDefinitions>

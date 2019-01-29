@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+   <parent>
+      <groupId>com.iba.bms</groupId>
+      <artifactId>beam</artifactId>
+      <version>8.6.1</version>
+   </parent>
+
+   <modelVersion>4.0.0</modelVersion>
+   <groupId>com.iba.ialign</groupId>
+   <artifactId>beam-ialign</artifactId>
+   <packaging>jar</packaging>
+   <version>8.x-SNAPSHOT</version>
+   <name>adapt iAlignment component</name>
+
+   <build>
+      <plugins>
+
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <executions>
+               <execution>
+                  <id>copy-dependencies</id>
+                  <phase>prepare-package</phase>
+                  <goals>
+                     <goal>copy-dependencies</goal>
+                  </goals>
+                  <configuration>
+                     <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                     <overWriteReleases>false</overWriteReleases>
+                     <overWriteSnapshots>false</overWriteSnapshots>
+                     <overWriteIfNewer>true</overWriteIfNewer>
+                  </configuration>
+               </execution>
+            </executions>
+         </plugin>
+
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-jar-plugin</artifactId>
+            <configuration>
+               <archive>
+                  <manifest>
+                     <addClasspath>true</addClasspath>
+                     <classpathPrefix>lib/</classpathPrefix>
+                     <mainClass>com.iba.ialign.Main</mainClass>
+                  </manifest>
+               </archive>
+            </configuration>
+         </plugin>
+
+          <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-compiler-plugin</artifactId>
+              <version>3.5.1</version>
+              <configuration>
+                  <source>1.8</source>
+                  <target>1.8</target>
+              </configuration>
+          </plugin>
+
+      </plugins>
+   </build>
+
+<dependencies>
+
+        <!-- ICOMP -->
+        <dependency>
+            <groupId>com.iba.icomp</groupId>
+            <artifactId>icompx-ui</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.iba.bms</groupId>
+            <artifactId>icomp-core-beam-ext</artifactId>
+        </dependency>
+
+        <!-- BEAM -->
+        <dependency>
+            <groupId>com.iba.bms</groupId>
+            <artifactId>beam-bds-controller-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.iba.bms</groupId>
+            <artifactId>beam-bms-controller-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.iba.bms</groupId>
+            <artifactId>beam-bms-datatypes-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.iba.bms</groupId>
+            <artifactId>beam-bms-datatypes-impl</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.iba.bms</groupId>
+            <artifactId>beam-bms-idt-api</artifactId>
+        </dependency>
+
+        <!-- Runtime Dependencies -->
+
+        <!-- ICOMP -->
+        <dependency>
+            <groupId>com.iba.icomp</groupId>
+            <artifactId>icomp-comm-notif</artifactId>
+            <!-- <scope>runtime</scope> -->
+        </dependency>
+        <dependency>
+            <groupId>com.iba.icomp</groupId>
+            <artifactId>icompx-aop</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.iba.icomp</groupId>
+            <artifactId>icompx-jmx</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- BEAM -->
+        <dependency>
+            <groupId>com.iba.bms</groupId>
+            <artifactId>beam-bms-controller-impl</artifactId>
+            <!--scope>runtime</scope-->
+        </dependency>
+
+        <dependency>
+            <groupId>com.iba.bms</groupId>
+            <artifactId>beam-bms-scanalgo</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.iba.bms</groupId>
+            <artifactId>beam-bss-beamaccesspointctrl-impl</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+		
+		<!-- BSS -->
+		<dependency>
+            <groupId>com.iba.bms</groupId>
+            <artifactId>beam-bss-devices-impl</artifactId>
+        </dependency>
+		
+		<dependency>
+            <groupId>com.iba.bms</groupId>
+            <artifactId>beam-bss-devices-api</artifactId>
+        </dependency>
+
+         <dependency>
+            <groupId>com.iba.bms</groupId>
+            <artifactId>bms-common</artifactId>
+            <scope>runtime</scope>
+         </dependency>
+
+         <dependency>
+            <groupId>com.iba.bms</groupId>
+            <artifactId>bss-controller-impl</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.iba.bms</groupId>
+            <artifactId>bds-common-impl</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+		<dependency>
+			<groupId>org.jfree</groupId>
+			<artifactId>jfreechart</artifactId>
+			<version>1.0.19</version>
+		</dependency>
+
+
+		
+		
+		<!-- BLAK -->
+		<dependency>
+            <groupId>com.iba.blak</groupId>
+            <artifactId>blak-blak</artifactId>
+			<version>8.x-SNAPSHOT</version>
+        </dependency>
+		
+		
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.5.2</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpcore</artifactId>
+			<version>4.4.4</version>
+		</dependency>
+		
+        <dependency>
+            <groupId>com.iba.pts-shared</groupId>
+            <artifactId>pts-treatment-room-session</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-beans</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.thoughtworks.xstream</groupId>
+            <artifactId>xstream</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.jgoodies</groupId>
+            <artifactId>binding</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.iba.bms</groupId>
+            <artifactId>bms-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.iba.icomp</groupId>
+            <artifactId>icomp-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.jgoodies</groupId>
+            <artifactId>forms</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.iba.bms</groupId>
+            <artifactId>beam-bms-dosimetry-impl</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.iba.icomp</groupId>
+            <artifactId>icompx-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.iba.icomp</groupId>
+            <artifactId>icompx-relauncher</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jfxvnc</groupId>
+            <artifactId>jfxvnc-ui</artifactId>
+            <version>1.2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jfxvnc</groupId>
+            <artifactId>jfxvnc-net</artifactId>
+            <version>1.2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jfxvnc</groupId>
+            <artifactId>jfxvnc-swing</artifactId>
+            <version>1.2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jfxvnc</groupId>
+            <artifactId>jfxvnc-app</artifactId>
+            <version>1.2.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.iba.bms</groupId>
+            <artifactId>beam-common-proc</artifactId>
+            <scope>runtime</scope>
+            <version>8.6.3</version>
+        </dependency>
+
+    <!-- https://mvnrepository.com/artifact/com.sikulix/sikulixapi -->
+    <dependency>
+        <groupId>com.sikulix</groupId>
+        <artifactId>sikulixapi</artifactId>
+        <version>1.1.1</version>
+    </dependency>
+
+    <dependency>
+        <groupId>com.google.code.gson</groupId>
+        <artifactId>gson</artifactId>
+        <version>2.8.5</version>
+    </dependency>
+
+    <dependency>
+        <groupId>com.jgoodies</groupId>
+        <artifactId>jgoodies-common</artifactId>
+        <version>1.8.1</version>
+    </dependency>
+
+    <dependency>
+        <groupId>com.jgoodies</groupId>
+        <artifactId>forms</artifactId>
+        <version>1.2.1</version>
+    </dependency>
+
+    </dependencies>
+
+</project>

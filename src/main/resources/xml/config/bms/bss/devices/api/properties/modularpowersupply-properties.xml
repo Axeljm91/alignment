@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<propertyDefinitions>
+	<component>
+
+		<name>ModularPowerSupply</name>
+
+		<!-- Converter-specific properties -->
+
+		<propertyDefinition>
+			<name>OutputVoltageConv</name>
+			<type>DOUBLE</type>
+			<writable>false</writable>
+			<indexed>true</indexed>
+			<description>Converter Output (i.e. Feedback) Voltage (V)</description>
+		</propertyDefinition>
+
+		<propertyDefinition>
+			<name>OutputCurrentConv</name>
+			<type>DOUBLE</type>
+			<writable>false</writable>
+			<indexed>true</indexed>
+			<description>Converter Output (i.e. Feedback) Current (A)</description>
+		</propertyDefinition>
+
+		<propertyDefinition>
+			<name>SetpointConv</name>
+			<type>DOUBLE</type>
+			<writable>true</writable>
+			<indexed>true</indexed>
+			<description>Converter (Current) Setpoint (A)</description>
+		</propertyDefinition>
+
+		<propertyDefinition>
+			<name>ModeConv</name>
+			<type>INTEGER</type>
+			<writable>true</writable>
+			<indexed>true</indexed>
+			<description>Converter Operation Mode (e.g. standby)</description>
+		</propertyDefinition>
+
+      <propertyDefinition>
+         <name>IoOkConv</name>
+         <type>BOOLEAN</type>
+         <writable>false</writable>
+         <indexed>true</indexed>
+         <description>Output Current Is Within Tolerances</description>
+      </propertyDefinition>
+      
+      <propertyDefinition>
+         <name>InterlockOkConv</name>
+         <type>BOOLEAN</type>
+         <writable>false</writable>
+         <indexed>true</indexed>
+         <description>Internal Interlock Flag</description>
+      </propertyDefinition>
+
+		<propertyDefinition>
+			<name>StatusConv</name>
+			<type>INTEGER</type>
+			<writable>false</writable>
+			<indexed>true</indexed>
+			<description>Converter Status (e.g. load failure)</description>
+		</propertyDefinition>
+
+
+      <!-- Properties not directly contained in the Modbus device, but computed by another means. -->
+      
+      <propertyDefinition>
+         <name>VideoConv</name>
+         <type>INTEGER</type>
+         <writable>false</writable>
+         <indexed>true</indexed>
+         <description>The PCVue 'video' variable (e.g. regulation NOK)</description>
+      </propertyDefinition>
+
+
+		<!-- Properties applicable to the power supply as a whole -->
+
+		<propertyDefinition>
+			<name>AlarmList</name>
+			<type>INTEGER</type>
+			<writable>false</writable>
+			<description>Power Supply Alarm List</description>
+		</propertyDefinition>
+
+		<propertyDefinition>
+			<name>LocalRemote</name>
+			<type>BOOLEAN</type>
+			<!-- This could be changed to allow modifying the control mode -->
+			<writable>false</writable>
+			<description>Power Supply Local/Remote Control Mode</description>
+		</propertyDefinition>
+
+	</component>
+</propertyDefinitions>
+

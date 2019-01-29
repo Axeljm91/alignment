@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<propertyDefinitions>
+   <component>
+      <name>Bcreu</name>
+      <propertyDefinition>
+         <name>RegulationError</name>
+         <type>INTEGER</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>Indicates if there is a regulation error</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>RequestedState</name>
+         <type>INTEGER</type>
+         <indexed>false</indexed>
+         <writable>true</writable>
+         <description>Set the requested state for the BCREU</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>WatchdogPeriodInMillisecond</name>
+         <type>INTEGER</type>
+         <indexed>false</indexed>
+         <writable>true</writable>
+         <description>Set the watchdog period for the BCREU in millisecond</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>RequestedMaxBeamCurrent</name>
+         <type>DOUBLE</type>
+         <indexed>false</indexed>
+         <writable>true</writable>
+         <description>Set the requested max beam current for the BCREU (32767 -> 500 nA)</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>FeedbackMaxBeamCurrent</name>
+         <type>DOUBLE</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>Feedback of the max beam current for the BCREU (32767 -> 500 nA)</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>RequestedTcsHardwire</name>
+         <type>INTEGER</type>
+         <indexed>false</indexed>
+         <writable>true</writable>
+         <description>Set it to 0 to enable modbus access to the BCREU. Set it to 1 to disable it</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>RunningState</name>
+         <type>INTEGER</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>Current state of the BCREU (1 = IDLE, 3 = START LOOKUP, 8 = LOOKUP FAILED...)</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>Status</name>
+         <type>INTEGER</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>Current status of the BCREU ("SYSTEM_DSP_STATUSWORD" register)</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>DspHealthStatus</name>
+         <type>INTEGER</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>Health status of the BCREU ("SYSTEM_DSP_HEALTHWORD" register)</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>DisplayedMaxBeamCurrent</name>
+         <type>INTEGER</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>Max beam current displayed on the BCREU multiplied by 10</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>DisplayedIcCyclo</name>
+         <type>INTEGER</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>Ic cyclo displayed on the BCREU multiplied by 10</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>FirmwareRelease</name>
+         <type>STRING</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>BCREU firmware release</description>
+      </propertyDefinition>
+   </component>
+</propertyDefinitions>

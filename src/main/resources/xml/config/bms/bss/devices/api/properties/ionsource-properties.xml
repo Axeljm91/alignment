@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<propertyDefinitions>
+   <component>
+      <name>IonSource</name>
+      <propertyDefinition>
+         <name>Mode</name>
+         <type>STRING</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>The Ion Source operating mode</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>BeamAccessPointId</name>
+         <type>INTEGER</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>The Beam Access point selected by the Ion Source</description>
+      </propertyDefinition>
+   </component>
+</propertyDefinitions>

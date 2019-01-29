@@ -1,0 +1,141 @@
+# Comment : A line starting with # will be considered as a comment
+# Names must match the elements name in the system
+# About types :
+# Degrader : degrader Options : - stairs : Non continuous degrader
+# - continuous : Continuous degrader
+# BPM : bpm Options : - degrader : Special degrader BPM
+# Quadrupoles : quad
+# Dipoles : bend
+# Steerings : steering
+# Beam Stops : bs
+# Slits : slits
+
+#Name,Type,Parameter
+
+#T1CX,acusteering,
+#T1CY,acusteering,
+#T2CX,acusteering,
+#T2CY,acusteering,
+
+DEGRADER,Degrader,continuous
+
+#Slits
+SL1E,slits,
+SL2E,slits,
+#SL3E,slits,
+
+#BPMs
+P1E,bpm,degrader
+P2E,bpm,
+
+#BEAM STOPs
+S2E,bs,
+
+#QUADs
+Q1E,"quad",
+Q2E,"quad",
+Q3E,"quad",
+Q47E,"quad",
+Q56E,"quad",
+#Q6E,"quad",
+#Q7E,"quad",
+Q8E,"quad",
+Q9E,"quad",
+Q10E,"quad",
+
+Q1B1,"quad",
+Q2B1,"quad",
+Q3B1,"quad",
+
+Q1F1,"quad",
+Q2F1,"quad",
+Q3F1,"quad",
+
+Q1N1,"quad",
+Q2N1,"quad",
+
+Q1S1,"quad",
+Q2S1,"quad",
+Q3S1,"quad",
+Q4S1,"quad",
+Q5S1,"quad",
+
+Q1B2,"quad",
+Q2B2,"quad",
+Q3B2,"quad",
+
+Q1F2,"quad",
+Q2F2,"quad",
+Q3F2,"quad",
+
+Q1I2,"quad",
+Q2I2,"quad",
+Q3I2,"quad",
+Q4I2,"quad",
+Q5I2,"quad",
+
+Q1N2,"quad",
+Q2N2,"quad",
+
+Q1S2,"quad",
+Q2S2,"quad",
+Q3S2,"quad",
+Q4S2,"quad",
+Q5S2,"quad",
+
+Q1B3,"quad",
+Q2B3,"quad",
+Q3B3,"quad",
+
+Q1F3,"quad",
+Q2F3,"quad",
+Q3F3,"quad",
+
+Q1I3,"quad",
+Q2I3,"quad",
+Q3I3,"quad",
+Q4I3,"quad",
+Q5I3,"quad",
+
+Q1S3,"quad",
+Q2S3,"quad",
+Q3S3,"quad",
+Q4S3,"quad",
+Q5S3,"quad",
+
+Q1B4,"quad",
+Q2B4,"quad",
+Q3B4,"quad",
+
+Q1G4,"quad",
+Q2G4,"quad",
+Q3G4,"quad",
+Q4G4,"quad",
+Q5G4,"quad",
+
+Q1N4,"quad",
+Q2N4,"quad",
+
+#DIPOLES
+B1234E, "bend",
+B12B1, "bend",
+B12B2, "bend",
+B1I2, "bend",
+B2I2, "bend",
+B12B3, "bend",
+B1I3, "bend",
+B2I3, "bend",
+B12B4, "bend",
+B1G4, "bend",
+B2G4, "bend",
+
+#bcm1e
+#BCM1E,bcm,
+#bcm2e
+#degrader
+#group3
+#sw	
+#t1g1
+#t3s1
+#trb1b2
+#trb3e

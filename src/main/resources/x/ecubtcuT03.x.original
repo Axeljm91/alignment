@@ -1,0 +1,721 @@
+/* Copyright Ion Beam Applications */
+
+typedef char MAX_STRING_LEN[256];
+
+typedef unsigned char UINT8;
+
+typedef unsigned short UINT16;
+
+typedef char DEVICE_NAME[20];
+
+typedef char ECUBTCU_EQUIPMENT_NAME[20];
+
+typedef char ECUBTCU_DEVICE_NAME[20];
+
+typedef char ECUBTCU_INDEX_NAME[40];
+
+typedef char ECUBTCU_CONFIG_DATA[1280];
+
+typedef int ECUBTCU_CONFIG_TYPE;
+
+typedef char BPM_DEVICE_NAME[20];
+
+typedef char BS_DEVICE_NAME[20];
+
+typedef char STEPPER_DEVICE_NAME[20];
+
+enum BCM_CONVERSION_TYPE {
+    BCM_NORMAL_GAIN = 0,
+    BCM_DEFAULT_GAIN = BCM_NORMAL_GAIN,
+    BCM_HIGH_GAIN,
+    BCM_NORMAL_CALIBRATE,
+    BCM_HIGH_CALIBRATE,
+    BCM_NORMAL_OFFSET,
+    BCM_HIGH_OFFSET,
+    BCM_NORMAL_FULL_CALIBRATE,
+    BCM_HIGH_FULL_CALIBRATE
+    };
+
+enum BCM_TRIGGER_TYPE {
+    BCM_STROBE_TRIGGER = 0,
+    BCM_FALLING_TRIGGER,
+    BCM_DEFAULT_TRIGGER = BCM_FALLING_TRIGGER,
+    BCM_RISING_TRIGGER
+    };
+
+enum BPM_ACQUISITION_MODE {
+    BPM_NORMAL_GAIN = 0,
+    BPM_HIGH_GAIN,
+    BPM_NORMAL_CALIBRATE,
+    BPM_HIGH_CALIBRATE,
+    BPM_NORMAL_OFFSET,
+    BPM_HIGH_OFFSET,
+    BPM_NORMAL_FULL_CALIBRATE,
+    BPM_HIGH_FULL_CALIBRATE
+    };
+
+enum BPM_TRIGGER_TYPE {
+    BPM_STROBE_TRIGGER = 0,
+    BPM_FALLING_TRIGGER,
+    BPM_RISING_TRIGGER
+    };
+
+enum BEAM_TUNING_BEAM_LINES_NAMES {
+    BEAM_TUNING_BEAM_LINE_FIRST_LINE,
+    BEAM_TUNING_BEAM_LINE_1 = BEAM_TUNING_BEAM_LINE_FIRST_LINE,
+    BEAM_TUNING_BEAM_LINE_2,
+    BEAM_TUNING_BEAM_LINE_3,
+    BEAM_TUNING_BEAM_LINE_UNKNOWN
+    };
+
+enum BEAM_LINE_REF_SETPOINT_TYPE {
+    BEAM_LINE_REF_SETPOINT_RANGE,
+    BEAM_LINE_REF_SETPOINT_TUNING,
+    BEAM_LINE_REF_SETPOINT_LAST_TYPE
+    };
+
+enum BEAM_TUNING_MODE {
+    BEAM_TUNING_AUTOMATIC = 0,
+    BEAM_TUNING_IRRADIATION,
+    BEAM_TUNING_IDLE,
+    BEAM_TUNING_LAST_MODE
+    };
+
+enum BEAM_TUNING_TREATMENT_MODE {
+    BEAM_TUNING_TREATMENT_NO_MODE = 0,
+    BEAM_TUNING_TREATMENT_WOBBLING,
+    BEAM_TUNING_TREATMENT_DSCAT,
+    BEAM_TUNING_TREATMENT_LAST_MODE
+    };
+
+struct ECU_TCU_RESPONSE {
+    UINT8 xValueIsValid;
+    UINT8 yValueIsValid;
+    double xSkewness;
+    double ySkewness;
+    double IC23xSigma;
+    double IC1xSigma;
+    double IC23ySigma;
+    double IC1ySigma;
+    double xMean;
+    double yMean;
+    double IC23totalCount;
+    double IC1totalCount;
+    UINT8 acquisitionId;
+    };
+
+struct ecubtcuSetConfiguration_in {
+    ECUBTCU_EQUIPMENT_NAME pEquipmentName;
+    ECUBTCU_DEVICE_NAME pDeviceName;
+    ECUBTCU_INDEX_NAME pParameterName;
+    ECUBTCU_CONFIG_DATA pValue;
+    ECUBTCU_CONFIG_TYPE type;
+};
+
+struct ecubtcuSetConfiguration_out {
+    int returnValue;
+};
+
+struct ecubtcuEndSetConfiguration_out {
+    int returnValue;
+};
+
+struct ecubtcuRequestShutdown_out {
+    int returnValue;
+};
+
+struct group3SetOffset_in {
+    double offset;
+};
+
+struct group3SetOffset_out {
+    int returnValue;
+};
+
+struct group3SetGain_in {
+    double gain;
+};
+
+struct group3SetGain_out {
+    int returnValue;
+};
+
+struct bpmInsert_in {
+    BPM_DEVICE_NAME pName;
+};
+
+struct bpmInsert_out {
+    int returnValue;
+};
+
+struct bpmRetract_in {
+    BPM_DEVICE_NAME pName;
+};
+
+struct bpmRetract_out {
+    int returnValue;
+};
+
+struct bsInsert_in {
+    BS_DEVICE_NAME pName;
+};
+
+struct bsInsert_out {
+    int returnValue;
+};
+
+struct bsRetract_in {
+    BS_DEVICE_NAME pName;
+};
+
+struct bsRetract_out {
+    int returnValue;
+};
+
+struct stepperIoExcite_in {
+    STEPPER_DEVICE_NAME pName;
+};
+
+struct stepperIoExcite_out {
+    int returnValue;
+};
+
+struct stepperIoDesexcite_in {
+    STEPPER_DEVICE_NAME pName;
+};
+
+struct stepperIoDesexcite_out {
+    int returnValue;
+};
+
+struct stepperIoCheckExcitation_in {
+    STEPPER_DEVICE_NAME pName;
+};
+
+struct stepperIoCheckExcitation_out {
+    int returnValue;
+};
+
+struct analogPsSetVoltage_in {
+    DEVICE_NAME pName;
+    double setVoltage;
+};
+
+struct analogPsSetVoltage_out {
+    int returnValue;
+};
+
+struct analogPsSetCurrent_in {
+    DEVICE_NAME pName;
+    double setCurrent;
+};
+
+struct analogPsSetCurrent_out {
+    int returnValue;
+};
+
+struct bcmStartCalibration_in {
+    DEVICE_NAME pName;
+};
+
+struct bcmStartCalibration_out {
+    int returnValue;
+};
+
+struct bcmAllStartCalibration_out {
+    int returnValue;
+};
+
+struct bcmChangeMode_in {
+    DEVICE_NAME pName;
+    BCM_CONVERSION_TYPE mode;
+    BCM_TRIGGER_TYPE acqType;
+};
+
+struct bcmChangeMode_out {
+    int returnValue;
+};
+
+struct bcmReset_in {
+    DEVICE_NAME pName;
+};
+
+struct bcmReset_out {
+    int returnValue;
+};
+
+struct bcmAllReset_out {
+    int returnValue;
+};
+
+struct bpmStartContinuousAcquisition_in {
+    DEVICE_NAME pName;
+};
+
+struct bpmStartContinuousAcquisition_out {
+    int returnValue;
+};
+
+struct bpmStopContinuousAcquisition_in {
+    DEVICE_NAME pName;
+};
+
+struct bpmStopContinuousAcquisition_out {
+    int returnValue;
+};
+
+struct bpmAllStartCalibration_out {
+    int returnValue;
+};
+
+struct bpmStartCalibration_in {
+    DEVICE_NAME pName;
+};
+
+struct bpmStartCalibration_out {
+    int returnValue;
+};
+
+struct bpmStartProfileAcquisition_in {
+    DEVICE_NAME pName;
+    int sample;
+};
+
+struct bpmStartProfileAcquisition_out {
+    int returnValue;
+};
+
+struct bpmStopProfileAcquisition_in {
+    DEVICE_NAME pName;
+};
+
+struct bpmStopProfileAcquisition_out {
+    int returnValue;
+};
+
+struct bpmChangeGain_in {
+    DEVICE_NAME pName;
+    int gain;
+};
+
+struct bpmChangeGain_out {
+    int returnValue;
+};
+
+struct bpmChangeMode_in {
+    DEVICE_NAME pName;
+    BPM_ACQUISITION_MODE mode;
+    BPM_TRIGGER_TYPE acqType;
+};
+
+struct bpmChangeMode_out {
+    int returnValue;
+};
+
+struct bpmDecreaseRangeByFactor_in {
+    DEVICE_NAME pName;
+    double factor;
+};
+
+struct bpmDecreaseRangeByFactor_out {
+    int returnValue;
+};
+
+struct bpmIncreaseRangeByFactor_in {
+    DEVICE_NAME pName;
+    double factor;
+};
+
+struct bpmIncreaseRangeByFactor_out {
+    int returnValue;
+};
+
+struct bpmAllReset_out {
+    int returnValue;
+};
+
+struct bpmReset_in {
+    DEVICE_NAME pName;
+};
+
+struct bpmReset_out {
+    int returnValue;
+};
+
+struct canMagnetSetValue_in {
+    DEVICE_NAME pName;
+    UINT16 setPoint;
+};
+
+struct canMagnetSetValue_out {
+    int returnValue;
+};
+
+struct canMagnetSetCurrent_in {
+    DEVICE_NAME pName;
+    double setCurrent;
+};
+
+struct canMagnetSetCurrent_out {
+    int returnValue;
+};
+
+struct canMagnetSetField_in {
+    DEVICE_NAME pName;
+    double setField;
+};
+
+struct canMagnetSetField_out {
+    int returnValue;
+};
+
+struct canMagnetStartCyclingDigit_in {
+    DEVICE_NAME pName;
+    UINT16 setPoint;
+};
+
+struct canMagnetStartCyclingDigit_out {
+    int returnValue;
+};
+
+struct canMagnetStartCyclingCurrent_in {
+    DEVICE_NAME pName;
+    double setCurrent;
+};
+
+struct canMagnetStartCyclingCurrent_out {
+    int returnValue;
+};
+
+struct canMagnetStartCyclingField_in {
+    DEVICE_NAME pName;
+    double setField;
+};
+
+struct canMagnetStartCyclingField_out {
+    int returnValue;
+};
+
+struct canMagnetAllStartCyclingCurrent_out {
+    int returnValue;
+};
+
+struct degraderGoHome_out {
+    int returnValue;
+};
+
+struct degraderHighGoPosition_in {
+    int steps;
+};
+
+struct degraderHighGoPosition_out {
+    int returnValue;
+};
+
+struct degraderGoStair_in {
+    int stairIndex;
+};
+
+struct degraderGoStair_out {
+    int returnValue;
+};
+
+struct degraderGoOnePlus_out {
+    int returnValue;
+};
+
+struct degraderGoOneMinus_out {
+    int returnValue;
+};
+
+struct degraderGoRelative_in {
+    int relStair;
+};
+
+struct degraderGoRelative_out {
+    int returnValue;
+};
+
+struct degraderCheckStair_in {
+    int param;
+};
+
+struct degraderCheckStair_out {
+    int returnValue;
+};
+
+struct degraderGoEnergy_in {
+    double energy;
+};
+
+struct degraderGoEnergy_out {
+    int returnValue;
+};
+
+struct degraderCheckEnergy_in {
+    double energy;
+};
+
+struct degraderCheckEnergy_out {
+    int returnValue;
+};
+
+struct iseuRequestSetLookUpMode_out {
+    int returnValue;
+};
+
+struct iseuRequestSetInternalPulseMode_out {
+    int returnValue;
+};
+
+struct iseuRequestSetTreatmentRoom_in {
+    int roomId;
+};
+
+struct iseuRequestSetTreatmentRoom_out {
+    int returnValue;
+};
+
+struct iseuRequestSetEndOfTreatmentMode_out {
+    int returnValue;
+};
+
+struct iseuRequestGeneratePulse_out {
+    int returnValue;
+};
+
+struct iseuRequestSetSinglePulseMode_in {
+    int flag;
+};
+
+struct iseuRequestSetSinglePulseMode_out {
+    int returnValue;
+};
+
+struct iseuRequestBypassRegulation_in {
+    int flag;
+};
+
+struct iseuRequestBypassRegulation_out {
+    int returnValue;
+};
+
+struct iseuRequestSetCurrentAtCycloExit_in {
+    double current;
+};
+
+struct iseuRequestSetCurrentAtCycloExit_out {
+    int returnValue;
+};
+
+struct beamLineSelectBeamLine_in {
+    BEAM_TUNING_BEAM_LINES_NAMES beamLineName;
+};
+
+struct beamLineSelectBeamLine_out {
+    int returnValue;
+};
+
+struct beamLineUnselectBeamLine_out {
+    int returnValue;
+};
+
+struct beamLineSetRange_in {
+    double range;
+    double gantryAngle;
+};
+
+struct beamLineSetRange_out {
+    int returnValue;
+};
+
+struct beamLineSetDegraderToRange_out {
+    int returnValue;
+};
+
+struct beamLineSetLineToRange_in {
+    double range;
+    double gantryAngle;
+};
+
+struct beamLineSetLineToRange_out {
+    int returnValue;
+};
+
+struct beamLineSelectAndSetToRange_in {
+    BEAM_TUNING_BEAM_LINES_NAMES beamLineName;
+    double range;
+    double gantryAngle;
+};
+
+struct beamLineSelectAndSetToRange_out {
+    int returnValue;
+};
+
+struct beamLineSetDegraderToBeamStop_out {
+    int returnValue;
+};
+
+struct beamLineStartTuning_in {
+    BEAM_TUNING_MODE mode;
+    BEAM_TUNING_TREATMENT_MODE treatmentMode;
+};
+
+struct beamLineStartTuning_out {
+    int returnValue;
+};
+
+struct beamLineStopTuning_out {
+    int returnValue;
+};
+
+struct beamLineResetTuning_out {
+    int returnValue;
+};
+
+struct beamLineTuneNextBlock_out {
+    int returnValue;
+};
+
+struct beamLineRedoTuningBlock_out {
+    int returnValue;
+};
+
+struct beamLineByPassTuningBlock_out {
+    int returnValue;
+};
+
+struct beamLineManualAcquire_out {
+    int returnValue;
+};
+
+struct beamLineStopManualAcquire_out {
+    int returnValue;
+};
+
+struct beamLineSaveReferenceSetPoint_in {
+    BEAM_TUNING_BEAM_LINES_NAMES beamLineName;
+    BEAM_LINE_REF_SETPOINT_TYPE referenceType;
+};
+
+struct beamLineSaveReferenceSetPoint_out {
+    int returnValue;
+};
+
+struct beamLineStartPhaseSpace_in {
+    DEVICE_NAME pMeasName;
+    DEVICE_NAME pMagnetName;
+    int numberOfStep;
+    double lowSetpoint;
+    double highSetpoint;
+};
+
+struct beamLineStartPhaseSpace_out {
+    int returnValue;
+};
+
+struct ecuTcuBeamTuningNotStarted_out {
+    int returnValue;
+};
+
+struct ecuTcuBeamTuningStarted_out {
+    int returnValue;
+};
+
+struct ecuTcuCountingNotStarted_out {
+    int returnValue;
+};
+
+struct ecuTcuCountingStarted_out {
+    int returnValue;
+};
+
+struct ecuTcuOnRequestAcquisition_in {
+    ECU_TCU_RESPONSE response;
+};
+
+struct ecuTcuOnRequestAcquisition_out {
+    int returnValue;
+};
+
+program RPC_PROGRAM {
+    version RPC_VERSION {
+        ecubtcuSetConfiguration_out ECUBTCUSETCONFIGURATION(ecubtcuSetConfiguration_in) = 1;
+        ecubtcuEndSetConfiguration_out ECUBTCUENDSETCONFIGURATION(void) = 2;
+        ecubtcuRequestShutdown_out ECUBTCUREQUESTSHUTDOWN(void) = 3;
+        group3SetOffset_out GROUP3SETOFFSET(group3SetOffset_in) = 4;
+        group3SetGain_out GROUP3SETGAIN(group3SetGain_in) = 5;
+        bpmInsert_out BPMINSERT(bpmInsert_in) = 6;
+        bpmRetract_out BPMRETRACT(bpmRetract_in) = 7;
+        bsInsert_out BSINSERT(bsInsert_in) = 8;
+        bsRetract_out BSRETRACT(bsRetract_in) = 9;
+        stepperIoExcite_out STEPPERIOEXCITE(stepperIoExcite_in) = 10;
+        stepperIoDesexcite_out STEPPERIODESEXCITE(stepperIoDesexcite_in) = 11;
+        stepperIoCheckExcitation_out STEPPERIOCHECKEXCITATION(stepperIoCheckExcitation_in) = 12;
+        analogPsSetVoltage_out ANALOGPSSETVOLTAGE(analogPsSetVoltage_in) = 13;
+        analogPsSetCurrent_out ANALOGPSSETCURRENT(analogPsSetCurrent_in) = 14;
+        bcmStartCalibration_out BCMSTARTCALIBRATION(bcmStartCalibration_in) = 15;
+        bcmAllStartCalibration_out BCMALLSTARTCALIBRATION(void) = 16;
+        bcmChangeMode_out BCMCHANGEMODE(bcmChangeMode_in) = 17;
+        bcmReset_out BCMRESET(bcmReset_in) = 18;
+        bcmAllReset_out BCMALLRESET(void) = 19;
+        bpmStartContinuousAcquisition_out BPMSTARTCONTINUOUSACQUISITION(bpmStartContinuousAcquisition_in) = 20;
+        bpmStopContinuousAcquisition_out BPMSTOPCONTINUOUSACQUISITION(bpmStopContinuousAcquisition_in) = 21;
+        bpmAllStartCalibration_out BPMALLSTARTCALIBRATION(void) = 22;
+        bpmStartCalibration_out BPMSTARTCALIBRATION(bpmStartCalibration_in) = 23;
+        bpmStartProfileAcquisition_out BPMSTARTPROFILEACQUISITION(bpmStartProfileAcquisition_in) = 24;
+        bpmStopProfileAcquisition_out BPMSTOPPROFILEACQUISITION(bpmStopProfileAcquisition_in) = 25;
+        bpmChangeGain_out BPMCHANGEGAIN(bpmChangeGain_in) = 26;
+        bpmChangeMode_out BPMCHANGEMODE(bpmChangeMode_in) = 27;
+        bpmDecreaseRangeByFactor_out BPMDECREASERANGEBYFACTOR(bpmDecreaseRangeByFactor_in) = 28;
+        bpmIncreaseRangeByFactor_out BPMINCREASERANGEBYFACTOR(bpmIncreaseRangeByFactor_in) = 29;
+        bpmAllReset_out BPMALLRESET(void) = 30;
+        bpmReset_out BPMRESET(bpmReset_in) = 31;
+        canMagnetSetValue_out CANMAGNETSETVALUE(canMagnetSetValue_in) = 32;
+        canMagnetSetCurrent_out CANMAGNETSETCURRENT(canMagnetSetCurrent_in) = 33;
+        canMagnetSetField_out CANMAGNETSETFIELD(canMagnetSetField_in) = 34;
+        canMagnetStartCyclingDigit_out CANMAGNETSTARTCYCLINGDIGIT(canMagnetStartCyclingDigit_in) = 35;
+        canMagnetStartCyclingCurrent_out CANMAGNETSTARTCYCLINGCURRENT(canMagnetStartCyclingCurrent_in) = 36;
+        canMagnetStartCyclingField_out CANMAGNETSTARTCYCLINGFIELD(canMagnetStartCyclingField_in) = 37;
+        canMagnetAllStartCyclingCurrent_out CANMAGNETALLSTARTCYCLINGCURRENT(void) = 38;
+        degraderGoHome_out DEGRADERGOHOME(void) = 39;
+        degraderHighGoPosition_out DEGRADERHIGHGOPOSITION(degraderHighGoPosition_in) = 40;
+        degraderGoStair_out DEGRADERGOSTAIR(degraderGoStair_in) = 41;
+        degraderGoOnePlus_out DEGRADERGOONEPLUS(void) = 42;
+        degraderGoOneMinus_out DEGRADERGOONEMINUS(void) = 43;
+        degraderGoRelative_out DEGRADERGORELATIVE(degraderGoRelative_in) = 44;
+        degraderCheckStair_out DEGRADERCHECKSTAIR(degraderCheckStair_in) = 45;
+        degraderGoEnergy_out DEGRADERGOENERGY(degraderGoEnergy_in) = 46;
+        degraderCheckEnergy_out DEGRADERCHECKENERGY(degraderCheckEnergy_in) = 47;
+        iseuRequestSetLookUpMode_out ISEUREQUESTSETLOOKUPMODE(void) = 48;
+        iseuRequestSetInternalPulseMode_out ISEUREQUESTSETINTERNALPULSEMODE(void) = 49;
+        iseuRequestSetTreatmentRoom_out ISEUREQUESTSETTREATMENTROOM(iseuRequestSetTreatmentRoom_in) = 50;
+        iseuRequestSetEndOfTreatmentMode_out ISEUREQUESTSETENDOFTREATMENTMODE(void) = 51;
+        iseuRequestGeneratePulse_out ISEUREQUESTGENERATEPULSE(void) = 52;
+        iseuRequestSetSinglePulseMode_out ISEUREQUESTSETSINGLEPULSEMODE(iseuRequestSetSinglePulseMode_in) = 53;
+        iseuRequestBypassRegulation_out ISEUREQUESTBYPASSREGULATION(iseuRequestBypassRegulation_in) = 54;
+        iseuRequestSetCurrentAtCycloExit_out ISEUREQUESTSETCURRENTATCYCLOEXIT(iseuRequestSetCurrentAtCycloExit_in) = 55;
+        beamLineSelectBeamLine_out BEAMLINESELECTBEAMLINE(beamLineSelectBeamLine_in) = 56;
+        beamLineUnselectBeamLine_out BEAMLINEUNSELECTBEAMLINE(void) = 57;
+        beamLineSetRange_out BEAMLINESETRANGE(beamLineSetRange_in) = 58;
+        beamLineSetDegraderToRange_out BEAMLINESETDEGRADERTORANGE(void) = 59;
+        beamLineSetLineToRange_out BEAMLINESETLINETORANGE(beamLineSetLineToRange_in) = 60;
+        beamLineSelectAndSetToRange_out BEAMLINESELECTANDSETTORANGE(beamLineSelectAndSetToRange_in) = 61;
+        beamLineSetDegraderToBeamStop_out BEAMLINESETDEGRADERTOBEAMSTOP(void) = 62;
+        beamLineStartTuning_out BEAMLINESTARTTUNING(beamLineStartTuning_in) = 63;
+        beamLineStopTuning_out BEAMLINESTOPTUNING(void) = 64;
+        beamLineResetTuning_out BEAMLINERESETTUNING(void) = 65;
+        beamLineTuneNextBlock_out BEAMLINETUNENEXTBLOCK(void) = 66;
+        beamLineRedoTuningBlock_out BEAMLINEREDOTUNINGBLOCK(void) = 67;
+        beamLineByPassTuningBlock_out BEAMLINEBYPASSTUNINGBLOCK(void) = 68;
+        beamLineManualAcquire_out BEAMLINEMANUALACQUIRE(void) = 69;
+        beamLineStopManualAcquire_out BEAMLINESTOPMANUALACQUIRE(void) = 70;
+        beamLineSaveReferenceSetPoint_out BEAMLINESAVEREFERENCESETPOINT(beamLineSaveReferenceSetPoint_in) = 71;
+        beamLineStartPhaseSpace_out BEAMLINESTARTPHASESPACE(beamLineStartPhaseSpace_in) = 72;
+        ecuTcuBeamTuningNotStarted_out ECUTCUBEAMTUNINGNOTSTARTED(void) = 73;
+        ecuTcuBeamTuningStarted_out ECUTCUBEAMTUNINGSTARTED(void) = 74;
+        ecuTcuCountingNotStarted_out ECUTCUCOUNTINGNOTSTARTED(void) = 75;
+        ecuTcuCountingStarted_out ECUTCUCOUNTINGSTARTED(void) = 76;
+        ecuTcuOnRequestAcquisition_out ECUTCUONREQUESTACQUISITION(ecuTcuOnRequestAcquisition_in) = 77;
+    } = 1;
+} = 55555201;

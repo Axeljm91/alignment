@@ -1,0 +1,19 @@
+##########################
+# Unversioned Generated Files #
+##########################
+/target
+/SikulixAppDataNotAvailable
+/log
+/.idea
+/CompCoil
+/Deflector
+/src/main/resources/images
+/src/main/resources/res
+
+
+######################
+# Large Files #
+######################
+.png
+.jar
+.log

@@ -1,0 +1,860 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<deviceTypes>
+    <deviceType class="com.iba.device.Acu230Device" name="Acu230">
+        <tagGroup type="READ">
+            <parameter index="0" type="INT">dbnr</parameter>
+            <parameter index="1" type="INT">startAdress</parameter>
+            <parameter index="2" type="INT">bitNbr</parameter>
+            <tags>
+                <tag bitNbr="5" dbnr="50" description="1:Tuning on request/0:no Tuning request" name="B0.M1.MCA01.TuningCmdStatus" startAdress="10" type="BOOLEAN"/>
+                <tag dbnr="80" description="ACU COUNTER" name="B0.__.ACU01.Counter" startAdress="94" type="INT"/>
+                <tag dbnr="80" description="YOKE TEMPERATURE FEEDBACK DIGITS" name="B0.M1.MCA01.Tempfeedbackd" startAdress="178" type="INT"/>
+                <tag dbnr="80" description="LLRF FORWARD POWER FEEDBACK DIGITS" name="B0.R1.FAA01.KwForwardPowerd" startAdress="30" type="INT"/>
+                <tag dbnr="80" description="LLRF REFLECTED POWER FEEDBACK DIGITS" name="B0.R1.FAA01.KwReflectedPowerd" startAdress="32" type="INT"/>
+                <tag dbnr="80" description="Current feedback (mA) of the FPA grid PS" name="B0.R1.FAA01.Gridcfeedbackd" startAdress="26" type="INT"/>
+                <tag dbnr="80" description="Current feedback (mA) of the FPA screen PS" name="B0.R1.FAA01.Screencfeedbackd" startAdress="28" type="INT"/>
+                <tag dbnr="80" description="Current feedback (A) of the FPA anode PS" name="B0.R1.FAA01.Anodecfeedbackd" startAdress="22" type="INT"/>
+                <tag dbnr="80" description="Voltage feedback (kV) of the FPA anode PS" name="B0.R1.FAA01.Anodevfeedbackd" startAdress="24" type="INT"/>
+                <tag dbnr="80" description="LLRF RIPPLE FEEDBACK DIGITS" name="B0.R1.LLA01.VDeeripplefeedbackd" startAdress="184" type="INT"/>
+                <tag dbnr="80" description="LLRF DEE1 VOLTAGE FEEDBACK DIGITS" name="B0.R1.LLA01.VDee1feedbackd" startAdress="186" type="INT"/>
+                <tag dbnr="80" description="LLRF DEE2 VOLTAGE FEEDBACK DIGITS" name="B0.R1.LLA01.VDee2feedbackd" startAdress="188" type="INT"/>
+                <tag dbnr="80" description="LLRF TUBE CURRENT FEEDBACK DIGITS" name="B0.R1.LLA01.Tubecfeedbackd" startAdress="190" type="INT"/>
+                <tag dbnr="80" description="LLRF DEE VOLTAGE SETPOINT DIGITS" name="B0.R1.LLA01.VDeespd" startAdress="182" type="INT"/>
+                <tag dbnr="80" description="ION SOURCE ARC P.S. VOLTAGE FEEDBACK DIGITS" name="B0.S1.ARA01.Psvfeedbackd" startAdress="170" type="INT"/>
+                <tag dbnr="80" description="ION SOURCE ARC P.S. CURRENT FEEDBACK DIGITS" name="B0.S1.ARA01.Pscfeedbackd" startAdress="180" type="INT"/>
+                <tag dbnr="80" description="ION SOURCE FILAMENT P.S. CURRENT FEEDBACK DIGITS" name="B0.S1.FIA01.Pscfeedbackd" startAdress="172" type="INT"/>
+                <tag dbnr="80" description="ION SOURCE ARC P.S. CURRENT SETPOINT DIGITS" name="B0.S1.ARA01.Pscspd" startAdress="34" type="INT"/>
+                <tag dbnr="80" description="ION SOURCE FILAMENT P.S. CURRENT SETPOINT DIGITS" name="B0.S1.FIA01.Pscspd" startAdress="84" type="INT"/>
+                <tag dbnr="80" description="DEFLECTOR VOLTAGE FEEDBACK DIGITS" name="B0.X1.DFA01.Psvfeedbackd" startAdress="18" type="INT"/>
+                <tag dbnr="80" description="DEFLECTOR CURRENT FEEDBACK DIGITS" name="B0.X1.DFA01.Pscfeedbackd" startAdress="16" type="INT"/>
+                <tag dbnr="80" description="DEFLECTOR VOLTAGE SETPOINT DIGITS" name="B0.X1.DFA01.Psvspd" startAdress="20" type="INT"/>
+                <tag dbnr="80" description="DEFLECTOR MOUVEMENT 1 FEEDBACK DIGITS" name="B0.X1.DFA01.Motor1mmfeedbackd" startAdress="8" type="INT"/>
+                <tag dbnr="80" description="DEFLECTOR MOUVEMENT 2 FEEDBACK DIGITS" name="B0.X1.DFA01.Motor2mmfeedbackd" startAdress="12" type="INT"/>
+                <tag dbnr="80" description="DEFLECTOR MOUVEMENT 1 SETPOINT DIGITS" name="B0.X1.DFA01.Motor1mmspd" startAdress="10" type="INT"/>
+                <tag dbnr="80" description="DEFLECTOR MOUVEMENT 2 SETPOINT DIGITS" name="B0.X1.DFA01.Motor2mmspd" startAdress="14" type="INT"/>
+                <tag dbnr="80" description="QUAD 1 CURRENT FEEDBACK DIGITS" name="B0.X1.QDB01.Pscfeedbackd" startAdress="56" type="INT"/>
+                <tag dbnr="80" description="QUAD 2 CURRENT FEEDBACK DIGITS" name="B0.X1.QDB02.Pscfeedbackd" startAdress="58" type="INT"/>
+                <tag dbnr="80" description="QUAD 1 CURRENT SETPOINT DIGITS" name="B0.X1.QDB01.pscspd" startAdress="60" type="INT"/>
+                <tag dbnr="80" description="QUAD 2 CURRENT SETPOINT DIGITS" name="B0.X1.QDB02.pscspd" startAdress="62" type="INT"/>
+                <tag dbnr="80" description="Harmonic Coil 1-3 current feedback : digit value" name="B0.M1.HCA01.Pscfeedbackd" startAdress="0" type="INT"/>
+                <tag dbnr="80" description="Harmonic Coil 2-4 current feedback : digit value" name="B0.M1.HCA02.Pscfeedbackd" startAdress="4" type="INT"/>
+                <tag dbnr="80" description="Harmonic Coil 1-3 current setpoint : digit value" name="B0.M1.HCA01.Pscspd" startAdress="2" type="INT"/>
+                <tag dbnr="80" description="Harmonic Coil 2-4 current setpoint : digit value" name="B0.M1.HCA02.Pscspd" startAdress="6" type="INT"/>
+                <tag dbnr="80" description="Feedback (digits) of the source-puller distance" name="B0.S1.PUA01.Mmfeedbackd" startAdress="36" type="INT"/>
+                <tag dbnr="80" description="ION SOURCE AZIMUTHAL MOVEMENT SETPOINT DIGITS" name="B0.S1.PUA01.Mmspd" startAdress="38" type="INT"/>
+                <tag dbnr="80" description="Value in mm/s for radial probe SPEED" name="B0.D1.RPA01.Speedsprvback" startAdress="76" type="INT"/>
+                <tag dbnr="80" description="Distance in mm between the RP end &amp; the Center" name="B0.D1.RPA01.MmInitPositionrvback" startAdress="78" type="INT"/>
+                <tag dbnr="80" description="Ion Source Tuning Factor" name="B0.S1.ARA01.TunFactsprvback" startAdress="82" type="INT"/>
+                <tag dbnr="80" description="X STERRING 1 CURRENT FEEDBACK DIGITS" name="B0.X1.SGC01.XPscfeedbackd" startAdress="40" type="INT"/>
+                <tag dbnr="80" description="Y STERRING 1 CURRENT FEEDBACK DIGITS" name="B0.X1.SGC01.YPscfeedbackd" startAdress="42" type="INT"/>
+                <tag dbnr="80" description="X STERRING 2 CURRENT FEEDBACK DIGITS" name="B0.X1.SGC02.XPscfeedbackd" startAdress="44" type="INT"/>
+                <tag dbnr="80" description="Y STERRING 2 CURRENT FEEDBACK DIGITS" name="B0.X1.SGC02.YPscfeedbackd" startAdress="46" type="INT"/>
+                <tag dbnr="80" description="X STEERING 1 CURRENT SETPOINT DIGITS" name="B0.X1.SGC01.XPscspd" startAdress="48" type="INT"/>
+                <tag dbnr="80" description="Y STEERING 1 CURRENT SETPOINT DIGITS" name="B0.X1.SGC01.YPscspd" startAdress="50" type="INT"/>
+                <tag dbnr="80" description="X STEERING 2 CURRENT SETPOINT DIGITS" name="B0.X1.SGC02.XPscspd" startAdress="52" type="INT"/>
+                <tag dbnr="80" description="X STEERING 2 CURRENT SETPOINT DIGITS" name="B0.X1.SGC02.YPscspd" startAdress="54" type="INT"/>
+                <tag dbnr="80" description="COMPENSATION COIL PS CURRENT FEEDBACK DIGITS" name="B0.M1.CCA01.Pscfeedbackd" startAdress="64" type="INT"/>
+                <tag dbnr="80" description="COMPENSATION COIL PS CURRENT SETPOINT DIGITS" name="B0.M1.CCA01.Pscspd" startAdress="66" type="INT"/>
+                <tag dbnr="80" description="MASS FLOW CONTROLER FEEDBACK DIGITS" name="B0.S1.MFA01.Feedbackd" startAdress="88" type="INT"/>
+                <tag dbnr="80" description="MASS FLOW CONTROLER SETPOINT DIGITS" name="B0.S1.MFA01.Spd" startAdress="90" type="INT"/>
+                <tag dbnr="80" description="DEFLECTOR RAMP DELAY BEFORE STEP UP" name="B0.X1.DFA01.StepUpDelayrvback" startAdress="174" type="INT"/>
+                <tag dbnr="80" description="DEFLECTOR RAMP DELAY BEFORE STEP DOWN" name="B0.X1.DFA01.StepDownDelayrvback" startAdress="176" type="INT"/>
+                <tag dbnr="80" description="SSA FORWARD POWER FEEDBACK DIGITS" name="B0.R1.SAA01.KwForwardPowerd" startAdress="192" type="INT"/>
+                <tag dbnr="80" description="SSA REFLECTED POWER FEEDBACK DIGITS" name="B0.R1.SAA01.KwReflectedPowerd" startAdress="194" type="INT"/>
+                <tag dbnr="80" description="IMPA FORWARD POWER FEEDBACK DIGITS" name="B0.R1.IMA01.KwForwardPowerd" startAdress="196" type="INT"/>
+                <tag dbnr="80" description="IMPA REFLECTED POWER FEEDBACK DIGITS" name="B0.R1.IMA01.KwReflectedPowerd" startAdress="198" type="INT"/>
+                <tag dbnr="82" description="YOKE TEMPERATURE FEEDBACK EQUIPMENT" name="B0.M1.MCA01.Tempfeedbackrv" startAdress="0" type="FLOAT"/>
+                <tag dbnr="82" description="LLRF FORWARD POWER FEEDBACK EQUIPMENT" name="B0.R1.FAA01.KwForwardPowerrv" startAdress="56" type="FLOAT"/>
+                <tag dbnr="82" description="LLRF REFLECTED POWER FEEDBACK EQUIPMENT" name="B0.R1.FAA01.KwReflectedPowerrv" startAdress="64" type="FLOAT"/>
+                <tag dbnr="82" description="Current feedback after conversion (mA) of the FPA grid PS" name="B0.R1.FAA01.Gridcfeedbackrv" startAdress="28" type="FLOAT"/>
+                <tag dbnr="82" description="Current feedback after conversion (mA) of the FPA screen PS" name="B0.R1.FAA01.Screencfeedbackrv" startAdress="32" type="FLOAT"/>
+                <tag dbnr="82" description="Current feedback after conversion (A) of the FPA anode PS" name="B0.R1.FAA01.Anodecfeedbackrv" startAdress="20" type="FLOAT"/>
+                <tag dbnr="82" description="Voltage feedback after conversion (kV) of the FPA anode PS" name="B0.R1.FAA01.Anodevfeedbackrv" startAdress="24" type="FLOAT"/>
+                <tag dbnr="82" description="LLRF RIPPLE FEEDBACK EQUIPMENT" name="B0.R1.LLA01.VDeeripplefeedbackrv" startAdress="176" type="FLOAT"/>
+                <tag dbnr="82" description="LLRF DEE1 VOLTAGE FEEDBACK EQUIPMENT" name="B0.R1.LLA01.VDee1feedbackrv" startAdress="184" type="FLOAT"/>
+                <tag dbnr="82" description="LLRF DEE2 VOLTAGE FEEDBACK EQUIPMENT" name="B0.R1.LLA01.VDee2feedbackrv" startAdress="188" type="FLOAT"/>
+                <tag dbnr="82" description="LLRF TUBE CURRENT FEEDBACK EQUIPMENT" name="B0.R1.LLA01.Tubecfeedbackrv" startAdress="344" type="FLOAT"/>
+                <tag dbnr="82" description="LLRF DEE VOLTAGE SETPOINT EQUIPMENT" name="B0.R1.LLA01.VDeesprvback" startAdress="252" type="FLOAT"/>
+                <tag dbnr="82" description="ION SOURCE ARC P.S. VOLTAGE FEEDBACK EQUIPMENT" name="B0.S1.ARA01.Psvfeedbackrv" startAdress="104" type="FLOAT"/>
+                <tag dbnr="82" description="ION SOURCE ARC P.S. CURRENT FEEDBACK EQUIPMENT" name="B0.S1.ARA01.Pscfeedbackrv" startAdress="100" type="FLOAT"/>
+                <tag dbnr="82" description="ION SOURCE FILAMENT P.S. CURRENT FEEDBACK EQUIPMENT" name="B0.S1.FIA01.Pscfeedbackrv" startAdress="108" type="FLOAT"/>
+                <tag dbnr="82" description="ION SOURCE ARC P.S. CURRENT SETPOINT EQUIPMENT" name="B0.S1.ARA01.Pscsprvback" startAdress="284" type="FLOAT"/>
+                <tag dbnr="82" description="ION SOURCE FILAMENT P.S. CURRENT SETPOINT EQUIPMENT" name="B0.S1.FIA01.Pscsprvback" startAdress="288" type="FLOAT"/>
+                <tag dbnr="82" description="SOURCE TUNING: ARC VOLTAGE REFERENCE " name="B0.S1.ARA01.Vrefsprvback" startAdress="364" type="FLOAT"/>
+                <tag dbnr="82" description="TUNING: FILAMENT CURRENT MAXIMUM VALUE (REAL VALUE)" name="B0.S1.FIA01.PsMaxcsprvback" startAdress="368" type="FLOAT"/>
+                <tag dbnr="82" description="DEFLECTOR MOUVEMENT 1 &amp; 2 SETPOINTDEADBAND" name="B0.X1.DFA01.MotormmDBsprvback" startAdress="388" type="FLOAT"/>
+                <tag dbnr="82" description="DEFLECTOR VOLTAGE FORCED VALUE" name="B0.X1.DFA01.PsvForcedsprvback" startAdress="384" type="FLOAT"/>
+                <tag dbnr="82" description="DEFLECTOR VOLTAGE FEEDBACK EQUIPMENT" name="B0.X1.DFA01.Psvfeedbackrv" startAdress="16" type="FLOAT"/>
+                <tag dbnr="82" description="DEFLECTOR CURRENT FEEDBACK EQUIPMENT" name="B0.X1.DFA01.Pscfeedbackrv" startAdress="12" type="FLOAT"/>
+                <tag dbnr="82" description="DEFLECTOR VOLTAGE DEADBAND" name="B0.X1.DFA01.PsvDBsprvback" startAdress="372" type="FLOAT"/>
+                <tag dbnr="82" description="DEFLECTOR VOLTAGE SETPOINT EQUIPMENT" name="B0.X1.DFA01.Psvsprvback" startAdress="324" type="FLOAT"/>
+                <tag dbnr="82" description="DEFLECTOR MOUVEMENT 1 FEEDBACK EQUIPMENT" name="B0.X1.DFA01.Motor1mmfeedbackrv" startAdress="4" type="FLOAT"/>
+                <tag dbnr="82" description="DEFLECTOR MOUVEMENT 2 FEEDBACK EQUIPMENT" name="B0.X1.DFA01.Motor2mmfeedbackrv" startAdress="8" type="FLOAT"/>
+                <tag dbnr="82" description="DEFLECTOR MOUVEMENT 1 SETPOINT EQUIPMENT" name="B0.X1.DFA01.Motor1mmsprvback" startAdress="316" type="FLOAT"/>
+                <tag dbnr="82" description="DEFLECTOR MOUVEMENT 2 SETPOINT EQUIPMENT" name="B0.X1.DFA01.Motor2mmsprvback" startAdress="320" type="FLOAT"/>
+                <tag dbnr="82" description="QUAD 1 CURRENT FEEDBACK EQUIPMENT" name="B0.X1.QDB01.Pscfeedbackrv" startAdress="144" type="FLOAT"/>
+                <tag dbnr="82" description="QUAD 2 CURRENT FEEDBACK EQUIPMENT" name="B0.X1.QDB02.Pscfeedbackrv" startAdress="148" type="FLOAT"/>
+                <tag dbnr="82" description="QUAD 1 CURRENT SETPOINT EQUIPMENT" name="B0.X1.QDB01.pscsprvback" startAdress="152" type="FLOAT"/>
+                <tag dbnr="82" description="QUAD 2 CURRENT SETPOINT EQUIPMENT" name="B0.X1.QDB02.pscsprvback" startAdress="156" type="FLOAT"/>
+                <tag dbnr="82" description="Harmonic Coil 1-3 current feedback : real value" name="B0.M1.HCA01.Pscfeedbackrv" startAdress="168" type="FLOAT"/>
+                <tag dbnr="82" description="Harmonic Coil 2-4 current feedback : real value" name="B0.M1.HCA02.Pscfeedbackrv" startAdress="172" type="FLOAT"/>
+                <tag dbnr="82" description="Harmonic Coil 1-3 current setpoint : real value" name="B0.M1.HCA01.Pscsprvback" startAdress="240" type="FLOAT"/>
+                <tag dbnr="82" description="Harmonic Coil 2-4 current setpoint : real value" name="B0.M1.HCA02.Pscsprvback" startAdress="244" type="FLOAT"/>
+                <tag dbnr="82" description="Feedback (mm) of the source-puller distance" name="B0.S1.PUA01.Mmfeedbackrv" startAdress="192" type="FLOAT"/>
+                <tag dbnr="82" description="ION SOURCE AZIMUTHAL MOVEMENT SETPOINT EQUIPMENT" name="B0.S1.PUA01.Mmsprvback" startAdress="292" type="FLOAT"/>
+                <tag dbnr="82" description="ION SOURCE AZIMUTHAL MOVEMENT SERVICE SETPOINT" name="B0.S1.PUA01.MmServicesprvback" startAdress="376" type="FLOAT"/>
+                <tag dbnr="82" description="ION SOURCE AZIMUTHAL MOVEMENT DEADBAND" name="B0.S1.PUA01.MmDBsprvback" startAdress="380" type="FLOAT"/>
+                <tag dbnr="82" description="Feedback of the setpoint position of the radial probe" name="B0.D1.RPA01.Mmsprvback" startAdress="248" type="FLOAT"/>
+                <tag dbnr="82" description="Feedback position of the radial probe in mm" name="B0.D1.RPA01.Mmfeedbackrv" startAdress="92" type="FLOAT"/>
+                <tag dbnr="82" description="COMPENSATION PS CURRENT DEADBAND" name="B0.M1.CCA01.PscDBsprvback" startAdress="392" type="FLOAT"/>
+                <tag dbnr="82" description="X STERRING 1 CURRENT FEEDBACK EQUIPMENT" name="B0.X1.SGC01.XPscfeedbackrv" startAdress="112" type="FLOAT"/>
+                <tag dbnr="82" description="Y STERRING 1 CURRENT FEEDBACK EQUIPMENT" name="B0.X1.SGC01.YPscfeedbackrv" startAdress="116" type="FLOAT"/>
+                <tag dbnr="82" description="X STERRING 2 CURRENT FEEDBACK EQUIPMENT" name="B0.X1.SGC02.XPscfeedbackrv" startAdress="120" type="FLOAT"/>
+                <tag dbnr="82" description="Y STERRING 2 CURRENT FEEDBACK EQUIPMENT" name="B0.X1.SGC02.YPscfeedbackrv" startAdress="124" type="FLOAT"/>
+                <tag dbnr="82" description="X STEERING 1 CURRENT SETPOINT EQUIPMENT" name="B0.X1.SGC01.XPscsprvback" startAdress="128" type="FLOAT"/>
+                <tag dbnr="82" description="Y STEERING 1 CURRENT SETPOINT EQUIPMENT" name="B0.X1.SGC01.YPscsprvback" startAdress="132" type="FLOAT"/>
+                <tag dbnr="82" description="X STEERING 2 CURRENT SETPOINT EQUIPMENT" name="B0.X1.SGC02.XPscsprvback" startAdress="136" type="FLOAT"/>
+                <tag dbnr="82" description="X STEERING 2 CURRENT SETPOINT EQUIPMENT" name="B0.X1.SGC02.YPscsprvback" startAdress="140" type="FLOAT"/>
+                <tag dbnr="82" description="COMPENSATION COIL PS CURRENT FEEDBACK EQUIPMENT" name="B0.M1.CCA01.Pscfeedbackrv" startAdress="160" type="FLOAT"/>
+                <tag dbnr="82" description="COMPENSATION COIL PS CURRENT SETPOINT EQUIPMENT" name="B0.M1.CCA01.Pscsprvback" startAdress="164" type="FLOAT"/>
+                <tag dbnr="82" description="Energy on the radial probe (MeV)" name="B0.D1.RPA01.Energy" startAdress="220" type="FLOAT"/>
+                <tag dbnr="82" description="DEFLECTOR RAMP MAX CURRENT LIMIT FOR INCREASE" name="B0.X1.DFA01.MaxIncreaseLimrvback" startAdress="308" type="FLOAT"/>
+                <tag dbnr="82" description="DEFLECTOR RAMP MIN CURRENT LIMIT FOR DECREASE" name="B0.X1.DFA01.MinDecreaseLimrvback" startAdress="312" type="FLOAT"/>
+                <tag dbnr="82" description="DEFLECTOR RAMP TARGET VOLTAGE SETPOINT DIGITS" name="B0.X1.DFA01.Targetvsprvback" startAdress="296" type="FLOAT"/>
+                <tag dbnr="82" description="DEFLECTOR RAMP INCRESING STEP" name="B0.X1.DFA01.IncreasingStepback" startAdress="300" type="FLOAT"/>
+                <tag dbnr="82" description="DEFLECTOR RAMP DECRESING STEP" name="B0.X1.DFA01.DecreasingStepback" startAdress="304" type="FLOAT"/>
+                <tag dbnr="82" description="FPA GRID CURRENT SETPOINT EQUIPMENT" name="B0.R1.FAA01.GridPscsprvback" startAdress="328" type="FLOAT"/>
+                <tag dbnr="82" description="FPA GRID VOLTAGE SETPOINT EQUIPMENT" name="B0.R1.FAA01.GridPsvsprvback" startAdress="332" type="FLOAT"/>
+                <tag dbnr="82" description="FPA SCREEN CURRENT SETPOINT EQUIPMENT" name="B0.R1.FAA01.ScreenPscsprvback" startAdress="336" type="FLOAT"/>
+                <tag dbnr="82" description="FPA SCREEN VOLTAGE SERPOINT EQUIPMENT" name="B0.R1.FAA01.ScreenPsvsprvback" startAdress="340" type="FLOAT"/>
+                <tag dbnr="82" description="MASS FLOW CONTROLER FEEDBACK REAL VALUE" name="B0.S1.MFA01.Feedbackrv" startAdress="224" type="FLOAT"/>
+                <tag dbnr="82" description="MASS FLOW CONTROLER SETPOINT REAL VALUE" name="B0.S1.MFA01.Sprvback" startAdress="228" type="FLOAT"/>
+                <tag dbnr="82" description="SSA FORWARD POWER FEEDBACK EQUIPMENT" name="B0.R1.SAA01.KwForwardPowerrv" startAdress="348" type="FLOAT"/>
+                <tag dbnr="82" description="SSA REFLECTED POWER FEEDBACK EQUIPMENT" name="B0.R1.SAA01.KwReflectedPowerrv" startAdress="352" type="FLOAT"/>
+                <tag dbnr="82" description="IMPA FORWARD POWER FEEDBACK EQUIPMENT" name="B0.R1.IMA01.KwForwardPowerrv" startAdress="356" type="FLOAT"/>
+                <tag dbnr="82" description="IMPA REFLECTED POWER FEEDBACK EQUIPMENT" name="B0.R1.IMA01.KwReflectedPowerrv" startAdress="360" type="FLOAT"/>
+                <tag dbnr="82" description="PLC Value of the FPA power in kW" name="B0.R1.FAA01.KwPowerrv" startAdress="60" type="FLOAT"/>
+                <tag dbnr="82" description="RF efficiency (%)" name="B0.R1.GEE01.Efficiency" startAdress="96" type="FLOAT"/>
+                <tag dbnr="80" description="Cryo 1 initial H2 dilution time (minutes) - readback" name="B0.V1.CRB01.H2DilTimeSprvBack" startAdress="100" type="INT"/>
+                <tag dbnr="80" description="Cryo 2 initial H2 dilution time (minutes) - readback" name="B0.V1.CRB02.H2DilTimeSprvBack" startAdress="102" type="INT"/>
+                <tag dbnr="80" description="Cryo 1 warm-up &amp; purge time (minutes) - readback" name="B0.V1.CRB01.WarmUpTimeSprvBack" startAdress="104" type="INT"/>
+                <tag dbnr="80" description="Cryo 2  warm-up &amp; purge time (minutes) - readback" name="B0.V1.CRB02.WarmUpTimeSprvBack" startAdress="106" type="INT"/>
+                <tag dbnr="80" description="Cryo 1 evacuation time (minutes) - readback" name="B0.V1.CRB01.EvacTimeSprvBack" startAdress="108" type="INT"/>
+                <tag dbnr="80" description="Cryo 2 evacuation time (minutes) - readback" name="B0.V1.CRB02.EvacTimeSprvBack" startAdress="110" type="INT"/>
+                <tag dbnr="80" description="Cryo 1 leak check waiting time (minutes) - readback" name="B0.V1.CRB01.LeakTimeSprvBack" startAdress="112" type="INT"/>
+                <tag dbnr="80" description="Cryo 2 leak check waiting time (minutes) - readback" name="B0.V1.CRB02.LeakTimeSprvBack" startAdress="114" type="INT"/>
+                <tag dbnr="80" description="Cryo 1 leak check max iterations - readback" name="B0.V1.CRB01.LeakIterSprvBack" startAdress="116" type="INT"/>
+                <tag dbnr="80" description="Cryo 2 leak check max iterations - readback" name="B0.V1.CRB02.LeakIterSprvBack" startAdress="118" type="INT"/>
+                <tag dbnr="80" description="Cryo 1 cooldown phase max time (minutes) - readback" name="B0.V1.CRB01.CoolTimeSprvBack" startAdress="120" type="INT"/>
+                <tag dbnr="80" description="Cryo 2 cooldown phase max time (minutes) - readback" name="B0.V1.CRB02.CoolTimeSprvBack" startAdress="122" type="INT"/>
+                <tag dbnr="80" description="Cyclo roughing phase max time - readback" name="B0.V1.GEB01.RoughTimeMaxSprvBack" startAdress="124" type="INT"/>
+                <tag dbnr="80" description="Cyclo high vacuum phase max time - readback" name="B0.V1.GEB01.HighTimeMaxSprvBack" startAdress="126" type="INT"/>
+                <tag dbnr="80" description="Source roughing vacuum phase max time - readback" name="B0.S1.MTA01.RoughTimeMaxSprvBack" startAdress="86" type="INT"/>
+                <tag dbnr="80" description="Cryo 1 action remaining time" name="B0.V1.CRB01.RemainingTime" startAdress="136" type="INT"/>
+                <tag dbnr="80" description="Cryo 2 action remaining time" name="B0.V1.CRB02.RemainingTime" startAdress="138" type="INT"/>
+                <tag dbnr="80" description="Cryo 1 action elapsed time" name="B0.V1.CRB01.ElapsedTime" startAdress="140" type="INT"/>
+                <tag dbnr="80" description="Cryo 2 action elapsed time" name="B0.V1.CRB02.ElapsedTime" startAdress="142" type="INT"/>
+                <tag dbnr="80" description="ACU Year" name="B0.__.ACU01.AcuYear" startAdress="144" type="INT"/>
+                <tag dbnr="80" description="ACU Month" name="B0.__.ACU01.AcuMonth" startAdress="146" type="INT"/>
+                <tag dbnr="80" description="ACU Day" name="B0.__.ACU01.AcuDay" startAdress="148" type="INT"/>
+                <tag dbnr="80" description="ACU Hour" name="B0.__.ACU01.AcuHour" startAdress="150" type="INT"/>
+                <tag dbnr="80" description="ACU Minute" name="B0.__.ACU01.AcuMinute" startAdress="152" type="INT"/>
+                <tag dbnr="80" description="ACU Second" name="B0.__.ACU01.AcuSecond" startAdress="154" type="INT"/>
+                <tag dbnr="80" description="Cryo 1 Day for automatic regeneration - readback" name="B0.V1.CRB01.AutoDaySprvBack" startAdress="156" type="INT"/>
+                <tag dbnr="80" description="Cryo 1 Hour for automatic regeneration - readback" name="B0.V1.CRB01.AutoHourSprvBack" startAdress="158" type="INT"/>
+                <tag dbnr="80" description="Cryo 1 Minute for automatic regeneration - readback" name="B0.V1.CRB01.AutoMinuteSprvBack" startAdress="160" type="INT"/>
+                <tag dbnr="80" description="Cryo 2 Day for automatic regeneration - readback" name="B0.V1.CRB02.AutoDaySprvBack" startAdress="162" type="INT"/>
+                <tag dbnr="80" description="Cryo 2 Hour for automatic regeneration - readback" name="B0.V1.CRB02.AutoHourSprvBack" startAdress="164" type="INT"/>
+                <tag dbnr="80" description="Cryo 2 Minute for automatic regeneration - readback" name="B0.V1.CRB02.AutoMinuteSprvBack" startAdress="166" type="INT"/>
+                <tag dbnr="81" description="Main coil : digital set point  requested by the user for analog MCPS" name="B0.M1.MCA01.Pscfeedbackd" startAdress="56" type="DINT"/>
+                <tag dbnr="81" description="Feedback (Digits) of the Main Coil PS" name="B0.M1.MCA01.Pscspd" startAdress="52" type="DINT"/>
+                <tag dbnr="82" description="Main coil : current setpoint : real value readback" name="B0.M1.MCA01.Pscsprvback" startAdress="232" type="FLOAT"/>
+                <tag dbnr="82" description="Main coil : STATUS CURRENT MEASURE" name="B0.M1.MCA01.Psmeascfeedbackrv" startAdress="260" type="FLOAT"/>
+                <tag dbnr="82" description="Main coil : VOLTAGE MEASURE (main screen)" name="B0.M1.MCA01.Psmeasvfeedbackrv" startAdress="256" type="FLOAT"/>
+                <tag dbnr="82" description="Current Feedback (real value) of the Main Coil PS" name="B0.M1.MCA01.Pscfeedbackrv" startAdress="180" type="FLOAT"/>
+                <tag dbnr="82" description="Main Coil : CURRENT MONITORING (main screen)" name="B0.M1.MCA01.Psmoncfeedbackrv" startAdress="180" type="FLOAT"/>
+                <tag dbnr="82" description="Main coil : VOLTAGE INPUT 2 MEASURE" name="B0.M1.MCA01.Psmeasv2feedbackrv" startAdress="264" type="FLOAT"/>
+                <tag dbnr="82" description="Main coil : IAC MEASURE" name="B0.M1.MCA01.IACcfeedbackrv" startAdress="268" type="FLOAT"/>
+                <tag dbnr="82" description="Main coil : GROUND INPUT MEASURE" name="B0.M1.MCA01.Groundcfeedbackrv" startAdress="272" type="FLOAT"/>
+                <tag dbnr="82" description="Main coil : REGULATION TEMPERATURE" name="B0.M1.MCA01.RegTempfeedbackrv" startAdress="276" type="FLOAT"/>
+                <tag dbnr="82" description="Main coil : MAINBOARD TEMPERATURE" name="B0.M1.MCA01.MainTempfeedbackrv" startAdress="280" type="FLOAT"/>
+                <tag dbnr="82" description="Feedback of the maincoil K tuning factor" name="B0.M1.MCA01.Ksprvback" startAdress="196" type="FLOAT"/>
+                <tag dbnr="88" description="YOKE TEMPERATURE FEEDBACK SLOPE" name="B0.M1.MCA01.Tempslopeback" startAdress="0" type="FLOAT"/>
+                <tag dbnr="88" description="YOKE TEMPERATURE FEEDBACK OFFSET" name="B0.M1.MCA01.Tempoffsetback" startAdress="4" type="FLOAT"/>
+                <tag dbnr="88" description="LLRF FORWARD POWER FEEDBACK SLOPE" name="B0.R1.FAA01.KwFwdPowerslopeback" startAdress="20" type="FLOAT"/>
+                <tag dbnr="88" description="LLRF FORWARD POWER FEEDBACK OFFSET" name="B0.R1.FAA01.KwFwdPoweroffsetback" startAdress="24" type="FLOAT"/>
+                <tag dbnr="88" description="LLRF REFLECTED POWER FEEDBACK SLOPE" name="B0.R1.FAA01.KwRflPowerslopeback" startAdress="28" type="FLOAT"/>
+                <tag dbnr="88" description="LLRF REFLECTED POWER FEEDBACK OFFSET" name="B0.R1.FAA01.KwRflPoweroffsetback" startAdress="32" type="FLOAT"/>
+                <tag dbnr="88" description="SSA FORWARD POWER FEEDBACK SLOPE" name="B0.R1.SAA01.KwFwdPowerslopeback" startAdress="36" type="FLOAT"/>
+                <tag dbnr="88" description="SSA FORWARD POWER FEEDBACK OFFSET" name="B0.R1.SAA01.KwFwdPoweroffsetback" startAdress="40" type="FLOAT"/>
+                <tag dbnr="88" description="SSA REFLECTED POWER FEEDBACK SLOPE" name="B0.R1.SAA01.KwRflPowerslopeback" startAdress="44" type="FLOAT"/>
+                <tag dbnr="88" description="SSA REFLECTED POWER FEEDBACK OFFSET" name="B0.R1.SAA01.KwRflPoweroffsetback" startAdress="48" type="FLOAT"/>
+                <tag dbnr="88" description="FPA FRID CURRENT FEEDBACK SLOPE" name="B0.R1.FAA01.Gridcslopeback" startAdress="52" type="FLOAT"/>
+                <tag dbnr="88" description="FPA FRID CURRENT FEEDBACK OFFSET" name="B0.R1.FAA01.Gridcoffsetback" startAdress="56" type="FLOAT"/>
+                <tag dbnr="88" description="FPA SCREEN CURRENT FEEDBACK SLOPE" name="B0.R1.FAA01.Screencslopeback" startAdress="60" type="FLOAT"/>
+                <tag dbnr="88" description="FPA SCREEN CURRENT FEEDBACK OFFSET" name="B0.R1.FAA01.Screencoffsetback" startAdress="64" type="FLOAT"/>
+                <tag dbnr="88" description="FPA ANODE CURRENT FEEDBACK SLOPE" name="B0.R1.FAA01.Anodecslopeback" startAdress="68" type="FLOAT"/>
+                <tag dbnr="88" description="FPA ANODE CURRENT FEEDBACK OFFSET" name="B0.R1.FAA01.Anodecoffsetback" startAdress="72" type="FLOAT"/>
+                <tag dbnr="88" description="FPA ANODE VOLTAGE FEEDBACK SLOPE" name="B0.R1.FAA01.Anodevslopeback" startAdress="76" type="FLOAT"/>
+                <tag dbnr="88" description="FPA ANODE VOLTAGE FEEDBACK OFFSET" name="B0.R1.FAA01.Anodevoffsetback" startAdress="80" type="FLOAT"/>
+                <tag dbnr="88" description="LLRF RIPPLE FEEDBACK SLOPE" name="B0.R1.LLA01.VDeerippleslopeback" startAdress="84" type="FLOAT"/>
+                <tag dbnr="88" description="LLRF RIPPLE FEEDBACK OFFSET" name="B0.R1.LLA01.VDeerippleoffsetback" startAdress="88" type="FLOAT"/>
+                <tag dbnr="88" description="IMPA FORWARD POWER FEEDBACK SLOPE" name="B0.R1.IMA01.KwFwdPowerslopeback" startAdress="92" type="FLOAT"/>
+                <tag dbnr="88" description="IMPA FORWARD POWER FEEDBACK OFFSET" name="B0.R1.IMA01.KwFwdPoweroffsetback" startAdress="96" type="FLOAT"/>
+                <tag dbnr="88" description="IMPA REFLECTED POWER FEEDBACK SLOPE" name="B0.R1.IMA01.KwRflPowerslopeback" startAdress="100" type="FLOAT"/>
+                <tag dbnr="88" description="IMPA REFLECTED POWER FEEDBACK OFFSET" name="B0.R1.IMA01.KwRflPoweroffsetback" startAdress="104" type="FLOAT"/>
+                <tag dbnr="88" description="LLRF DEE1 VOLTAGE FEEDBACK SLOPE" name="B0.R1.LLA01.VDee1slopeback" startAdress="108" type="FLOAT"/>
+                <tag dbnr="88" description="LLRF DEE1 VOLTAGE FEEDBACK OFFSET" name="B0.R1.LLA01.VDee1offsetback" startAdress="112" type="FLOAT"/>
+                <tag dbnr="88" description="LLRF DEE2 VOLTAGE FEEDBACK SLOPE" name="B0.R1.LLA01.VDee2slopeback" startAdress="116" type="FLOAT"/>
+                <tag dbnr="88" description="LLRF DEE2 VOLTAGE FEEDBACK OFFSET" name="B0.R1.LLA01.VDee2offsetback" startAdress="120" type="FLOAT"/>
+                <tag dbnr="88" description="LLRF TUBE CURRENT FEEDBACK SLOPE" name="B0.R1.LLA01.Tubecslopeback" startAdress="124" type="FLOAT"/>
+                <tag dbnr="88" description="LLRF TUBE CURRENT FEEDBACK OFFSET" name="B0.R1.LLA01.Tubecoffsetback" startAdress="128" type="FLOAT"/>
+                <tag dbnr="88" description="LLRF DEE VOLTAGE SETPOINT SLOPE" name="B0.R1.LLA01.VDeespslopeback" startAdress="140" type="FLOAT"/>
+                <tag dbnr="88" description="LLRF DEE VOLTAGE SETPOINT OFFSET" name="B0.R1.LLA01.VDeespoffsetback" startAdress="144" type="FLOAT"/>
+                <tag dbnr="88" description="ION SOURCE ARC VOLTAGE FEEDBACK SLOPE" name="B0.S1.ARA01.Psvslopeback" startAdress="156" type="FLOAT"/>
+                <tag dbnr="88" description="ION SOURCE ARC VOLTAGE FEEDBACK OFFSET" name="B0.S1.ARA01.Psvoffsetback" startAdress="160" type="FLOAT"/>
+                <tag dbnr="88" description="ION SOURCE ARC CURRENT FEEDBACK SLOPE for upper range" name="B0.S1.ARA01.Pschslopeback" startAdress="164" type="FLOAT"/>
+                <tag dbnr="88" description="ION SOURCE ARC CURRENT FEEDBACK OFFSET for upper range" name="B0.S1.ARA01.Pschoffsetback" startAdress="168" type="FLOAT"/>
+                <tag dbnr="88" description="ION SOURCE FILAMENT CURRENT FEEDBACK SLOPE" name="B0.S1.FIA01.Pscslopeback" startAdress="172" type="FLOAT"/>
+                <tag dbnr="88" description="ION SOURCE FILAMENT CURRENT FEEDBACK OFFSET" name="B0.S1.FIA01.Pscoffsetback" startAdress="176" type="FLOAT"/>
+                <tag dbnr="88" description="ION SOURCE ARC CURRENT SETPOINT SLOPE" name="B0.S1.ARA01.Pscspslopeback" startAdress="180" type="FLOAT"/>
+                <tag dbnr="88" description="ION SOURCE ARC CURRENT SETPOINT OFFSET" name="B0.S1.ARA01.Pscspoffsetback" startAdress="184" type="FLOAT"/>
+                <tag dbnr="88" description="ION SOURCE FILAMENT CURRENT SETPOINT SLOPE" name="B0.S1.FIA01.Pscspslopeback" startAdress="188" type="FLOAT"/>
+                <tag dbnr="88" description="ION SOURCE FILAMENT CURRENT SETPOINT OFFSET" name="B0.S1.FIA01.Pscspoffsetback" startAdress="192" type="FLOAT"/>
+                <tag dbnr="88" description="MAIN COIL CURRENT SETPOINT SLOPE" name="B0.M1.MCA01.Pscspslopeback" startAdress="196" type="FLOAT"/>
+                <tag dbnr="88" description="MAIN COIL CURRENT SETPOINT OFFSET" name="B0.M1.MCA01.Pscspoffsetback" startAdress="200" type="FLOAT"/>
+                <tag dbnr="88" description="MAIN COIL CURRENT FEEDBACK SLOPE" name="B0.M1.MCA01.Pscslopeback" startAdress="204" type="FLOAT"/>
+                <tag dbnr="88" description="MAIN COIL CURRENT FEEDBACK OFFSET" name="B0.M1.MCA01.Pscoffsetback" startAdress="208" type="FLOAT"/>
+                <tag dbnr="88" description="DEFLECTOR VOLTAGE FEEDBACK SLOPE" name="B0.X1.DFA01.Psvslopeback" startAdress="212" type="FLOAT"/>
+                <tag dbnr="88" description="DEFLECTOR VOLTAGE FEEDBACK OFFSET" name="B0.X1.DFA01.Psvoffsetback" startAdress="216" type="FLOAT"/>
+                <tag dbnr="88" description="DEFLECTOR CURRENT FEEDBACK SLOPE" name="B0.X1.DFA01.Pscslopeback" startAdress="220" type="FLOAT"/>
+                <tag dbnr="88" description="DEFLECTOR CURRENT FEEDBACK OFFSET" name="B0.X1.DFA01.Pscoffsetback" startAdress="224" type="FLOAT"/>
+                <tag dbnr="88" description="DEFLECTOR VOLTAGE SETPOINT SLOPE" name="B0.X1.DFA01.Psvspslopeback" startAdress="228" type="FLOAT"/>
+                <tag dbnr="88" description="DEFLECTOR VOLTAGE SETPOINT OFFSET" name="B0.X1.DFA01.Psvspoffsetback" startAdress="232" type="FLOAT"/>
+                <tag dbnr="88" description="DEFLECTOR MOUVEMENT 1 FEEDBACK SLOPE" name="B0.X1.DFA01.Motor1mmslopeback" startAdress="236" type="FLOAT"/>
+                <tag dbnr="88" description="DEFLECTOR MOUVEMENT 1 FEEDBACK OFFSET" name="B0.X1.DFA01.Motor1mmoffsetback" startAdress="240" type="FLOAT"/>
+                <tag dbnr="88" description="DEFLECTOR MOUVEMENT 2 FEEDBACK SLOPE" name="B0.X1.DFA01.Motor2mmslopeback" startAdress="244" type="FLOAT"/>
+                <tag dbnr="88" description="DEFLECTOR MOUVEMENT 2 FEEDBACK OFFSET" name="B0.X1.DFA01.Motor2mmoffsetback" startAdress="248" type="FLOAT"/>
+                <tag dbnr="88" description="DEFLECTOR MOUVEMENT 1 SETPOINT SLOPE" name="B0.X1.DFA01.Motor1mmspslopeback" startAdress="252" type="FLOAT"/>
+                <tag dbnr="88" description="DEFLECTOR MOUVEMENT 1 SETPOINT OFFSET" name="B0.X1.DFA01.Motor1mmspoffsetback" startAdress="256" type="FLOAT"/>
+                <tag dbnr="88" description="DEFLECTOR MOUVEMENT 2 SETPOINT SLOPE" name="B0.X1.DFA01.Motor2mmspslopeback" startAdress="260" type="FLOAT"/>
+                <tag dbnr="88" description="DEFLECTOR MOUVEMENT 2 SETPOINT OFFSET" name="B0.X1.DFA01.Motor2mmspoffsetback" startAdress="264" type="FLOAT"/>
+
+                <tag dbnr="88" description="QUAD 1 P.S. CURRENT FEEDBACK SLOPE" name="B0.X1.QDB01.Pscslopeback" startAdress="276" type="FLOAT"/>
+                <tag dbnr="88" description="QUAD 1 P.S. CURRENT FEEDBACK OFFSET" name="B0.X1.QDB01.Pscoffsetback" startAdress="280" type="FLOAT"/>
+                <tag dbnr="88" description="QUAD 2 P.S. CURRENT FEEDBACK SLOPE" name="B0.X1.QDB02.Pscslopeback" startAdress="284" type="FLOAT"/>
+                <tag dbnr="88" description="QUAD 2 P.S. CURRENT FEEDBACK OFFSET" name="B0.X1.QDB02.Pscoffsetback" startAdress="288" type="FLOAT"/>
+                <tag dbnr="88" description="QUAD 1 P.S. CURRENT SETPOINT SLOPE" name="B0.X1.QDB01.pscspslopeback" startAdress="292" type="FLOAT"/>
+                <tag dbnr="88" description="QUAD 1 P.S. CURRENT SETPOINT OFFSET" name="B0.X1.QDB01.pscspoffsetback" startAdress="296" type="FLOAT"/>
+                <tag dbnr="88" description="QUAD 2 P.S. CURRENT SETPOINT SLOPE" name="B0.X1.QDB02.pscspslopeback" startAdress="300" type="FLOAT"/>
+                <tag dbnr="88" description="QUAD 2 P.S. CURRENT SETPOINT OFFSET" name="B0.X1.QDB02.pscspoffsetback" startAdress="304" type="FLOAT"/>
+                <tag dbnr="88" description="HARMONIC COIL 1-3 CURRENT FEEDBACK SLOPE" name="B0.M1.HCA01.Pscslopeback" startAdress="316" type="FLOAT"/>
+                <tag dbnr="88" description="HARMONIC COIL 1-3 CURRENT FEEDBACK OFFSET" name="B0.M1.HCA01.Pscoffsetback" startAdress="320" type="FLOAT"/>
+                <tag dbnr="88" description="HARMONIC COIL 2-4 CURRENT FEEDBACK SLOPE" name="B0.M1.HCA02.Pscslopeback" startAdress="324" type="FLOAT"/>
+                <tag dbnr="88" description="HARMONIC COIL 2-4 CURRENT FEEDBACK OFFSET" name="B0.M1.HCA02.Pscoffsetback" startAdress="328" type="FLOAT"/>
+                <tag dbnr="88" description="HARMONIC COIL 1-3 CURRENT SETPOINT SLOPE" name="B0.M1.HCA01.Pscspslopeback" startAdress="332" type="FLOAT"/>
+                <tag dbnr="88" description="HARMONIC COIL 1-3 CURRENT SETPOINT OFFSET" name="B0.M1.HCA01.Pscspoffsetback" startAdress="336" type="FLOAT"/>
+                <tag dbnr="88" description="HARMONIC COIL 2-4 CURRENT SETPOINT SLOPE" name="B0.M1.HCA02.Pscspslopeback" startAdress="340" type="FLOAT"/>
+                <tag dbnr="88" description="HARMONIC COIL 2-4 CURRENT SETPOINT OFFSET" name="B0.M1.HCA02.Pscspoffsetback" startAdress="344" type="FLOAT"/>
+                <tag dbnr="88" description="ION SOURCE AZIMUTHAL MOVEMENT FEEDBACK SLOPE" name="B0.S1.PUA01.Mmslopeback" startAdress="352" type="FLOAT"/>
+                <tag dbnr="88" description="ION SOURCE AZIMUTHAL MOVEMENT FEEDBACK OFFSET" name="B0.S1.PUA01.Mmoffsetback" startAdress="356" type="FLOAT"/>
+                <tag dbnr="88" description="ION SOURCE AZIMUTHAL MOVEMENT SETPOINT SLOPE" name="B0.S1.PUA01.Mmspslopeback" startAdress="360" type="FLOAT"/>
+                <tag dbnr="88" description="ION SOURCE AZIMUTHAL MOVEMENT SETPOINT OFFSET" name="B0.S1.PUA01.Mmspoffsetback" startAdress="364" type="FLOAT"/>
+                <tag dbnr="88" description="MASS FLOW CONTROLLER SETPOINT SLOPE" name="B0.S1.MFA01.Spslopeback" startAdress="376" type="FLOAT"/>
+                <tag dbnr="88" description="MASS FLOW CONTROLLER SETPOINT OFFSEET" name="B0.S1.MFA01.Spoffsetback" startAdress="380" type="FLOAT"/>
+                <tag dbnr="88" description="MASS FLOW CONTROLLER FEEDBACK SLOPE" name="B0.S1.MFA01.Slopeback" startAdress="384" type="FLOAT"/>
+                <tag dbnr="88" description="MASS FLOW CONTROLLER FEEDBACK OFFSET" name="B0.S1.MFA01.Offsetback" startAdress="388" type="FLOAT"/>
+                <tag dbnr="89" description="X STERRING 1 CURRENT FEEDBACK SLOPE" name="B0.X1.SGC01.XPscslopeback" startAdress="12" type="FLOAT"/>
+                <tag dbnr="89" description="X STERRING 1 CURRENT FEEDBACK OFFSET" name="B0.X1.SGC01.XPscoffsetback" startAdress="16" type="FLOAT"/>
+                <tag dbnr="89" description="X STERRING 2 CURRENT FEEDBACK SLOPE" name="B0.X1.SGC02.XPscslopeback" startAdress="20" type="FLOAT"/>
+                <tag dbnr="89" description="X STERRING 2 CURRENT FEEDBACK OFFSET" name="B0.X1.SGC02.XPscoffsetback" startAdress="24" type="FLOAT"/>
+                <tag dbnr="89" description="X STERRING 1 CURRENT SETPOINT SLOPE" name="B0.X1.SGC01.XPscspslopeback" startAdress="28" type="FLOAT"/>
+                <tag dbnr="89" description="X STERRING 1 CURRENT SETPOINT OFFSET" name="B0.X1.SGC01.XPscspoffsetback" startAdress="32" type="FLOAT"/>
+                <tag dbnr="89" description="X STERRING 2 CURRENT SETPOINT SLOPE" name="B0.X1.SGC02.XPscspslopeback" startAdress="36" type="FLOAT"/>
+                <tag dbnr="89" description="X STERRING 2 CURRENT SETPOINT OFFSET" name="B0.X1.SGC02.XPscspoffsetback" startAdress="40" type="FLOAT"/>
+                <tag dbnr="89" description="Y STERRING 1 CURRENT FEEDBACK SLOPE" name="B0.X1.SGC01.YPscslopeback" startAdress="44" type="FLOAT"/>
+                <tag dbnr="89" description="Y STERRING 1 CURRENT FEEDBACK OFFSET" name="B0.X1.SGC01.YPscoffsetback" startAdress="48" type="FLOAT"/>
+                <tag dbnr="89" description="Y STERRING 2 CURRENT FEEDBACK SLOPE" name="B0.X1.SGC02.YPscslopeback" startAdress="52" type="FLOAT"/>
+                <tag dbnr="89" description="Y STERRING 2 CURRENT FEEDBACK OFFSET" name="B0.X1.SGC02.YPscoffsetback" startAdress="56" type="FLOAT"/>
+                <tag dbnr="89" description="Y STERRING 1 CURRENT SETPOINT SLOPE" name="B0.X1.SGC01.YPscspslopeback" startAdress="60" type="FLOAT"/>
+                <tag dbnr="89" description="Y STERRING 1 CURRENT SETPOINT OFFSET" name="B0.X1.SGC01.YPscspoffsetback" startAdress="64" type="FLOAT"/>
+                <tag dbnr="89" description="Y STERRING 2 CURRENT SETPOINT SLOPE" name="B0.X1.SGC02.YPscspslopeback" startAdress="68" type="FLOAT"/>
+                <tag dbnr="89" description="Y STERRING 2 CURRENT SETPOINT OFFSET" name="B0.X1.SGC02.YPscspoffsetback" startAdress="72" type="FLOAT"/>
+                <tag dbnr="89" description="COMPENSATION COIL CURRENT FEEDBACK SLOPE" name="B0.M1.CCA01.Pscslopeback" startAdress="76" type="FLOAT"/>
+                <tag dbnr="89" description="COMPENSATION COIL CURRENT FEEDBACK OFFSET" name="B0.M1.CCA01.Pscoffsetback" startAdress="80" type="FLOAT"/>
+                <tag dbnr="89" description="COMPENSATION COIL CURRENT SETPOINT SLOPE" name="B0.M1.CCA01.Pscspslopeback" startAdress="84" type="FLOAT"/>
+                <tag dbnr="89" description="COMPENSATION COIL CURRENT SETPOINT OFFSET" name="B0.M1.CCA01.Pscspoffsetback" startAdress="88" type="FLOAT"/>
+                <tag dbnr="89" description="RADIAL PROBE ENERGY FOR LARGE RADIUS : POLYNOMIAL COEFFICIENT 3" name="B0.D1.RPA01.LargeRadiusC3back" startAdress="96" type="FLOAT"/>
+                <tag dbnr="89" description="RADIAL PROBE ENERGY FOR LARGE RADIUS : POLYNOMIAL COEFFICIENT 2" name="B0.D1.RPA01.LargeRadiusC2back" startAdress="100" type="FLOAT"/>
+                <tag dbnr="89" description="RADIAL PROBE ENERGY FOR LARGE RADIUS : POLYNOMIAL COEFFICIENT 1" name="B0.D1.RPA01.LargeRadiusC1back" startAdress="104" type="FLOAT"/>
+                <tag dbnr="89" description="RADIAL PROBE ENERGY FOR LARGE RADIUS : POLYNOMIAL COEFFICIENT 0" name="B0.D1.RPA01.LargeRadiusC0back" startAdress="108" type="FLOAT"/>
+                <tag dbnr="89" description="ION SOURCE ARC CURRENT FEEDBACK SLOPE for lower range" name="B0.S1.ARA01.Psclslopeback" startAdress="112" type="FLOAT"/>
+                <tag dbnr="89" description="ION SOURCE ARC CURRENT FEEDBACK OFFSET for lower range" name="B0.S1.ARA01.Pscloffsetback" startAdress="116" type="FLOAT"/>
+                <tag dbnr="89" description="RADIAL PROBE ENERGY : POLYNOMIAL PIVOT RADIUS (mm)" name="B0.D1.RPA01.PivotRadiusback" startAdress="120" type="FLOAT"/>
+                <tag dbnr="89" description="RADIAL PROBE ENERGY FOR SMALL RADIUS : POLYNOMIAL COEFFICIENT 3" name="B0.D1.RPA01.SmallRadiusC3back" startAdress="124" type="FLOAT"/>
+                <tag dbnr="89" description="RADIAL PROBE ENERGY FOR SMALL RADIUS : POLYNOMIAL COEFFICIENT 2" name="B0.D1.RPA01.SmallRadiusC2back" startAdress="128" type="FLOAT"/>
+                <tag dbnr="89" description="RADIAL PROBE ENERGY FOR SMALL RADIUS : POLYNOMIAL COEFFICIENT 1" name="B0.D1.RPA01.SmallRadiusC1back" startAdress="132" type="FLOAT"/>
+                <tag dbnr="89" description="RADIAL PROBE ENERGY FOR SMALL RADIUS : POLYNOMIAL COEFFICIENT 0" name="B0.D1.RPA01.SmallRadiusC0back" startAdress="136" type="FLOAT"/>
+                <tag dbnr="90" description="Cavity High Vacuum 1 Status" name="B0.V1.PEA01.Status" startAdress="80" type="BYTE"/>
+                <tag dbnr="90" description="Cavity High Vacuum 2  Status" name="B0.V1.PEA02.Status" startAdress="81" type="BYTE"/>
+                <tag dbnr="90" description="Cavity Pirani Vacuum Status" name="B0.V1.PGB01.Status" startAdress="82" type="BYTE"/>
+                <tag dbnr="90" description="Odp Pirani Vacuum Status" name="B0.V1.PGB02.Status" startAdress="83" type="BYTE"/>
+                <tag dbnr="90" description="Source Airlock Vacuum Pirani Status" name="B0.S1.PGB01.Status" startAdress="84" type="BYTE"/>
+                <tag dbnr="82" description="Cavity High Vacuum 1 Readback Real Value" name="B0.V1.PEA01.CavityHighVacuumRV" startAdress="200" type="FLOAT"/>
+                <tag dbnr="82" description="Cavity High Vacuum 2 Readback Real Value" name="B0.V1.PEA02.CavityHighVacuumRV" startAdress="204" type="FLOAT"/>
+                <tag dbnr="82" description="Cavity Pirani Vacuum  Readback Real Value" name="B0.V1.PGB01.RoughVacuumRV" startAdress="208" type="FLOAT"/>
+                <tag dbnr="82" description="Odp Pirani Vacuum  Readback Real Value" name="B0.V1.PGB02.RoughVacuumRV" startAdress="212" type="FLOAT"/>
+                <tag dbnr="82" description="Source Airlock Vacuum Pirani  Readback Real Value" name="B0.S1.PGB01.RoughVacuumRV" startAdress="216" type="FLOAT"/>
+                <tag dbnr="81" description="LLRF Frequency setpoint readback" name="B0.R1.LLA01.Frequencysprvback" startAdress="64" type="DINT"/>
+                <tag dbnr="81" description="LLRF Frequency feedback in Hz" name="B0.R1.LLA01.Frequencyrv" startAdress="68" type="DINT"/>
+                <tag dbnr="90" description="Status of the General Water Pump" name="B0.C1.GEC01.WaterPumpVideo" startAdress="4" type="BYTE"/>
+                <tag dbnr="90" description="Status of the hydrolic station" name="B0.V1.HYA01.Video" startAdress="5" type="BYTE"/>
+                <tag dbnr="90" description="Video status of the general water tank" name="B0.C1.GEC01.WaterTankVideo" startAdress="6" type="BYTE"/>
+                <tag dbnr="90" description="Heater status of the oil diffusion pump 1" name="B0.V1.ODB01.HeaterVideo" startAdress="12" type="BYTE"/>
+                <tag dbnr="90" description="Heater status of the oil diffusion pump 2" name="B0.V1.ODB02.HeaterVideo" startAdress="13" type="BYTE"/>
+                <tag dbnr="90" description="Status of the cyclo roughing pump " name="B0.V1.VPB01.CycloRoughPumpVideo" startAdress="14" type="BYTE"/>
+                <tag dbnr="90" description="Status of the cryo roughing pump" name="B0.V1.CRA01.CryoRoughPumpVideo" startAdress="15" type="BYTE"/>
+                <tag dbnr="90" description="Valve status of the cryo pump 1" name="B0.V1.CRB01.PumpGateValveVideo" startAdress="16" type="BYTE"/>
+                <tag dbnr="90" description="Valve status of the oil diffusion pump 1" name="B0.V1.ODB01.PumpGateValveVideo" startAdress="16" type="BYTE"/>
+                <tag dbnr="90" description="Valve status of the cryo pump 2" name="B0.V1.CRB02.PumpGateValveVideo" startAdress="17" type="BYTE"/>
+                <tag dbnr="90" description="Valve status of the oil diffusion pump 2" name="B0.V1.ODB02.PumpGateValveVideo" startAdress="17" type="BYTE"/>
+                <tag dbnr="90" description="Status of the cyclo vacuum chamber" name="B0.V1.GEB01.ChamberVideo" startAdress="18" type="BYTE"/>
+                <tag dbnr="90" description="Temperature status of the oil diffusion pump 1" name="B0.V1.ODB01.TempVideo" startAdress="19" type="BYTE"/>
+                <tag dbnr="90" description="Temperature status of the oil diffusion pump 2" name="B0.V1.ODB02.TempVideo" startAdress="20" type="BYTE"/>
+                <tag dbnr="90" description="Status of the cryo 1 compressor" name="B0.V1.CRB01.CompressorVideo" startAdress="22" type="BYTE"/>
+                <tag dbnr="90" description="Status of the cryo 2 compressor" name="B0.V1.CRB02.CompressorVideo" startAdress="23" type="BYTE"/>
+                <tag dbnr="90" description="Video status of the radial probe" name="B0.D1.RPA01.Video" startAdress="30" type="BYTE"/>
+                <tag dbnr="90" description="Video status of the maincoil water tank" name="B0.M1.MCA01.TankVideo" startAdress="33" type="BYTE"/>
+                <tag dbnr="90" description="Status of the Main Coil PS" name="B0.M1.MCA01.WaterPumpVideo" startAdress="35" type="BYTE"/>
+                <tag dbnr="90" description="Status of the Main Coil PS" name="B0.M1.MCA01.Video" startAdress="36" type="BYTE"/>
+                <tag dbnr="90" description="Status of the FPA grid PS" name="B0.R1.FAA01.GridVideo" startAdress="40" type="BYTE"/>
+                <tag dbnr="90" description="Status of the FPA anode PS" name="B0.R1.FAA01.AnodeVideo" startAdress="41" type="BYTE"/>
+                <tag dbnr="90" description="Status of the FPA screen PS" name="B0.R1.FAA01.ScreenVideo" startAdress="42" type="BYTE"/>
+                <tag dbnr="90" description="Status of the impa grid PS" name="B0.R1.IMA01.GridVideo" startAdress="43" type="BYTE"/>
+                <tag dbnr="90" description="Status of the impa anode PS" name="B0.R1.IMA01.AnodeVideo" startAdress="44" type="BYTE"/>
+                <tag dbnr="90" description="Status of the impa screen PS" name="B0.R1.IMA01.ScreenVideo" startAdress="45" type="BYTE"/>
+                <tag dbnr="90" description="Status of the FPA blower PS" name="B0.R1.FAA01.BlowerVideo" startAdress="46" type="BYTE"/>
+                <tag dbnr="90" description="Status of the FPA filament PS" name="B0.R1.FAA01.FilamentVideo" startAdress="47" type="BYTE"/>
+                <tag dbnr="90" description="Status of the impa blower PS" name="B0.R1.IMA01.BlowerVideo" startAdress="48" type="BYTE"/>
+                <tag dbnr="90" description="Status of the impa filament PS" name="B0.R1.IMA01.FilamentVideo" startAdress="49" type="BYTE"/>
+                <tag dbnr="90" description="Status of the SSA" name="B0.R1.SAA01.Video" startAdress="50" type="BYTE"/>
+                <tag dbnr="90" description="Status of the Modulator LLRF" name="B0.R1.LLA01.Video" startAdress="51" type="BYTE"/>
+                <tag dbnr="90" description="Flag=1 when the LLRF control mode video" name="B0.R1.LLA01.FrequencyModeVideo" startAdress="52" type="BYTE"/>
+                <tag dbnr="90" description="Status of the source filament PS" name="B0.S1.FIA01.Video" startAdress="54" type="BYTE"/>
+                <tag dbnr="90" description="Status of the source arc PS" name="B0.S1.ARA01.Video" startAdress="55" type="BYTE"/>
+                <tag dbnr="90" description="Status of the source PS" name="B0.S1.GED01.Video" startAdress="56" type="BYTE"/>
+                <tag dbnr="90" description="Status of the deflector PS" name="B0.X1.DFA01.PsVideo" startAdress="58" type="BYTE"/>
+                <tag dbnr="90" description="General status of the deflector" name="B0.X1.DFA01.GeneralVideo" startAdress="59" type="BYTE"/>
+                <tag dbnr="90" description="Status of Quad 1" name="B0.X1.QDB01.Video" startAdress="61" type="BYTE"/>
+                <tag dbnr="90" description="Status of Quad 2" name="B0.X1.QDB02.Video" startAdress="63" type="BYTE"/>
+                <tag dbnr="90" description="Status of the source valve" name="B0.S1.MTA01.SourceValveVideo" startAdress="64" type="BYTE"/>
+                <tag dbnr="90" description="Status of the source roughing pump" name="B0.S1.VPC01.RoughPumpVideo" startAdress="65" type="BYTE"/>
+                <tag dbnr="90" description="Status of Steering 1" name="B0.X1.SGC01.Video" startAdress="69" type="BYTE"/>
+                <tag dbnr="90" description="Status of Steering 2" name="B0.X1.SGC02.Video" startAdress="70" type="BYTE"/>
+                <tag dbnr="90" description="Status of vacuum cooling pump" name="B0.C1.GEC01.CoolingPumpVideo" startAdress="71" type="BYTE"/>
+                <tag dbnr="90" description="Status of vacuum cooling pump" name="B0.V1.ODA01.CoolingPumpVideo" startAdress="71" type="BYTE"/>
+                <tag dbnr="90" description="Ion source movement status" name="B0.S1.MTA01.Mmfeedbackd" startAdress="72" type="BYTE"/>
+                <tag dbnr="80" description="Current ACU Software Version" name="B0.__.ACU01.Version" startAdress="68" type="INT"/>
+                <tag bitNbr="4" dbnr="60" description="Flag=1 when general water resistivity 1 is OK (low)" name="B0.C1.GEC01.ResistivityLow" startAdress="1" type="BOOLEAN"/>
+                <tag bitNbr="5" dbnr="60" description="Flag=1 when general water resistivity 2 is OK (very low)" name="B0.C1.GEC01.ResistivityTooLow" startAdress="1" type="BOOLEAN"/>
+                <tag bitNbr="6" dbnr="60" description="Flag=1 when general water temp 2 is OK (vtoo high)" name="B0.C1.GEC01.WaterTempTooHigh" startAdress="1" type="BOOLEAN"/>
+                <tag bitNbr="7" dbnr="60" description="Flag=1 when general water temp 1 is OK (high)" name="B0.C1.GEC01.WaterTempHigh" startAdress="1" type="BOOLEAN"/>
+                <tag bitNbr="1" dbnr="60" description="Flag=1 when general water tank1 is OK (level low)" name="B0.C1.GEC01.WaterTankLow" startAdress="2" type="BOOLEAN"/>
+                <tag bitNbr="2" dbnr="60" description="Flag=1 when general water tank2 is OK (level very low)" name="B0.C1.GEC01.WaterTankTooLow" startAdress="2" type="BOOLEAN"/>
+                <tag bitNbr="3" dbnr="60" description="Flag=1 when general water deionisation is OK" name="B0.C1.GEC01.WaterDeionisation" startAdress="2" type="BOOLEAN"/>
+                <tag bitNbr="4" dbnr="60" description="Flag=1 when the general water flow is OK" name="B0.C1.GEC01.Waterflow" startAdress="2" type="BOOLEAN"/>
+                <tag bitNbr="5" dbnr="60" description="Status of the water pump: overtemperature" name="B0.C1.GEC01.WaterPumpThermSwitch" startAdress="2" type="BOOLEAN"/>
+                <tag bitNbr="6" dbnr="60" description="Flag=1 when the yoke of the cyclotron is opened" name="B0.V1.GEB01.YokeStatus" startAdress="2" type="BOOLEAN"/>
+                <tag bitNbr="2" dbnr="60" description="Flag=1 when the eletta of the vacuum pump 1 and 2 is reached" name="B0.V1.GEB01.VacuumWaterflow" startAdress="3" type="BOOLEAN"/>
+                <tag bitNbr="3" dbnr="60" description="Flag=1 when general air pressure is OK" name="B0.__.GEA01.AirPressureStatus" startAdress="3" type="BOOLEAN"/>
+                <tag bitNbr="4" dbnr="60" description="Flag=1 when the oil diffusion pump 1 is in over temperature" name="B0.V1.ODB01.OverTempStatus" startAdress="3" type="BOOLEAN"/>
+                <tag bitNbr="5" dbnr="60" description="Flag=1 when the oil diffusion pump 2 is in over temperature" name="B0.V1.ODB02.OverTempStatus" startAdress="3" type="BOOLEAN"/>
+                <tag bitNbr="6" dbnr="60" description="Flag=0 when the temperature of the ODP or CRYO 1 is normal / OK" name="B0.V1.CRB01.TempStatus" startAdress="3" type="BOOLEAN"/>
+                <tag bitNbr="6" dbnr="60" description="Flag=0 when the temperature of the ODP or CRYO 1 is normal / OK" name="B0.V1.ODB01.TempStatus" startAdress="3" type="BOOLEAN"/>
+                <tag bitNbr="7" dbnr="60" description="Flag=0 when the temperature of the ODP or CRYO 2 is normal / OK" name="B0.V1.CRB02.TempStatus" startAdress="3" type="BOOLEAN"/>
+                <tag bitNbr="7" dbnr="60" description="Flag=0 when the temperature of the ODP or CRYO 2 is normal / OK" name="B0.V1.ODB02.TempStatus" startAdress="3" type="BOOLEAN"/>
+                <tag bitNbr="4" dbnr="60" description="Flag=1 when the valve between the cyclo and the source is closed" name="B0.S1.MTA01.SourceValveOpened" startAdress="4" type="BOOLEAN"/>
+                <tag bitNbr="5" dbnr="60" description="Flag=1 when the valve between the cyclo and the source is opened" name="B0.S1.MTA01.SourceValveClosed" startAdress="4" type="BOOLEAN"/>
+                <tag bitNbr="6" dbnr="60" description="Cyclone at atmospheric pressure interlock" name="B0.V1.CRA01.CycloAtmosStatus" startAdress="4" type="BOOLEAN"/>
+                <tag bitNbr="6" dbnr="60" description="Cyclone at atmospheric pressure interlock" name="B0.V1.ODA01.CycloAtmosStatus" startAdress="4" type="BOOLEAN"/>
+                <tag bitNbr="0" dbnr="60" description="Flag = 1 when the source gaz pressure is OK" name="B0.S1.GED01.H2PressureStatus" startAdress="5" type="BOOLEAN"/>
+                <tag bitNbr="2" dbnr="60" description="Flag=1 When the temperature of the cooling loop of the ODPs / Cryos is OK" name="B0.V1.GEB01.WaterTempStatus" startAdress="5" type="BOOLEAN"/>
+                <tag bitNbr="4" dbnr="60" description="Flag=1 when the vaccum state is OK (cyclo high vac 1 OK)" name="B0.V1.PEA01.CavityHighVacStatus" startAdress="5" type="BOOLEAN"/>
+                <tag bitNbr="5" dbnr="60" description="Flag=1 when the vaccum state is OK (cyclo high vac 2 OK)" name="B0.V1.PEA02.CavityHighVacStatus" startAdress="5" type="BOOLEAN"/>
+                <tag bitNbr="6" dbnr="60" description="Cyclone rough vacuum pressostat" name="B0.V1.PGB01.RoughVacuumStatus" startAdress="5" type="BOOLEAN"/>
+                <tag bitNbr="7" dbnr="60" description="Flag=1 when the vaccum state is OK (ODPs or CRYO rough vac OK)" name="B0.V1.PGB02.RoughVacuumStatus" startAdress="5" type="BOOLEAN"/>
+                <tag bitNbr="0" dbnr="60" description="Flag = 1 when the source vacuum chamber is OK" name="B0.S1.PGB01.RoughVacuumStatus" startAdress="6" type="BOOLEAN"/>
+                <tag bitNbr="1" dbnr="60" description="Flag = 1 when the vacuum cryo 1 output gas flowmeter switch is OK" name="B0.V1.CRB01.GasFlowMeterStatus" startAdress="6" type="BOOLEAN"/>
+                <tag bitNbr="2" dbnr="60" description="Flag = 1 when the vacuum cryo 2 output gas flowmeter switch is OK" name="B0.V1.CRB02.GasFlowMeterStatus" startAdress="6" type="BOOLEAN"/>
+                <tag bitNbr="5" dbnr="60" description="Flag = 1 when the pressure in the N2 bottle for warming up &amp; purge cryo is OK" name="B0.V1.CRA01.N2BottleStatus" startAdress="6" type="BOOLEAN"/>
+                <tag bitNbr="0" dbnr="60" description="Flag =1 when the thermal switch of the Main Coil is activated" name="B0.M1.MCA01.ThermalSwitch" startAdress="8" type="BOOLEAN"/>
+                <tag bitNbr="1" dbnr="60" description="Main Coil Upper Waterflow OK (6 Series Eletta) " name="B0.M1.MCA01.UpperWaterflow" startAdress="8" type="BOOLEAN"/>
+                <tag bitNbr="2" dbnr="60" description="Main Coil Lower Waterflow OK (6 Series Eletta) " name="B0.M1.MCA01.LowerWaterflow" startAdress="8" type="BOOLEAN"/>
+                <tag bitNbr="4" dbnr="60" description="Flag =1 when maincoil PS is in Regulation OK" name="B0.M1.MCA01.PSRegulOk" startAdress="8" type="BOOLEAN"/>
+                <tag bitNbr="6" dbnr="60" description="Flag =1 when maincoil water resistivity 1 is OK (res low)" name="B0.M1.MCA01.ResistivityLow" startAdress="8" type="BOOLEAN"/>
+                <tag bitNbr="7" dbnr="60" description="Flag =1 when maincoil water resistivity 2 is OK (res very low)" name="B0.M1.MCA01.ResistivityTooLow" startAdress="8" type="BOOLEAN"/>
+                <tag bitNbr="0" dbnr="60" description="Flag=1 when maincoil water temp 1 is OK (temp very high)" name="B0.M1.MCA01.WaterTempTooHigh" startAdress="9" type="BOOLEAN"/>
+                <tag bitNbr="1" dbnr="60" description="Flag=1 when maincoil water temp 2 is OK (temp high)" name="B0.M1.MCA01.WaterTempHigh" startAdress="9" type="BOOLEAN"/>
+                <tag bitNbr="3" dbnr="60" description="Flag =1 when maincoil water tank 1 is OK (level low)" name="B0.M1.MCA01.WaterTankLow" startAdress="9" type="BOOLEAN"/>
+                <tag bitNbr="4" dbnr="60" description="Flag =1 when maincoil water tank 2 is OK (level very low)" name="B0.M1.MCA01.WaterTankTooLow" startAdress="9" type="BOOLEAN"/>
+                <tag bitNbr="5" dbnr="60" description="Flag =1 when maincoil water deionisation is OK" name="B0.M1.MCA01.WaterDeionisation" startAdress="9" type="BOOLEAN"/>
+                <tag bitNbr="6" dbnr="60" description="Flag=1 when the MainCoil pump water flow is OK" name="B0.M1.MCA01.PumpWaterflow" startAdress="9" type="BOOLEAN"/>
+                <tag bitNbr="7" dbnr="60" description="Status of the water pump: overtemperature" name="B0.M1.MCA01.WaterPumpThermSwitch" startAdress="9" type="BOOLEAN"/>
+                <tag bitNbr="5" dbnr="60" description="Regulation info of the Harmonic Coil 1-3" name="B0.M1.HCA01.Regulation" startAdress="10" type="BOOLEAN"/>
+                <tag bitNbr="6" dbnr="60" description="Regulation info of the Harmonic Coil 2-4" name="B0.M1.HCA02.Regulation" startAdress="10" type="BOOLEAN"/>
+                <tag bitNbr="0" dbnr="60" description="Flag=1 when the FPA air flow is OK" name="B0.R1.FAA01.AirflowStatus" startAdress="11" type="BOOLEAN"/>
+                <tag bitNbr="2" dbnr="60" description="Flag=1 when the FPA water flow is OK" name="B0.R1.FAA01.Waterflow" startAdress="11" type="BOOLEAN"/>
+                <tag bitNbr="3" dbnr="60" description="Flag=1 when the door of the spinner thermal switch is OK" name="B0.R1.FAA01.SpinnnerThermalSwitch" startAdress="11" type="BOOLEAN"/>
+                <tag bitNbr="5" dbnr="60" description="Flag=1 when auto TFO thermal switch is OK" name="B0.R1.FAA01.TfoThermalSwitch" startAdress="11" type="BOOLEAN"/>
+                <tag bitNbr="6" dbnr="60" description="Flag=1 when the Bleeder Thermal Switch is OK" name="B0.R1.FAA01.BleederThermalSw" startAdress="12" type="BOOLEAN"/>
+                <tag bitNbr="7" dbnr="60" description="Flag=1 when the cavity air flow is OK" name="B0.R1.FAA01.GridCavityAirflow" startAdress="12" type="BOOLEAN"/>
+                <tag bitNbr="3" dbnr="60" description="Flag=1 when the internal security of the FPA anode PS is OK" name="B0.R1.FAA01.AnodeIntSecurity" startAdress="13" type="BOOLEAN"/>
+                <tag bitNbr="4" dbnr="60" description="RF coupler water-flow switch" name="B0.R1.GEE01.CouplerWaterflow" startAdress="13" type="BOOLEAN"/>
+                <tag bitNbr="0" dbnr="60" description="Water flow uvh_1d cavity interlock" name="B0.R1.GEE01.CavityUVH1D" startAdress="14" type="BOOLEAN"/>
+                <tag bitNbr="1" dbnr="60" description="Water flow uvh_3d cavity interlock" name="B0.R1.GEE01.CavityUVH3D" startAdress="14" type="BOOLEAN"/>
+                <tag bitNbr="2" dbnr="60" description="Water flow upper_counterdee cavity interlock" name="B0.R1.GEE01.CavityUpCounterdee" startAdress="14" type="BOOLEAN"/>
+                <tag bitNbr="3" dbnr="60" description="Water flow uvh_31e cavity interlock" name="B0.R1.GEE01.CavityUVH31E" startAdress="14" type="BOOLEAN"/>
+                <tag bitNbr="4" dbnr="60" description="Water flow uvh_1s cavity interlock" name="B0.R1.GEE01.CavityUVH1S" startAdress="14" type="BOOLEAN"/>
+                <tag bitNbr="5" dbnr="60" description="Water flow uvh_3s cavity interlock" name="B0.R1.GEE01.CavityUVH3S" startAdress="14" type="BOOLEAN"/>
+                <tag bitNbr="6" dbnr="60" description="Water flow lower_rearwall1cavity interlock" name="B0.R1.GEE01.CavityLowerRearwall1" startAdress="14" type="BOOLEAN"/>
+                <tag bitNbr="0" dbnr="60" description="Water flow lvh_1d cavity interlock" name="B0.R1.GEE01.CavityLVH1D" startAdress="15" type="BOOLEAN"/>
+                <tag bitNbr="1" dbnr="60" description="Water flow lvh_3d cavity interlock" name="B0.R1.GEE01.CavityLVH3D" startAdress="15" type="BOOLEAN"/>
+                <tag bitNbr="2" dbnr="60" description="Water flow lower_counterdee cavity interlock" name="B0.R1.GEE01.CavityLowCounterdee" startAdress="15" type="BOOLEAN"/>
+                <tag bitNbr="3" dbnr="60" description="Water flow lvh_31e cavity interlock" name="B0.R1.GEE01.CavityLVH31E" startAdress="15" type="BOOLEAN"/>
+                <tag bitNbr="4" dbnr="60" description="Water flow lvh_1s cavity interlock" name="B0.R1.GEE01.CavityLVH1S" startAdress="15" type="BOOLEAN"/>
+                <tag bitNbr="5" dbnr="60" description="Water flow lvh_3s cavity interlock" name="B0.R1.GEE01.CavityLVH3S" startAdress="15" type="BOOLEAN"/>
+                <tag bitNbr="6" dbnr="60" description="Water flow lower_rearwall2 cavity interlock" name="B0.R1.GEE01.CavityLowerRearwall2" startAdress="15" type="BOOLEAN"/>
+                <tag bitNbr="0" dbnr="60" description="Flag=1 when the SSA is OK" name="B0.R1.SAA01.Status" startAdress="16" type="BOOLEAN"/>
+                <tag bitNbr="1" dbnr="60" description="Flag=1 when the SSA is in overtemperature" name="B0.R1.SAA01.OverTempStatus" startAdress="16" type="BOOLEAN"/>
+                <tag bitNbr="4" dbnr="60" description="Flag=1 when the door of the impa grid PS is closed" name="B0.R1.IMA01.GridDoor" startAdress="16" type="BOOLEAN"/>
+                <tag bitNbr="5" dbnr="60" description="Flag=1 when the impa air flow is OK" name="B0.R1.IMA01.AirflowStatus" startAdress="16" type="BOOLEAN"/>
+                <tag bitNbr="1" dbnr="60" description="Flag=1 when the internal security of the impa anode PS is OK" name="B0.R1.IMA01.AnodeIntSecurity" startAdress="17" type="BOOLEAN"/>
+                <tag bitNbr="3" dbnr="60" description="Flag=1 when the internal security of the impa grid PS is OK" name="B0.R1.IMA01.GridIntSecurity" startAdress="17" type="BOOLEAN"/>
+                <tag bitNbr="4" dbnr="60" description="Flag=1 when the regulation of the impa screen PS is OK" name="B0.R1.IMA01.PsScreenRegulation" startAdress="17" type="BOOLEAN"/>
+                <tag bitNbr="5" dbnr="60" description="Flag=1 when the internal security of the impa screen PS is OK" name="B0.R1.IMA01.ScreenIntSecurity" startAdress="17" type="BOOLEAN"/>
+                <tag bitNbr="2" dbnr="60" description="Flag=1 when LLRF tuning mode is ON" name="B0.R1.LLA01.TuningMode" startAdress="18" type="BOOLEAN"/>
+                <tag bitNbr="3" dbnr="60" description="Flag=1 when vdee voltage is OK" name="B0.R1.LLA01.VDeeRegulation" startAdress="18" type="BOOLEAN"/>
+                <tag bitNbr="4" dbnr="60" description="Tuning capacitor upper limit switch interlock" name="B0.R1.LLA01.CapaUpper" startAdress="18" type="BOOLEAN"/>
+                <tag bitNbr="5" dbnr="60" description="Tuning capacitor lower limit switch interlock" name="B0.R1.LLA01.CapaLower" startAdress="18" type="BOOLEAN"/>
+                <tag bitNbr="6" dbnr="60" description="Flag=1 when LLRF tuning motor is OK" name="B0.R1.LLA01.TuningMotorStatus" startAdress="18" type="BOOLEAN"/>
+                <tag bitNbr="0" dbnr="60" description="Flag=1 when the waterflow of the source is OK" name="B0.S1.GED01.Waterflow" startAdress="19" type="BOOLEAN"/>
+                <tag bitNbr="1" dbnr="60" description="Flag = 1 when the source mvt is UNLOCK" name="B0.S1.MTA01.Unlock" startAdress="19" type="BOOLEAN"/>
+                <tag bitNbr="4" dbnr="60" description="Flag = 1 when the source mvt reached the IN LS" name="B0.S1.MTA01.Inls" startAdress="19" type="BOOLEAN"/>
+                <tag bitNbr="5" dbnr="60" description="Flag = 1 when the source mvt reached the standby LS" name="B0.S1.MTA01.Standbyls" startAdress="19" type="BOOLEAN"/>
+                <tag bitNbr="6" dbnr="60" description="Flag = 1 when the source mvt reached the OUT LS" name="B0.S1.MTA01.Outls" startAdress="19" type="BOOLEAN"/>
+                <tag bitNbr="7" dbnr="60" description="Flag = 1 when the source driver is OK" name="B0.S1.PUA01.ElectronicStatus" startAdress="19" type="BOOLEAN"/>
+                <tag bitNbr="0" dbnr="60" description="Flag = 1 when the source mvt is HIGH limit (azimut left limit switch)" name="B0.S1.PUA01.HighLimit" startAdress="20" type="BOOLEAN"/>
+                <tag bitNbr="1" dbnr="60" description="Flag = 1 when the source mvt is LOW limit (azimut right limit switch)" name="B0.S1.PUA01.LowLimit" startAdress="20" type="BOOLEAN"/>
+                <tag bitNbr="2" dbnr="60" description="Flag=1 when the internal security of the arc source PS is OK" name="B0.S1.ARA01.InternalInterlock" startAdress="20" type="BOOLEAN"/>
+                <tag bitNbr="4" dbnr="60" description="Flag=1 when the internal security of the filament source PS is OK" name="B0.S1.FIA01.InternalInterlock" startAdress="20" type="BOOLEAN"/>
+                <tag bitNbr="5" dbnr="60" description="Flag=1 when the regulation of the filament source PS is OK" name="B0.S1.FIA01.Regulation" startAdress="20" type="BOOLEAN"/>
+                <tag bitNbr="6" dbnr="60" description="Flag=1 when the control mode of the arc + filament source PS is remote" name="B0.S1.GED01.LocalCmdStatus" startAdress="20" type="BOOLEAN"/>
+                <tag bitNbr="1" dbnr="60" description="Flag=1 when the vacuum water tank level is low (1 = ok)" name="B0.C1.GEC01.VacWaterTankLow" startAdress="21" type="BOOLEAN"/>
+                <tag bitNbr="2" dbnr="60" description="Flag=1 when the vacuum water tank level is too low (1 = ok)" name="B0.C1.GEC01.VacWaterTankTooLow" startAdress="21" type="BOOLEAN"/>
+                <tag bitNbr="0" dbnr="60" description="Flag=1 when the waterflow is OK" name="B0.D1.RPA01.Waterflow" startAdress="22" type="BOOLEAN"/>
+                <tag bitNbr="1" dbnr="60" description="Flag = 1 when the radial proble reaches the IN Limit Switch" name="B0.D1.RPA01.Inls" startAdress="22" type="BOOLEAN"/>
+                <tag bitNbr="2" dbnr="60" description="Flag = 1 when the radial proble reaches the OUT Limit Switch" name="B0.D1.RPA01.Outls" startAdress="22" type="BOOLEAN"/>
+                <tag bitNbr="0" dbnr="60" description="Flag=1 when the waterflow of the PS is OK" name="B0.X1.DFA01.PsWaterflow" startAdress="23" type="BOOLEAN"/>
+                <tag bitNbr="1" dbnr="60" description="Flag=1 when the status of the electronic is OK" name="B0.X1.DFA01.Motor1ElectronStatus" startAdress="23" type="BOOLEAN"/>
+                <tag bitNbr="2" dbnr="60" description="Flag=1 when the deflector motor 1 is full OUT (left limit switch)" name="B0.X1.DFA01.Motor1LsFullout" startAdress="23" type="BOOLEAN"/>
+                <tag bitNbr="3" dbnr="60" description="Flag=1 when the deflector motor 1 is full IN (right limit switch)" name="B0.X1.DFA01.Motor1LsFullin" startAdress="23" type="BOOLEAN"/>
+                <tag bitNbr="4" dbnr="60" description="Flag=1 when the status of the electronic is OK" name="B0.X1.DFA01.Motor2ElectronStatus" startAdress="23" type="BOOLEAN"/>
+                <tag bitNbr="5" dbnr="60" description="Flag=1 when the deflector  motor 2 is full OUT (left limit switch)" name="B0.X1.DFA01.Motor2LsFullout" startAdress="23" type="BOOLEAN"/>
+                <tag bitNbr="6" dbnr="60" description="Flag=1 when the deflector  motor 2 is full IN (right limit switch)" name="B0.X1.DFA01.Motor2LsFullin" startAdress="23" type="BOOLEAN"/>
+                <tag bitNbr="0" dbnr="60" description="Extraction Quad 1 : Water Flow Sw." name="B0.X1.QDB01.Waterflow" startAdress="24" type="BOOLEAN"/>
+                <tag bitNbr="1" dbnr="60" description="Extraction Quad 2 : Water Flow Sw." name="B0.X1.QDB02.Waterflow" startAdress="24" type="BOOLEAN"/>
+                <tag bitNbr="2" dbnr="60" description="Q1 : Thermal Sw. Ok" name="B0.X1.QDB01.ThermalSwitch" startAdress="24" type="BOOLEAN"/>
+                <tag bitNbr="3" dbnr="60" description="Q2 : Thermal Sw. Ok" name="B0.X1.QDB02.ThermalSwitch" startAdress="24" type="BOOLEAN"/>
+                <tag bitNbr="4" dbnr="60" description="Extraction Steering T1C : Water Flow Sw." name="B0.X1.SGC01.Waterflow" startAdress="24" type="BOOLEAN"/>
+                <tag bitNbr="5" dbnr="60" description="Extraction Steering T2C : Water Flow Sw." name="B0.X1.SGC02.Waterflow" startAdress="24" type="BOOLEAN"/>
+                <tag bitNbr="6" dbnr="60" description="Extraction Steering T1C : Thermal Sw Ok" name="B0.X1.SGC01.ThermalSwitch" startAdress="24" type="BOOLEAN"/>
+                <tag bitNbr="7" dbnr="60" description="Extraction Steering T2C : Thermal Sw Ok" name="B0.X1.SGC02.ThermalSwitch" startAdress="24" type="BOOLEAN"/>
+                <tag bitNbr="0" dbnr="60" description="Quad 1. Magnet Ps &#8220;No Internal Default&#8221; Info" name="B0.X1.QDB01.InternalOk" startAdress="25" type="BOOLEAN"/>
+                <tag bitNbr="2" dbnr="60" description="Quad 1. Magnet Ps &#8220;Remote Mode&#8221; Info" name="B0.X1.QDB01.CtrlMode" startAdress="25" type="BOOLEAN"/>
+                <tag bitNbr="3" dbnr="60" description="Quad 2. Magnet Ps &#8220;No Internal Default&#8221; Info" name="B0.X1.QDB02.InternalOk" startAdress="25" type="BOOLEAN"/>
+                <tag bitNbr="5" dbnr="60" description="Quad 2. Magnet Ps &#8220;Remote Mode&#8221; Info" name="B0.X1.QDB02.CtrlMode" startAdress="25" type="BOOLEAN"/>
+                <tag bitNbr="0" dbnr="60" description="X- Steering 1 Magnet Ps: &#8220;Regulation Ok&#8221; Info" name="B0.X1.SGC01.XRegulOk" startAdress="26" type="BOOLEAN"/>
+                <tag bitNbr="1" dbnr="60" description="Y- Steering 1 Magnet Ps: &#8220;Regulation Ok&#8221; Info" name="B0.X1.SGC01.YRegulOk" startAdress="26" type="BOOLEAN"/>
+                <tag bitNbr="2" dbnr="60" description="X-Y Steering 1 Magnet Ps &#8220;Remote Mode&#8221; Info" name="B0.X1.SGC01.CtrlMode" startAdress="26" type="BOOLEAN"/>
+                <tag bitNbr="3" dbnr="60" description="X-Y Steering 1 Magnet Ps &#8220;No Internal Default&#8221; Info" name="B0.X1.SGC01.InternalOk" startAdress="26" type="BOOLEAN"/>
+                <tag bitNbr="4" dbnr="60" description="X- Steering 2 Magnet Ps: &#8220;Regulation Ok&#8221; Info" name="B0.X1.SGC02.XRegulOk" startAdress="26" type="BOOLEAN"/>
+                <tag bitNbr="5" dbnr="60" description="Y- Steering 2 Magnet Ps: &#8220;Regulation Ok&#8221; Info" name="B0.X1.SGC02.YRegulOk" startAdress="26" type="BOOLEAN"/>
+                <tag bitNbr="6" dbnr="60" description="X-Y Steering 2 Magnet Ps &#8220;Remote Mode&#8221; Info" name="B0.X1.SGC02.CtrlMode" startAdress="26" type="BOOLEAN"/>
+                <tag bitNbr="7" dbnr="60" description="X-Y Steering 2 Magnet Ps &#8220;No Internal Default&#8221; Info" name="B0.X1.SGC02.InternalOk" startAdress="26" type="BOOLEAN"/>
+                <tag bitNbr="0" dbnr="60" description="Flag=1 when general security is OK" name="B0.S1.GED01.SecurityStatus" startAdress="27" type="BOOLEAN"/>
+                <tag bitNbr="1" dbnr="60" description="Flag = 1 when the FPA aux pump is running" name="B0.R1.FAA01.CirculatorStatus" startAdress="50" type="BOOLEAN"/>
+                <tag bitNbr="5" dbnr="60" description="Flag = 1 when the Source / RP roughing pump is running" name="B0.S1.MTA01.RoughingPumpStatus" startAdress="52" type="BOOLEAN"/>
+                <tag bitNbr="0" dbnr="50" description="Flag=1 when the water pump cmd is ON" name="B0.C1.GEC01.WaterPumpCmdStatus" startAdress="4" type="BOOLEAN"/>
+                <tag bitNbr="1" dbnr="50" description="Flag=1 when general water flow is not OK" name="B0.C1.GEC01.WaterflowStatus" startAdress="4" type="BOOLEAN"/>
+                <tag bitNbr="2" dbnr="50" description="Flag=1 when cyclo manifold is OK" name="B0.V1.GEB01.Manifold" startAdress="4" type="BOOLEAN"/>
+                <tag bitNbr="7" dbnr="50" description="Flag=0 when cooling pump is NOK" name="B0.C1.GEC01.CoolingPumpFailure" startAdress="4" type="BOOLEAN"/>
+                <tag bitNbr="0" dbnr="50" description="Command Status of ODPs Cooling Pump" name="B0.C1.GEC01.CoolingPumpCmdStatus" startAdress="5" type="BOOLEAN"/>
+                <tag bitNbr="1" dbnr="50" description="No feedback from contactor of pump motor" name="B0.C1.GEC01.CoolingPumpDefault" startAdress="5" type="BOOLEAN"/>
+                <tag bitNbr="2" dbnr="50" description="Flag=1 when No Flow and Pump is running" name="B0.C1.GEC01.CoolingFlowDefault" startAdress="5" type="BOOLEAN"/>
+                <tag bitNbr="0" dbnr="50" description="Flag=1 when the vacuum system is requested to start (ON cmd)" name="B0.V1.GEB01.HighVacuumCmdStatus" startAdress="6" type="BOOLEAN"/>
+                <tag bitNbr="1" dbnr="50" description="Flag=1 when the vacuum system is requested to go in standby state" name="B0.V1.GEB01.StandbyCmdStatus" startAdress="6" type="BOOLEAN"/>
+                <tag bitNbr="2" dbnr="50" description="Flag=1 when the vacuum system is requested to go in vented state" name="B0.V1.GEB01.VentingCmdStatus" startAdress="6" type="BOOLEAN"/>
+                <tag bitNbr="1" dbnr="50" description="Flag=0 when the temperature of the oil diffusion pumps is normal" name="B0.V1.ODA01.TempStatus" startAdress="7" type="BOOLEAN"/>
+                <tag bitNbr="2" dbnr="50" description="Flag=1 when the oil diffusion pumps are in over temperature" name="B0.V1.ODA01.OverTempStatus" startAdress="7" type="BOOLEAN"/>
+                <tag bitNbr="3" dbnr="50" description="Flag=1 when the vaccum state is OK (both cyclo high vac OK)" name="B0.V1.GEB01.CycloHighVacStatus" startAdress="7" type="BOOLEAN"/>
+                <tag bitNbr="4" dbnr="50" description="Flag = 1 when a vacuum OFF is requested" name="B0.V1.GEB01.OffCmdStatus" startAdress="7" type="BOOLEAN"/>
+                <tag bitNbr="0" dbnr="50" description="&quot;Flag=1 when the Main-Coil is in &quot;&quot;local enable&quot;&quot;&quot;" name="B0.M1.MCA01.LocalEnable" startAdress="8" type="BOOLEAN"/>
+                <tag bitNbr="1" dbnr="50" description="Flag=1 when the Main-Coil is in Remote mode" name="B0.M1.MCA01.Remote" startAdress="8" type="BOOLEAN"/>
+                <tag bitNbr="2" dbnr="50" description="Flag=1 when the Main-Coil is in Ramp progress" name="B0.M1.MCA01.RampProgress" startAdress="8" type="BOOLEAN"/>
+                <tag bitNbr="3" dbnr="50" description="Flag=1 when the Main-Coil is in Local mode" name="B0.M1.MCA01.Local" startAdress="8" type="BOOLEAN"/>
+                <tag bitNbr="4" dbnr="50" description="Flag=1 when the current of the Main-Coil is bigger than 400 Amps (50%)" name="B0.M1.MCA01.PsMinokStatus" startAdress="8" type="BOOLEAN"/>
+                <tag bitNbr="5" dbnr="50" description="1:water pump is requested to start/0:no request" name="B0.M1.MCA01.WaterPumpCmdStatus" startAdress="8" type="BOOLEAN"/>
+                <tag bitNbr="6" dbnr="50" description="Flag =1 when maincoil water flow is not OK" name="B0.M1.MCA01.CoolingFailure" startAdress="8" type="BOOLEAN"/>
+                <tag bitNbr="1" dbnr="50" description="Flag=1 when the door of the Main Coil PS is closed" name="B0.M1.MCA01.PsDoor" startAdress="10" type="BOOLEAN"/>
+                <tag bitNbr="2" dbnr="50" description="Flag=1 when the current is at at least 80% from the setpoint" name="B0.M1.MCA01.PsReady" startAdress="10" type="BOOLEAN"/>
+                <tag bitNbr="3" dbnr="50" description="Flag=1 when the main coil field is off" name="B0.M1.MCA01.PsFieldOffStatus" startAdress="10" type="BOOLEAN"/>
+                <tag bitNbr="4" dbnr="50" description="1:Main Coil On" name="B0.M1.MCA01.PsOnRegOkStatus" startAdress="10" type="BOOLEAN"/>
+                <tag bitNbr="6" dbnr="50" description="Flag=1 when the requested setpoint of Main Coil PS is reached" name="B0.M1.MCA01.CsprvStatus" startAdress="10" type="BOOLEAN"/>
+                <tag bitNbr="7" dbnr="50" description="Flag=1 when the link with the Main Coil PS is failed" name="B0.M1.MCA01.RS232LinkStatus" startAdress="10" type="BOOLEAN"/>
+                <tag bitNbr="2" dbnr="50" description="Flag=1 when the PS power cmd is ON" name="B0.M1.MCA01.PsCmdStatus" startAdress="11" type="BOOLEAN"/>
+                <tag bitNbr="5" dbnr="50" description="Flag=1 when the MainCoil water flows are OK" name="B0.M1.MCA01.Waterflow" startAdress="11" type="BOOLEAN"/>
+                <tag bitNbr="0" dbnr="50" description="Flag=1 when the RF cmd is ON" name="B0.R1.GEE01.CmdStatus" startAdress="12" type="BOOLEAN"/>
+                <tag bitNbr="1" dbnr="50" description="Flag=1 when the RF cmd is STANDBY" name="B0.R1.GEE01.StandbyCmdStatus" startAdress="12" type="BOOLEAN"/>
+                <tag bitNbr="4" dbnr="50" description="Flag=1 when the FPA power cmd is ON" name="B0.R1.FAA01.CmdStatus" startAdress="12" type="BOOLEAN"/>
+                <tag bitNbr="0" dbnr="50" description="Flag=1 when the FPA blower PS power cmd is ON" name="B0.R1.FAA01.BlowerCmdStatus" startAdress="13" type="BOOLEAN"/>
+                <tag bitNbr="1" dbnr="50" description="Flag=1 when the impa power cmd is ON" name="B0.R1.IMA01.CmdStatus" startAdress="13" type="BOOLEAN"/>
+                <tag bitNbr="2" dbnr="50" description="Flag=1 when the LLRF link is OK" name="B0.R1.LLA01.LinkStatus" startAdress="13" type="BOOLEAN"/>
+                <tag bitNbr="3" dbnr="50" description="Flag=1 when the impa filament PS power cmd is ON" name="B0.R1.IMA01.FilamentCmdStatus" startAdress="13" type="BOOLEAN"/>
+                <tag bitNbr="4" dbnr="50" description="Flag=1 when the all RF mater flows are OK" name="B0.R1.LLA01.Waterflow" startAdress="13" type="BOOLEAN"/>
+                <tag bitNbr="5" dbnr="50" description="Flag=1 when the impa blower PS power cmd is ON" name="B0.R1.IMA01.BlowerCmdStatus" startAdress="13" type="BOOLEAN"/>
+                <tag bitNbr="6" dbnr="50" description="Flag=1 when the Modulator cmd is ON" name="B0.R1.LLA01.ModulatorCmdStatus" startAdress="13" type="BOOLEAN"/>
+                <tag bitNbr="6" dbnr="50" description="Flag=1 when the Modulator cmd is ON" name="B0.R1.LLA01.RestartCmdStatus" startAdress="13" type="BOOLEAN"/>
+                <tag bitNbr="7" dbnr="50" description="Flag = 1 when RF manifold 1 is OK" name="B0.R1.GEE01.Manifold1" startAdress="13" type="BOOLEAN"/>
+                <tag bitNbr="0" dbnr="50" description="Flag = 1 when RF manifold 2 is OK" name="B0.R1.GEE01.Manifold2" startAdress="14" type="BOOLEAN"/>
+                <tag bitNbr="7" dbnr="50" description="Flag=1 when LLRF tuning limit is OK" name="B0.R1.LLA01.TuningLimit" startAdress="14" type="BOOLEAN"/>
+                <tag bitNbr="1" dbnr="50" description="Flag = 1 : the External Interlock of the LLRF are OK" name="B0.R1.LLA01.ExternalInterlock" startAdress="15" type="BOOLEAN"/>
+                <tag bitNbr="2" dbnr="50" description="Flag = 1 : the FPA screen PS regulation is OK (Jema or FUG)" name="B0.R1.FAA01.PsScreenRegulation" startAdress="15" type="BOOLEAN"/>
+                <tag bitNbr="6" dbnr="50" description="1:IMPA Ext Conditions OK/0: Ext Conditions Not OK" name="B0.R1.IMA01.ExternalInterlock" startAdress="15" type="BOOLEAN"/>
+                <tag bitNbr="7" dbnr="50" description="1:FPA Ext Conditions OK/0: Ext Conditions Not OK" name="B0.R1.FAA01.ExternalInterlock" startAdress="15" type="BOOLEAN"/>
+                <tag bitNbr="0" dbnr="50" description="Flag = 1 when the screen PS is in REMOTE controled" name="B0.R1.FAA01.ScreenCtrlMode" startAdress="16" type="BOOLEAN"/>
+                <tag bitNbr="1" dbnr="50" description="Flag=1 when the internal security of the FPA screen PS is OK" name="B0.R1.FAA01.ScreenIntSecurity" startAdress="16" type="BOOLEAN"/>
+                <tag bitNbr="2" dbnr="50" description="Flag = 1 when the grid PS is in REMOTE controled" name="B0.R1.FAA01.GridCtrlMode" startAdress="16" type="BOOLEAN"/>
+                <tag bitNbr="3" dbnr="50" description="Flag=1 when the internal security of the FPA grid PS is OK" name="B0.R1.FAA01.GridIntSecurity" startAdress="16" type="BOOLEAN"/>
+                <tag bitNbr="4" dbnr="50" description="Flag=1 when the LLRF control mode is Local (0) / Remote (1)" name="B0.R1.LLA01.FrequencyMode" startAdress="16" type="BOOLEAN"/>
+                <tag bitNbr="5" dbnr="50" description="Flag=1 when the control is V1 (0) / V2 (1) " name="B0.R1.LLA01.VDeeMode" startAdress="16" type="BOOLEAN"/>
+                <tag bitNbr="0" dbnr="50" description="Flag=1 when the filament source PS power cmd is ON" name="B0.S1.FIA01.PsCmdStatus" startAdress="17" type="BOOLEAN"/>
+                <tag bitNbr="1" dbnr="50" description="ION SOURCE ARC COMMAND ENABLE" name="B0.S1.ARA01.PsCmdStatus" startAdress="17" type="BOOLEAN"/>
+                <tag bitNbr="1" dbnr="50" description="ION SOURCE FILAMENT COMMAND ENABLE" name="B0.S1.GED01.PsCmdOnStatus" startAdress="17" type="BOOLEAN"/>
+                <tag bitNbr="2" dbnr="50" description="External Conditions to allow the tuning of the Ion Source" name="B0.S1.GED01.PsTuningCmdStatus" startAdress="17" type="BOOLEAN"/>
+                <tag bitNbr="3" dbnr="50" description="1:cmd enable/ 0:cmd disable" name="B0.S1.FIA01.PsOnCmdEnable" startAdress="17" type="BOOLEAN"/>
+                <tag bitNbr="4" dbnr="50" description="1:cmd enable/ 0:cmd disable" name="B0.S1.ARA01.PsOnCmdEnable" startAdress="17" type="BOOLEAN"/>
+                <tag bitNbr="5" dbnr="50" description="1:cmd in accessible to the User/0:cmd not accessible" name="B0.S1.GED01.PsTuningCmdEnable" startAdress="17" type="BOOLEAN"/>
+                <tag bitNbr="7" dbnr="50" description="Flag=1 when the Source Arc Tuning has failed" name="B0.S1.GED01.PsTuningFailed" startAdress="17" type="BOOLEAN"/>
+                <tag bitNbr="4" dbnr="50" description="Flag=1 when the deflector PS power cmd is ON" name="B0.X1.DFA01.PsCmdStatus" startAdress="18" type="BOOLEAN"/>
+                <tag bitNbr="6" dbnr="50" description="Flag = 1 when deflector PS (setpoint -feedback) &gt; range Deadband" name="B0.X1.DFA01.RegulationFailure" startAdress="18" type="BOOLEAN"/>
+                <tag bitNbr="0" dbnr="50" description="Flag = 1 when deflector  motor 1 (setpoint -feedback) &gt; range" name="B0.X1.DFA01.Motor1PositionFail" startAdress="19" type="BOOLEAN"/>
+                <tag bitNbr="1" dbnr="50" description="Flag = 1 when deflector  motor 2 (setpoint -feedback) &gt; range" name="B0.X1.DFA01.Motor2PositionFail" startAdress="19" type="BOOLEAN"/>
+                <tag bitNbr="4" dbnr="50" description="Deflector interlock - Arc detected if TRUE" name="B0.X1.DFA01.ArcDetected" startAdress="19" type="BOOLEAN"/>
+                <tag bitNbr="2" dbnr="50" description="Flag=1 when the steering T1C cmd is ON" name="B0.X1.SGC01.PsCmdStatus" startAdress="20" type="BOOLEAN"/>
+                <tag bitNbr="3" dbnr="50" description="Flag=1 when the steering T2C cmd is ON" name="B0.X1.SGC02.PsCmdStatus" startAdress="20" type="BOOLEAN"/>
+                <tag bitNbr="0" dbnr="50" description="Flag=1 when the Q1c &amp; Q2C cmd is ON" name="B0.X1.QDB01.Q1Q2CmdStatus" startAdress="21" type="BOOLEAN"/>
+                <tag bitNbr="0" dbnr="50" description="Flag=1 when the Q1c &amp; Q2C cmd is ON" name="B0.X1.QDB02.Q1Q2CmdStatus" startAdress="21" type="BOOLEAN"/>
+                <tag bitNbr="6" dbnr="50" description="Flag=1 when the Q1c cmd is ON" name="B0.X1.QDB01.PsCmdStatus" startAdress="21" type="BOOLEAN"/>
+                <tag bitNbr="7" dbnr="50" description="Flag=1 when the Q2C cmd is ON" name="B0.X1.QDB02.PsCmdStatus" startAdress="21" type="BOOLEAN"/>
+                <tag bitNbr="0" dbnr="50" description="Flag = 1 when the source mvt request is IN" name="B0.S1.MTA01.InCmdStatus" startAdress="22" type="BOOLEAN"/>
+                <tag bitNbr="1" dbnr="50" description="Flag = 1 when the source mvt request is OUT" name="B0.S1.MTA01.OutCmdStatus" startAdress="22" type="BOOLEAN"/>
+                <tag bitNbr="2" dbnr="50" description="Flag = 1 when the source mvt reached non LS" name="B0.S1.MTA01.Unknownls" startAdress="23" type="BOOLEAN"/>
+                <tag bitNbr="3" dbnr="50" description="Flag = 1 when Ion source movment G7 is at his initial step" name="B0.S1.MTA01.InitStepStatus" startAdress="23" type="BOOLEAN"/>
+                <tag bitNbr="5" dbnr="50" description="Flag = 1 when (setpoint -feedback) &gt; range" name="B0.S1.PUA01.SpFailed" startAdress="23" type="BOOLEAN"/>
+                <tag bitNbr="6" dbnr="50" description="Flag = 1 when the source mvt is in Service (Home) Position" name="B0.S1.MTA01.ServicePosition" startAdress="23" type="BOOLEAN"/>
+                <tag bitNbr="7" dbnr="50" description="Flag = 1 when the source mvt request is STANDBY" name="B0.S1.MTA01.StandbyCmdStatus" startAdress="23" type="BOOLEAN"/>
+                <tag bitNbr="0" dbnr="50" description="Flag = 1 when the source is mounted" name="B0.S1.MTA01.Mounted" startAdress="24" type="BOOLEAN"/>
+                <tag bitNbr="2" dbnr="50" description="Flag = 1 when the source mvt is in the upper part" name="B0.S1.MTA01.UpMovement" startAdress="24" type="BOOLEAN"/>
+                <tag bitNbr="3" dbnr="50" description="Flag = 1 when the source mvt is in the lower part" name="B0.S1.MTA01.DownMovement" startAdress="24" type="BOOLEAN"/>
+                <tag bitNbr="4" dbnr="50" description="Flag = 1 when the source drive is in error" name="B0.S1.MTA01.FailDetect" startAdress="24" type="BOOLEAN"/>
+                <tag bitNbr="5" dbnr="50" description="Flag = 1 when the source movement roughing phase has failed" name="B0.S1.MTA01.RoughPhaseFail" startAdress="24" type="BOOLEAN"/>
+                <tag bitNbr="0" dbnr="50" description="Command Status of Harmonic Coils PS" name="B0.M1.HCA01.PsCmdStatus" startAdress="25" type="BOOLEAN"/>
+                <tag bitNbr="0" dbnr="50" description="Command Status of Harmonic Coils PS" name="B0.M1.HCA02.PsCmdStatus" startAdress="25" type="BOOLEAN"/>
+                <tag bitNbr="1" dbnr="50" description="Local Command Status of Harmonic Coils PS" name="B0.M1.HCA01.PsLocalCmdStatus" startAdress="25" type="BOOLEAN"/>
+                <tag bitNbr="1" dbnr="50" description="Local Command Status of Harmonic Coils PS" name="B0.M1.HCA02.PsLocalCmdStatus" startAdress="25" type="BOOLEAN"/>
+                <tag bitNbr="4" dbnr="50" description="Flag = 1 when cc (setpoint -feedback) &gt; range" name="B0.M1.CCA01.PsSpFailed" startAdress="25" type="BOOLEAN"/>
+                <tag bitNbr="5" dbnr="50" description="Median plan virtual OFF" name="B0.M1.CCA01.PsVirtualOffStatus" startAdress="25" type="BOOLEAN"/>
+                <tag bitNbr="0" dbnr="50" description="Flag = 1 when radial probe IN cmd request" name="B0.D1.RPA01.InCmdStatus" startAdress="26" type="BOOLEAN"/>
+                <tag bitNbr="0" dbnr="50" description="Flag = 1 when radial probe IN cmd request" name="B0.D1.RPA01.MoveInCmdStatus" startAdress="26" type="BOOLEAN"/>
+                <tag bitNbr="1" dbnr="50" description="Flag = 1 when radial probe OUT cmd request" name="B0.D1.RPA01.MoveOutCmdStatus" startAdress="26" type="BOOLEAN"/>
+                <tag bitNbr="1" dbnr="50" description="Flag = 1 when radial probe OUT cmd request" name="B0.D1.RPA01.OutCmdStatus" startAdress="26" type="BOOLEAN"/>
+                <tag bitNbr="2" dbnr="50" description="Flag = 1 when radial probe STOP cmd request" name="B0.D1.RPA01.StopCmdStatus" startAdress="26" type="BOOLEAN"/>
+                <tag bitNbr="3" dbnr="50" description="Flag = 1 when the radial probe is at 350 mm" name="B0.D1.RPA01.Goto350CmdStatus" startAdress="26" type="BOOLEAN"/>
+                <tag bitNbr="4" dbnr="50" description="Flag = 1 when the radial probe is at 1030 mm" name="B0.D1.RPA01.Goto1030CmdStatus" startAdress="26" type="BOOLEAN"/>
+                <tag bitNbr="5" dbnr="50" description="Flag = 1 when the radial probe is at 1045 mm" name="B0.D1.RPA01.Goto1045CmdStatus" startAdress="26" type="BOOLEAN"/>
+                <tag bitNbr="6" dbnr="50" description="Flag = 1 when the radial probe is at the X mm requir. Posit." name="B0.D1.RPA01.GotoXCmdStatus" startAdress="26" type="BOOLEAN"/>
+                <tag bitNbr="7" dbnr="50" description="Flag = 1 when the radial proble is initializing" name="B0.D1.RPA01.InitCmdStatus" startAdress="26" type="BOOLEAN"/>
+                <tag bitNbr="1" dbnr="50" description="Flag = 1 when the radial probe is initialized" name="B0.D1.RPA01.Initiated" startAdress="27" type="BOOLEAN"/>
+                <tag bitNbr="7" dbnr="50" description="Flag = 1 when DRIVE fail is detected" name="B0.D1.RPA01.FailDetect" startAdress="27" type="BOOLEAN"/>
+                <tag bitNbr="4" dbnr="50" description="Flag = 1 when deflector ramp is selected" name="B0.X1.DFA01.RampCmdStatus" startAdress="29" type="BOOLEAN"/>
+                <tag bitNbr="0" dbnr="50" description="Flag = 1 when the Profibus communication with the FPA screen FUG PS is OK" name="B0.R1.FAA01.ScreenDPLinkStatus" startAdress="46" type="BOOLEAN"/>
+                <tag bitNbr="1" dbnr="50" description="Flag = 1 when the Profibus communication with the FPA grid FUG PS is OK" name="B0.R1.FAA01.GridDPLinkStatus" startAdress="46" type="BOOLEAN"/>
+                <tag bitNbr="4" dbnr="50" description="Flag = 1 when the Profibus communication with the MC PS is OK" name="B0.M1.MCA01.DPLinkStatus" startAdress="46" type="BOOLEAN"/>
+                <tag bitNbr="6" dbnr="50" description="Flag = 1 when the Profibus communication with the Drive Beckhoff RP is OK" name="B0.D1.RPA01.LinkStatus" startAdress="46" type="BOOLEAN"/>
+                <tag bitNbr="7" dbnr="50" description="Flag = 1 when the Profibus communication with the Drive Beckhoff Source is OK" name="B0.S1.MTA01.LinkStatus" startAdress="46" type="BOOLEAN"/>
+                <tag bitNbr="0" dbnr="50" description="Flag = 1 when the vacuum cryo manual is selected" name="B0.V1.CRA01.ManualCmdStatus" startAdress="56" type="BOOLEAN"/>
+                <tag bitNbr="1" dbnr="50" description="Flag = 1 when the cyclo roughing vacuum phase has failed" name="B0.V1.GEB01.RoughVacuumFailed" startAdress="56" type="BOOLEAN"/>
+                <tag bitNbr="4" dbnr="50" description="Flag = 1 when the cyclo high vacuum phase has failed" name="B0.V1.GEB01.HighVacuumFailed" startAdress="56" type="BOOLEAN"/>
+                <tag bitNbr="0" dbnr="50" description="Flag = 1 when the vacuum cryo 1 full regeneration action is selected " name="B0.V1.CRB01.FullRegCmdStatus" startAdress="57" type="BOOLEAN"/>
+                <tag bitNbr="1" dbnr="50" description="Flag = 1 when the vacuum cryo 1 warm-up &amp; purge action is selected" name="B0.V1.CRB01.WarmUpCmdStatus" startAdress="57" type="BOOLEAN"/>
+                <tag bitNbr="2" dbnr="50" description="Flag = 1 when the vacuum cryo 1 evacuation &amp; check action is selected" name="B0.V1.CRB01.EvacuationCmdStatus" startAdress="57" type="BOOLEAN"/>
+                <tag bitNbr="3" dbnr="50" description="Flag = 1 when the vacuum cryo 1 cooldown action is selected" name="B0.V1.CRB01.CoolDownCmdStatus" startAdress="57" type="BOOLEAN"/>
+                <tag bitNbr="4" dbnr="50" description="Flag = 1 when the vacuum cryo 1 full regeneration action is enabled" name="B0.V1.CRB01.FullRegCmdEnable" startAdress="57" type="BOOLEAN"/>
+                <tag bitNbr="5" dbnr="50" description="Flag = 1 when the vacuum cryo 1 warm-up &amp; purge action is enabled" name="B0.V1.CRB01.WarmUpCmdEnable" startAdress="57" type="BOOLEAN"/>
+                <tag bitNbr="6" dbnr="50" description="Flag = 1 when the vacuum cryo 1 evacuation &amp; check action is enabled" name="B0.V1.CRB01.EvacuationCmdEnable" startAdress="57" type="BOOLEAN"/>
+                <tag bitNbr="7" dbnr="50" description="Flag = 1 when the vacuum cryo 1 cooldown action is enabled" name="B0.V1.CRB01.CoolDownCmdEnable" startAdress="57" type="BOOLEAN"/>
+                <tag bitNbr="2" dbnr="50" description="Flag = 1 when the cryo 1 N2 flow before warm-up has failed" name="B0.V1.CRB01.N2FlowFailed" startAdress="58" type="BOOLEAN"/>
+                <tag bitNbr="3" dbnr="50" description="Flag = 1 when the cryo 1 N2 pressure before warm-up has failed" name="B0.V1.CRB01.N2PressureFailed" startAdress="58" type="BOOLEAN"/>
+                <tag bitNbr="4" dbnr="50" description="Flag = 1 when the cryo 1 the leak check has failed" name="B0.V1.CRB01.LeakCheckFailed" startAdress="58" type="BOOLEAN"/>
+                <tag bitNbr="5" dbnr="50" description="Flag = 1 when the cryo 1 cooldown phase has failed" name="B0.V1.CRB01.CoolDownFailed" startAdress="58" type="BOOLEAN"/>
+                <tag bitNbr="6" dbnr="50" description="Flag = 1 when the vacuum cryo 1 auto regeneration is selected" name="B0.V1.CRB01.AutoRegCmdStatus" startAdress="58" type="BOOLEAN"/>
+                <tag bitNbr="7" dbnr="50" description="Flag = 1 when the cryo 1 evacuation phase has failed" name="B0.V1.CRB01.EvacuationFailed" startAdress="58" type="BOOLEAN"/>
+                <tag bitNbr="0" dbnr="50" description="Flag = 1 when the cryo 1 pumping gate valve is open requested" name="B0.V1.CRB01.PumpGateVlvCmdStatus" startAdress="59" type="BOOLEAN"/>
+                <tag bitNbr="1" dbnr="50" description="Flag = 1 when the cryo 1 pumping gate valve is enabled to open" name="B0.V1.CRB01.PumpGateVlvOpenEnable" startAdress="59" type="BOOLEAN"/>
+                <tag bitNbr="0" dbnr="50" description="Flag = 1 when the vacuum cryo 2 full regeneration action is selceted " name="B0.V1.CRB02.FullRegCmdStatus" startAdress="60" type="BOOLEAN"/>
+                <tag bitNbr="1" dbnr="50" description="Flag = 1 when the vacuum cryo 2 warm-up &amp; purge action is selected" name="B0.V1.CRB02.WarmUpCmdStatus" startAdress="60" type="BOOLEAN"/>
+                <tag bitNbr="2" dbnr="50" description="Flag = 1 when the vacuum cryo 2 evacuation &amp; check action is selected" name="B0.V1.CRB02.EvacuationCmdStatus" startAdress="60" type="BOOLEAN"/>
+                <tag bitNbr="3" dbnr="50" description="Flag = 1 when the vacuum cryo 2 cooldown action is selected" name="B0.V1.CRB02.CoolDownCmdStatus" startAdress="60" type="BOOLEAN"/>
+                <tag bitNbr="4" dbnr="50" description="Flag = 1 when the vacuum cryo 2 full regeneration action is disabled" name="B0.V1.CRB02.FullRegCmdEnable" startAdress="60" type="BOOLEAN"/>
+                <tag bitNbr="5" dbnr="50" description="Flag = 1 when the vacuum cryo 2 warm-up &amp; purge action is disabled" name="B0.V1.CRB02.WarmUpCmdEnable" startAdress="60" type="BOOLEAN"/>
+                <tag bitNbr="6" dbnr="50" description="Flag = 1 when the vacuum cryo 2 evacuation &amp; check action is disabled" name="B0.V1.CRB02.EvacuationCmdEnable" startAdress="60" type="BOOLEAN"/>
+                <tag bitNbr="7" dbnr="50" description="Flag = 1 when the vacuum cryo 2 cooldown action is disabled" name="B0.V1.CRB02.CoolDownCmdEnable" startAdress="60" type="BOOLEAN"/>
+                <tag bitNbr="2" dbnr="50" description="Flag = 1 when the cryo 2 N2 flow before warm-up has failed" name="B0.V1.CRB02.N2FlowFailed" startAdress="61" type="BOOLEAN"/>
+                <tag bitNbr="3" dbnr="50" description="Flag = 1 when the cryo 2 N2 pressure before warm-up has failed" name="B0.V1.CRB02.N2PressureFailed" startAdress="61" type="BOOLEAN"/>
+                <tag bitNbr="4" dbnr="50" description="Flag = 1 when the cryo 2 the leak check has failed" name="B0.V1.CRB02.LeakCheckFailed" startAdress="61" type="BOOLEAN"/>
+                <tag bitNbr="5" dbnr="50" description="Flag = 1 when the cryo 2 cooldown phase has failed" name="B0.V1.CRB02.CoolDownFailed" startAdress="61" type="BOOLEAN"/>
+                <tag bitNbr="6" dbnr="50" description="Flag = 1 when the vacuum cryo 2 auto regeneration is selected" name="B0.V1.CRB02.AutoRegCmdStatus" startAdress="61" type="BOOLEAN"/>
+                <tag bitNbr="7" dbnr="50" description="Flag = 1 when the cryo 1 evacuation phase has failed" name="B0.V1.CRB02.EvacuationFailed" startAdress="61" type="BOOLEAN"/>
+                <tag bitNbr="0" dbnr="50" description="Flag = 1 when the cryo 1 pumping gate valve is open requested" name="B0.V1.CRB02.PumpGateVlvCmdStatus" startAdress="62" type="BOOLEAN"/>
+                <tag bitNbr="1" dbnr="50" description="Flag = 1 when the cryo 1 pumping gate valve is enabled to open" name="B0.V1.CRB02.PumpGateVlvOpenEnable" startAdress="62" type="BOOLEAN"/>
+                <tag bitNbr="0" dbnr="50" description="Flag = 1 when the cryo 1 is in a forced warm-up" name="B0.V1.CRB01.ForcedWarmUp" startAdress="63" type="BOOLEAN"/>
+                <tag bitNbr="0" dbnr="50" description="Flag = 1 when the cryo 2 is in a forced warm-up" name="B0.V1.CRB02.ForcedWarmUp" startAdress="64" type="BOOLEAN"/>
+                <tag bitNbr="0" dbnr="50" description="Flag = 0 : MCPS Status : global fault" name="B0.M1.MCA01.GlobalFault" startAdress="66" type="BOOLEAN"/>
+                <tag bitNbr="1" dbnr="50" description="Flag = 0 : MCPS Status global alarm" name="B0.M1.MCA01.GlobalAlarm" startAdress="66" type="BOOLEAN"/>
+                <tag bitNbr="2" dbnr="50" description="Flag = 0 : MCPS Status Over voltage output fault" name="B0.M1.MCA01.OverVoltageOutputFlt" startAdress="66" type="BOOLEAN"/>
+                <tag bitNbr="3" dbnr="50" description="Flag = 0 : MCPS Status Over current output fault" name="B0.M1.MCA01.OverCurrentOutputFlt" startAdress="66" type="BOOLEAN"/>
+                <tag bitNbr="4" dbnr="50" description="Flag = 0 : MCPS Status Monitor Current fault" name="B0.M1.MCA01.MonitorCurrentInFlt" startAdress="66" type="BOOLEAN"/>
+                <tag bitNbr="5" dbnr="50" description="Flag = 0 : MCPS Status IACM1 fault" name="B0.M1.MCA01.IACM1Flt" startAdress="66" type="BOOLEAN"/>
+                <tag bitNbr="6" dbnr="50" description="Flag = 0 : MCPS Status IACM2 fault" name="B0.M1.MCA01.IACM2Flt" startAdress="66" type="BOOLEAN"/>
+                <tag bitNbr="7" dbnr="50" description="Flag = 0 : MCPS Status Ground fault" name="B0.M1.MCA01.GroundFlt" startAdress="66" type="BOOLEAN"/>
+                <tag bitNbr="0" dbnr="50" description="Flag = 0 : MCPS Status Door fault" name="B0.M1.MCA01.DoorFlt" startAdress="67" type="BOOLEAN"/>
+                <tag bitNbr="1" dbnr="50" description="Flag = 0 : MCPS Status Temp L1L fault" name="B0.M1.MCA01.TempL1L11Flt" startAdress="67" type="BOOLEAN"/>
+                <tag bitNbr="2" dbnr="50" description="Flag = 0 : MCPS Status Temp L2L fault" name="B0.M1.MCA01.TempL2L12Flt" startAdress="67" type="BOOLEAN"/>
+                <tag bitNbr="3" dbnr="50" description="Flag = 0 : MCPS Status Temp L3L fault" name="B0.M1.MCA01.TempL3L13Flt" startAdress="67" type="BOOLEAN"/>
+                <tag bitNbr="4" dbnr="50" description="Flag = 0 : MCPS Status Temp transfo fault" name="B0.M1.MCA01.TempTransfoFlt" startAdress="67" type="BOOLEAN"/>
+                <tag bitNbr="5" dbnr="50" description="Flag = 0 : MCPS Status Thermal breakere fault" name="B0.M1.MCA01.ThermalBreakerFlt" startAdress="67" type="BOOLEAN"/>
+                <tag bitNbr="6" dbnr="50" description="Flag = 0 : MCPS Status temperature Buck 1 Fault" name="B0.M1.MCA01.TempBuck1Flt" startAdress="67" type="BOOLEAN"/>
+                <tag bitNbr="7" dbnr="50" description="Flag = 0 : MCPS Status temperature Buck 2 Fault" name="B0.M1.MCA01.TempBuck2Flt" startAdress="67" type="BOOLEAN"/>
+                <tag bitNbr="0" dbnr="50" description="Flag = 0 : MCPS Status Fuse fault" name="B0.M1.MCA01.FuseFlt" startAdress="68" type="BOOLEAN"/>
+                <tag bitNbr="1" dbnr="50" description="Flag = 0 : MCPS Status Phase fault" name="B0.M1.MCA01.PhasesFlt" startAdress="68" type="BOOLEAN"/>
+                <tag bitNbr="2" dbnr="50" description="Flag = 0 : MCPS Status Flowmeter fault" name="B0.M1.MCA01.FlowmeterFlt" startAdress="68" type="BOOLEAN"/>
+                <tag bitNbr="3" dbnr="50" description="Flag = 0 : MCPS Status External fault" name="B0.M1.MCA01.ExternalFlt" startAdress="68" type="BOOLEAN"/>
+                <tag bitNbr="4" dbnr="50" description="Flag = 0 : MCPS Status Driver fault 1" name="B0.M1.MCA01.DriverFlt1" startAdress="68" type="BOOLEAN"/>
+                <tag bitNbr="5" dbnr="50" description="Flag = 0 : MCPS Status Driver fault 2" name="B0.M1.MCA01.DriverFlt2" startAdress="68" type="BOOLEAN"/>
+                <tag bitNbr="6" dbnr="50" description="Flag = 0 : MCPS Status IAC Function fault" name="B0.M1.MCA01.IACFunctionFlt" startAdress="68" type="BOOLEAN"/>
+                <tag bitNbr="7" dbnr="50" description="Flag = 0 : MCPS Status Intor function fault" name="B0.M1.MCA01.IntorFunctionFlt" startAdress="68" type="BOOLEAN"/>
+                <tag bitNbr="0" dbnr="50" description="Flag = 0 : MCPS Status DefCard Function fault" name="B0.M1.MCA01.DefCardFunctionFlt" startAdress="69" type="BOOLEAN"/>
+                <tag bitNbr="1" dbnr="50" description="Flag = 0 : MCPS Status Data Eeprom fault" name="B0.M1.MCA01.DataEepromFlt" startAdress="69" type="BOOLEAN"/>
+                <tag bitNbr="2" dbnr="50" description="Flag = 0 : MCPS Status Timeout Eeprom fault" name="B0.M1.MCA01.TimeoutEepromFlt" startAdress="69" type="BOOLEAN"/>
+                <tag bitNbr="3" dbnr="50" description="Flag = 0 : MCPS Status Reg comm fault" name="B0.M1.MCA01.RegCommFlt" startAdress="69" type="BOOLEAN"/>
+                <tag bitNbr="4" dbnr="50" description="Flag = 0 : MCPS Status Display card fault" name="B0.M1.MCA01.DisplayCardFlt" startAdress="69" type="BOOLEAN"/>
+                <tag bitNbr="5" dbnr="50" description="Flag = 0 : MCPS Status Profibus Comm fault" name="B0.M1.MCA01.ProfibusCommFlt" startAdress="69" type="BOOLEAN"/>
+                <tag bitNbr="0" dbnr="50" description="Flag=1 if the passive filter is OK" name="B0.M1.MCA01.PsPassiveFilter" startAdress="72" type="BOOLEAN"/>
+                <tag bitNbr="1" dbnr="50" description="Flag=0 if the transformer temperature is normal" name="B0.M1.MCA01.PsTransformerTemp" startAdress="72" type="BOOLEAN"/>
+                <tag bitNbr="2" dbnr="50" description="Flag=1 when the Thermal protection of the thyristors are OK" name="B0.M1.MCA01.PsThyristorTemp" startAdress="72" type="BOOLEAN"/>
+                <tag bitNbr="3" dbnr="50" description="Flag=1 when the main fuses are ok" name="B0.M1.MCA01.PsMainFuse" startAdress="72" type="BOOLEAN"/>
+                <tag bitNbr="4" dbnr="50" description="Flag=1 when External Fuse OK" name="B0.M1.MCA01.PsEarthFuse" startAdress="72" type="BOOLEAN"/>
+                <tag bitNbr="5" dbnr="50" description="Flag=1 when the Main Coil PS is in DC over voltage" name="B0.M1.MCA01.PsDCOvervoltage" startAdress="72" type="BOOLEAN"/>
+                <tag bitNbr="6" dbnr="50" description="Flag=1 when the Main Coil PS is in DC over current" name="B0.M1.MCA01.PsDCOvercurrent" startAdress="72" type="BOOLEAN"/>
+                <tag bitNbr="7" dbnr="50" description="Flag=1 when the Main Coil PS is in AC over current" name="B0.M1.MCA01.PsACOvercurrent" startAdress="72" type="BOOLEAN"/>
+                <tag bitNbr="0" dbnr="50" description="Flag=1 when the Maincoil supply is synchronized" name="B0.M1.MCA01.PsSynchronization" startAdress="73" type="BOOLEAN"/>
+                <tag bitNbr="1" dbnr="50" description="Flag=1 when the phase condition is OK" name="B0.M1.MCA01.PsPhase" startAdress="73" type="BOOLEAN"/>
+                <tag bitNbr="2" dbnr="50" description="Flag=1 when the waterflow contact of the Main Coil PS is detected" name="B0.M1.MCA01.PsWaterflow" startAdress="73" type="BOOLEAN"/>
+                <tag bitNbr="0" dbnr="60" description="Flag=1 when the valve isolating roughing pump 1 is open" name="B0.V1.VVC03.ValveStatus" startAdress="102" type="BOOLEAN"/>
+                <tag bitNbr="2" dbnr="60" description="Flag = 1 when the cyclo roughing valve is OPEN " name="B0.V1.VVB01.ValveStatus" startAdress="102" type="BOOLEAN"/>
+                <tag bitNbr="3" dbnr="60" description="Flag = 1 when ODP or CRYO roughing valve is OPEN" name="B0.V1.CRA01.CryoRoughValveStatus" startAdress="102" type="BOOLEAN"/>
+                <tag bitNbr="3" dbnr="60" description="Flag = 1 when ODP or CRYO roughing valve is OPEN" name="B0.V1.ODA01.OdpRoughValveStatus" startAdress="102" type="BOOLEAN"/>
+                <tag bitNbr="6" dbnr="60" description="Flag = 1 when venting valve is OPEN" name="B0.V1.VVB02.ValveStatus" startAdress="102" type="BOOLEAN"/>
+                <tag bitNbr="4" dbnr="60" description="Flag = 1 when the source roughing valve airlock is OK" name="B0.S1.VVC02.ValveStatus" startAdress="103" type="BOOLEAN"/>
+                <tag bitNbr="5" dbnr="60" description="Flag = 1 when the source roughing valve gasket is OK" name="B0.S1.VVC03.ValveStatus" startAdress="103" type="BOOLEAN"/>
+                <tag bitNbr="0" dbnr="60" description="Flag = 1 when the source venting valve is OK" name="B0.S1.VVC01.ValveStatus" startAdress="104" type="BOOLEAN"/>
+                <tag bitNbr="7" dbnr="60" description="Flag=1 when the SSA is requested to start" name="B0.R1.SAA01.AuxiliairiesCmdStatus" startAdress="106" type="BOOLEAN"/>
+                <tag bitNbr="4" dbnr="60" description="Flag=1 when the FPA filament 1/4 PS power cmd is ON" name="B0.R1.FAA01.Filament14CmdStatus" startAdress="108" type="BOOLEAN"/>
+                <tag bitNbr="5" dbnr="60" description="Flag=1 when the FPA filament 1/2 PS power cmd is ON" name="B0.R1.FAA01.Filament12CmdStatus" startAdress="108" type="BOOLEAN"/>
+                <tag bitNbr="0" dbnr="60" description="1:X100mA/0:X1mA" name="B0.S1.ARA01.RangeCmdStatus" startAdress="111" type="BOOLEAN"/>
+                <tag bitNbr="4" dbnr="60" description="Flag=1 when the valve of the O2 is opened" name="B0.X1.DFA01.O2ValveStatus" startAdress="111" type="BOOLEAN"/>
+                <tag bitNbr="1" dbnr="60" description="Flag = 1 when the vacuum cryo 1 roughing valve is OPEN" name="B0.V1.CRB01.RoughValveStatus" startAdress="113" type="BOOLEAN"/>
+                <tag bitNbr="2" dbnr="60" description="Flag = 1 when the vacuum cryo 2 roughing valve is OPEN" name="B0.V1.CRB02.RoughValveStatus" startAdress="113" type="BOOLEAN"/>
+                <tag bitNbr="3" dbnr="60" description="Flag = 1 when the vacuum cryo 1 warm-up &amp; purge valve is OPEN" name="B0.V1.CRB01.WarmUpValveStatus" startAdress="113" type="BOOLEAN"/>
+                <tag bitNbr="4" dbnr="60" description="Flag = 1 when the vacuum cryo 2 warm-up &amp; purge valve is OPEN" name="B0.V1.CRB02.WarmUpValveStatus" startAdress="113" type="BOOLEAN"/>
+                <tag bitNbr="5" dbnr="60" description="Flag = 1 when the vacuum cryo 2 N2 for H2 initial dilution valve is OPEN" name="B0.V1.CRB01.DilutionValveStatus" startAdress="113" type="BOOLEAN"/>
+                <tag bitNbr="6" dbnr="60" description="Flag = 1 when the vacuum cryo 1 N2 for H2 initial dilution valve is OPEN" name="B0.V1.CRB02.DilutionValveStatus" startAdress="113" type="BOOLEAN"/>
+                <tag dbnr="80" description="BCMEU : chanel 0 digit value" name="E0.E1.BCA01.dchnl0" startAdress="200" type="INT"/>
+                <tag dbnr="80" description="BCMEU : chanel 1 digit value" name="E0.E1.BCA01.dchnl1" startAdress="202" type="INT"/>
+                <tag dbnr="80" description="BCMEU : chanel 2 digit value" name="E0.E1.BCA01.dchnl2" startAdress="204" type="INT"/>
+                <tag dbnr="80" description="BCMEU : chanel 3 digit value" name="E0.E1.BCA01.dchnl3" startAdress="206" type="INT"/>
+                <tag dbnr="80" description="BCMEU : chanel 4 digit value" name="E0.E1.BCA01.dchnl4" startAdress="208" type="INT"/>
+                <tag dbnr="80" description="BCMEU : chanel 5 digit value" name="E0.E1.BCA01.dchnl5" startAdress="210" type="INT"/>
+                <tag dbnr="80" description="BCMEU : chanel 6 digit value" name="E0.E1.BCA01.dchnl6" startAdress="212" type="INT"/>
+                <tag dbnr="80" description="BCMEU : chanel 7 digit value" name="E0.E1.BCA01.dchnl7" startAdress="214" type="INT"/>
+                <tag dbnr="80" description="BCMEU : requested acquisition mode " name="E0.E1.BCA01.req_acq_mode" startAdress="216" type="INT"/>
+                <tag dbnr="80" description="BCMEU : requested acquisition mode from BCMEU" name="E0.E1.BCA01.acq_mode" startAdress="218" type="INT"/>
+                <tag dbnr="80" description="BCMEU : requested acquisition mode to BCMEU feedback" name="E0.E1.BCA01.cmd_acq_mode_back" startAdress="220" type="INT"/>
+                <tag dbnr="80" description="BCMEU : requested data type to BCMEU" name="E0.E1.BCA01.req_data_type" startAdress="222" type="INT"/>
+                <tag dbnr="80" description="BCMEU : data type feedback from BCMEU" name="E0.E1.BCA01.data_type" startAdress="224" type="INT"/>
+                <tag dbnr="80" description="BCMEU : operqtion mode" name="E0.E1.BCA01.operation_mode" startAdress="226" type="INT"/>
+                <tag dbnr="82" description="BCMEU : chanel 0 real value" name="E0.E1.BCA01.cchnl0" startAdress="396" type="FLOAT"/>
+                <tag dbnr="82" description="BCMEU : chanel 1 real value" name="E0.E1.BCA01.cchnl1" startAdress="400" type="FLOAT"/>
+                <tag dbnr="82" description="BCMEU : chanel 2 real value" name="E0.E1.BCA01.cchnl2" startAdress="404" type="FLOAT"/>
+                <tag dbnr="82" description="BCMEU : chanel 3 real value" name="E0.E1.BCA01.cchnl3" startAdress="408" type="FLOAT"/>
+                <tag dbnr="82" description="BCMEU : chanel 4 real value" name="E0.E1.BCA01.cchnl4" startAdress="412" type="FLOAT"/>
+                <tag dbnr="82" description="BCMEU : chanel 5 real value" name="E0.E1.BCA01.cchnl5" startAdress="416" type="FLOAT"/>
+                <tag dbnr="82" description="BCMEU : chanel 6 real value" name="E0.E1.BCA01.cchnl6" startAdress="420" type="FLOAT"/>
+                <tag dbnr="82" description="BCMEU : chanel 7 real value" name="E0.E1.BCA01.cchnl7" startAdress="424" type="FLOAT"/>
+                <tag dbnr="82" description="BCMEU : chanel 0 real value" name="B0.D1.RPA01.cfeedback" startAdress="396" type="FLOAT"/>
+                <tag dbnr="82" description="BCMEU : chanel 1 real value" name="B0.D1.RPB02.cfeedback" startAdress="400" type="FLOAT"/>
+                <tag dbnr="82" description="BCMEU : chanel 2 real value" name="B0.X1.CLA01.cfeedback" startAdress="404" type="FLOAT"/>
+                <tag dbnr="82" description="BCMEU : chanel 3 real value" name="B0.X1.CLA02.cfeedback" startAdress="408" type="FLOAT"/>
+                <tag dbnr="82" description="BCMEU : chanel 4 real value" name="B0.X1.CLA03.cfeedback" startAdress="412" type="FLOAT"/>
+                <tag dbnr="82" description="BCMEU : chanel 5 real value" name="B0.X1.CLA04.cfeedback" startAdress="416" type="FLOAT"/>
+                <tag dbnr="82" description="BCMEU : chanel 6 real value" name="E0.E1.BSB01.cfeedback" startAdress="420" type="FLOAT"/>
+                <tag dbnr="82" description="BCMEU : chanel 7 real value" name="E0.E1.CLA01.cfeedback" startAdress="424" type="FLOAT"/>
+
+                <tag dbnr="77" description="DEKIMO : Radial probe 1" name="DEK_RP1" startAdress="200" type="FLOAT"/>
+                <tag dbnr="77" description="DEKIMO : Radial probe 2" name="DEK_RP2" startAdress="204" type="FLOAT"/>
+                <tag dbnr="77" description="DEKIMO : COL UP" name="DEK_COL_UP" startAdress="208" type="FLOAT"/>
+                <tag dbnr="77" description="DEKIMO : COL DOWN" name="DEK_COL_BOTTOM" startAdress="212" type="FLOAT"/>
+                <tag dbnr="77" description="DEKIMO : COL LEFT" name="DEK_COL_LEFT" startAdress="216" type="FLOAT"/>
+                <tag dbnr="77" description="DEKIMO : COL RIGHT" name="DEK_COL_RIGHT" startAdress="220" type="FLOAT"/>
+                <tag dbnr="77" description="DEKIMO : COL BS" name="DEK_BS" startAdress="224" type="FLOAT"/>
+                <tag dbnr="77" description="DEKIMO : COL SUM" name="DEK_SUM" startAdress="228" type="FLOAT"/>
+                <tag dbnr="77" description="DEKIMO : EXT COL" name="DEK_EXT_COL" startAdress="232" type="FLOAT"/>
+                <tag dbnr="77" description="DEKIMO : EXT EXT COL BS" name="DEK_EXT_COL_BS" startAdress="236" type="FLOAT"/>
+
+                <tag dbnr="80" description="BCMEU : data type feedback from BCMEU" name="B0.D1.RPA01.datatype" startAdress="224" type="INT"/>
+                <tag dbnr="80" description="BCMEU : data type feedback from BCMEU" name="B0.D1.RPB02.datatype" startAdress="224" type="INT"/>
+                <tag dbnr="80" description="BCMEU : data type feedback from BCMEU" name="B0.X1.CLA01.datatype" startAdress="224" type="INT"/>
+                <tag dbnr="80" description="BCMEU : data type feedback from BCMEU" name="B0.X1.CLA02.datatype" startAdress="224" type="INT"/>
+                <tag dbnr="80" description="BCMEU : data type feedback from BCMEU" name="B0.X1.CLA03.datatype" startAdress="224" type="INT"/>
+                <tag dbnr="80" description="BCMEU : data type feedback from BCMEU" name="B0.X1.CLA04.datatype" startAdress="224" type="INT"/>
+                <tag dbnr="80" description="BCMEU : data type feedback from BCMEU" name="E0.E1.BSB01.datatype" startAdress="224" type="INT"/>
+                <tag dbnr="80" description="BCMEU : data type feedback from BCMEU" name="E0.E1.CLA01.datatype" startAdress="224" type="INT"/>
+                <tag dbnr="80" description="BCMEU : calibrated" name="B0.D1.RPA01.calibrated" startAdress="228" type="INT"/>
+                <tag dbnr="80" description="BCMEU : calibrated" name="B0.D1.RPB02.calibrated" startAdress="228" type="INT"/>
+                <tag dbnr="80" description="BCMEU : calibrated" name="B0.X1.CLA01.calibrated" startAdress="228" type="INT"/>
+                <tag dbnr="80" description="BCMEU : calibrated" name="B0.X1.CLA02.calibrated" startAdress="228" type="INT"/>
+                <tag dbnr="80" description="BCMEU : calibrated" name="B0.X1.CLA03.calibrated" startAdress="228" type="INT"/>
+                <tag dbnr="80" description="BCMEU : calibrated" name="B0.X1.CLA04.calibrated" startAdress="228" type="INT"/>
+                <tag dbnr="80" description="BCMEU : calibrated" name="E0.E1.BSB01.calibrated" startAdress="228" type="INT"/>
+                <tag dbnr="80" description="BCMEU : calibrated" name="E0.E1.BCA01.calibration_status" startAdress="228" type="INT"/>
+                <tag dbnr="80" description="BCMEU : calibrated" name="E0.E1.CLA01.calibrated" startAdress="228" type="INT"/>
+                <tag bitNbr="1" dbnr="50" description="BCMEU : Anybus Link status" name="E0.E1.BCA01.AnybusLinkStatus" startAdress="47" type="BOOLEAN"/>
+                <tag bitNbr="2" dbnr="50" description="BCMEU : BCMEU link status" name="E0.E1.BCA01.BcmLinkStatus" startAdress="47" type="BOOLEAN"/>
+            </tags>
+        </tagGroup>
+        <tagGroup type="WRITE">
+            <parameter index="0" type="INT">dbnr</parameter>
+            <parameter index="1" type="INT">startAdress</parameter>
+            <tags>
+                <tag name="B0.__.ACU01.KeyCommand" type="INT" description="ACU K@SD : key command" dbnr="103" startAdress="0"/>
+                <tag name="B0.D1.RPA01.Mmsprv" type="FLOAT" description="Feedback of the setpoint position of the radial probe" dbnr="1" startAdress="332"/>
+                <tag name="B0.M1.CCA01.Pscspoffset" type="FLOAT" description="COMPENSATION COIL CURRENT SETPOINT OFFSET" dbnr="11" startAdress="488"/>
+                <tag name="B0.M1.CCA01.Pscsprv" type="FLOAT" description="COMPENSATION COIL PS CURRENT SETPOINT EQUIPMENT" dbnr="1" startAdress="560"/>
+                <tag name="B0.M1.CCA01.Pscspslope" type="FLOAT" description="COMPENSATION COIL CURRENT SETPOINT SLOPE" dbnr="11" startAdress="484"/>
+                <tag name="B0.M1.HCA01.Pscspoffset" type="FLOAT" description="HARMONIC COIL 1-3 CURRENT SETPOINT OFFSET" dbnr="11" startAdress="336"/>
+                <tag name="B0.M1.HCA01.Pscsprv" type="FLOAT" description="Harmonic Coil 1-3 current setpoint : real value" dbnr="1" startAdress="276"/>
+                <tag name="B0.M1.HCA01.Pscspslope" type="FLOAT" description="HARMONIC COIL 1-3 CURRENT SETPOINT SLOPE" dbnr="11" startAdress="332"/>
+                <tag name="B0.M1.HCA02.Pscspoffset" type="FLOAT" description="HARMONIC COIL 2-4 CURRENT SETPOINT OFFSET" dbnr="11" startAdress="344"/>
+                <tag name="B0.M1.HCA02.Pscsprv" type="FLOAT" description="Harmonic Coil 2-4 current setpoint : real value" dbnr="1" startAdress="282"/>
+                <tag name="B0.M1.HCA02.Pscspslope" type="FLOAT" description="HARMONIC COIL 2-4 CURRENT SETPOINT SLOPE" dbnr="11" startAdress="340"/>
+                <tag name="B0.M1.MCA01.Pscspoffset" type="FLOAT" description="MAIN COIL CURRENT SETPOINT OFFSET" dbnr="11" startAdress="200"/>
+                <tag name="B0.M1.MCA01.Pscsprv" type="FLOAT" description="Main coil : current setpoint : real value" dbnr="4" startAdress="2"/>
+                <tag name="B0.M1.MCA01.Pscsprvback" type="FLOAT" description="Main coil : current setpoint : real value readback" dbnr="4" startAdress="2"/>
+                <tag name="B0.M1.MCA01.Pscspslope" type="FLOAT" description="MAIN COIL CURRENT SETPOINT SLOPE" dbnr="11" startAdress="196"/>
+                <tag name="B0.R1.FAA01.GridPscsprv" type="FLOAT" description="FPA GRID CURRENT SETPOINT EQUIPMENT" dbnr="1" startAdress="630"/>
+                <tag name="B0.R1.FAA01.GridPsvsprv" type="FLOAT" description="FPA GRID VOLTAGE SETPOINT EQUIPMENT" dbnr="1" startAdress="634"/>
+                <tag name="B0.R1.FAA01.ScreenPscsprv" type="FLOAT" description="FPA SCREEN CURRENT SETPOINT EQUIPMENT" dbnr="1" startAdress="650"/>
+                <tag name="B0.R1.LLA01.VDeespoffset" type="FLOAT" description="LLRF DEE VOLTAGE SETPOINT OFFSET" dbnr="11" startAdress="144"/>
+                <tag name="B0.R1.LLA01.VDeesprv" type="FLOAT" description="LLRF DEE VOLTAGE SETPOINT EQUIPMENT" dbnr="1" startAdress="104"/>
+                <tag name="B0.R1.LLA01.VDeespslope" type="FLOAT" description="LLRF DEE VOLTAGE SETPOINT SLOPE" dbnr="11" startAdress="140"/>
+                <tag name="B0.S1.ARA01.Pscspoffset" type="FLOAT" description="ION SOURCE ARC CURRENT SETPOINT OFFSET" dbnr="11" startAdress="184"/>
+                <tag name="B0.S1.ARA01.Pscsprv" type="FLOAT" description="ION SOURCE ARC P.S. CURRENT SETPOINT EQUIPMENT" dbnr="1" startAdress="148"/>
+                <tag name="B0.S1.ARA01.Pscspslope" type="FLOAT" description="ION SOURCE ARC CURRENT SETPOINT SLOPE" dbnr="11" startAdress="180"/>
+                <tag name="B0.S1.FIA01.Pscspoffset" type="FLOAT" description="ION SOURCE FILAMENT CURRENT SETPOINT OFFSET" dbnr="11" startAdress="192"/>
+                <tag name="B0.S1.FIA01.Pscsprv" type="FLOAT" description="ION SOURCE FILAMENT P.S. CURRENT SETPOINT EQUIPMENT" dbnr="1" startAdress="154"/>
+                <tag name="B0.S1.FIA01.Pscspslope" type="FLOAT" description="ION SOURCE FILAMENT CURRENT SETPOINT SLOPE" dbnr="11" startAdress="188"/>
+                <tag name="B0.S1.MFA01.Spoffset" type="FLOAT" description="MASS FLOW CONTROLLER SETPOINT OFFSEET" dbnr="11" startAdress="380"/>
+                <tag name="B0.S1.MFA01.Sprv" type="FLOAT" description="MASS FLOW CONTROLER SETPOINT REAL VALUE" dbnr="1" startAdress="674"/>
+                <tag name="B0.S1.MFA01.Spslope" type="FLOAT" description="MASS FLOW CONTROLLER SETPOINT SLOPE" dbnr="11" startAdress="376"/>
+                <tag name="B0.S1.PUA01.MmServicesprv" type="FLOAT" description="ION SOURCE AZIMUTHAL MOVEMENT SERVICE SETPOINT" dbnr="1" startAdress="312"/>
+                <tag name="B0.S1.PUA01.Mmspoffset" type="FLOAT" description="ION SOURCE AZIMUTHAL MOVEMENT SETPOINT OFFSET" dbnr="11" startAdress="364"/>
+                <tag name="B0.S1.PUA01.Mmsprv" type="FLOAT" description="ION SOURCE AZIMUTHAL MOVEMENT SETPOINT EQUIPMENT" dbnr="1" startAdress="298"/>
+                <tag name="B0.S1.PUA01.Mmspslope" type="FLOAT" description="ION SOURCE AZIMUTHAL MOVEMENT SETPOINT SLOPE" dbnr="11" startAdress="360"/>
+                <tag name="B0.X1.DFA01.Motor1mmspoffset" type="FLOAT" description="DEFLECTOR MOUVEMENT 1 SETPOINT OFFSET" dbnr="11" startAdress="256"/>
+                <tag name="B0.S1.PUA01.Mmslope" type="FLOAT" description="ION SOURCE AZIMUTHAL MOVEMENT FEEDBACK SLOPE" dbnr="11" startAdress="352"/>
+                <tag name="B0.S1.PUA01.Mmoffset" type="FLOAT" description="ION SOURCE AZIMUTHAL MOVEMENT FEEDBACK OFFSET" dbnr="11" startAdress="356"/>
+                <tag name="B0.X1.DFA01.Motor1mmsprv" type="FLOAT" description="DEFLECTOR MOUVEMENT 1 SETPOINT EQUIPMENT" dbnr="1" startAdress="220"/>
+                <tag name="B0.X1.DFA01.Motor1mmspslope" type="FLOAT" description="DEFLECTOR MOUVEMENT 1 SETPOINT SLOPE" dbnr="11" startAdress="252"/>
+                <tag name="B0.X1.DFA01.Motor2mmspoffset" type="FLOAT" description="DEFLECTOR MOUVEMENT 2 SETPOINT OFFSET" dbnr="11" startAdress="264"/>
+                <tag name="B0.X1.DFA01.Motor2mmsprv" type="FLOAT" description="DEFLECTOR MOUVEMENT 2 SETPOINT EQUIPMENT" dbnr="1" startAdress="226"/>
+                <tag name="B0.X1.DFA01.Motor2mmspslope" type="FLOAT" description="DEFLECTOR MOUVEMENT 2 SETPOINT SLOPE" dbnr="11" startAdress="260"/>
+                <tag name="B0.X1.DFA01.Motor1mmslope" type="FLOAT" description="DEFLECTOR MOUVEMENT 1 FEEDBACK SLOPE" dbnr="11" startAdress="236"/>
+                <tag name="B0.X1.DFA01.Motor1mmoffset" type="FLOAT" description="DEFLECTOR MOUVEMENT 1 FEEDBACK OFFSET" dbnr="11" startAdress="240"/>
+                <tag name="B0.X1.DFA01.Motor2mmslope" type="FLOAT" description="DEFLECTOR MOUVEMENT 2 FEEDBACK SLOPE" dbnr="11" startAdress="244"/>
+                <tag name="B0.X1.DFA01.Motor2mmoffset" type="FLOAT" description="DEFLECTOR MOUVEMENT 2 FEEDBACK OFFSET" dbnr="11" startAdress="248"/>
+
+                <tag name="B0.X1.DFA01.MotormmDBsprv" type="FLOAT" description="DEFLECTOR MOUVEMENT 1 &amp; 2 SETPOINTDEADBAND" dbnr="1" startAdress="178"/>
+                <tag name="B0.X1.DFA01.Psvspoffset" type="FLOAT" description="DEFLECTOR VOLTAGE SETPOINT OFFSET" dbnr="11" startAdress="232"/>
+                <tag name="B0.X1.DFA01.Psvsprv" type="FLOAT" description="DEFLECTOR VOLTAGE SETPOINT EQUIPMENT" dbnr="1" startAdress="202"/>
+                <tag name="B0.X1.DFA01.Psvspslope" type="FLOAT" description="DEFLECTOR VOLTAGE SETPOINT SLOPE" dbnr="11" startAdress="228"/>
+                <tag name="B0.X1.DFA01.Targetvsprv" type="FLOAT" description="DEFLECTOR RAMP TARGET VOLTAGE SETPOINT DIGITS" dbnr="1" startAdress="598"/>
+                <tag name="B0.X1.QDB01.pscspoffset" type="FLOAT" description="QUAD 1 P.S. CURRENT SETPOINT OFFSET" dbnr="11" startAdress="296"/>
+                <tag name="B0.X1.QDB01.pscsprv" type="FLOAT" description="QUAD 1 CURRENT SETPOINT EQUIPMENT" dbnr="1" startAdress="244"/>
+                <tag name="B0.X1.QDB01.pscspslope" type="FLOAT" description="QUAD 1 P.S. CURRENT SETPOINT SLOPE" dbnr="11" startAdress="292"/>
+                <tag name="B0.X1.QDB02.pscspoffset" type="FLOAT" description="QUAD 2 P.S. CURRENT SETPOINT OFFSET" dbnr="11" startAdress="304"/>
+                <tag name="B0.X1.QDB02.pscsprv" type="FLOAT" description="QUAD 2 CURRENT SETPOINT EQUIPMENT" dbnr="1" startAdress="250"/>
+                <tag name="B0.X1.QDB02.pscspslope" type="FLOAT" description="QUAD 2 P.S. CURRENT SETPOINT SLOPE" dbnr="11" startAdress="300"/>
+                <tag name="B0.X1.SGC01.XPscspoffset" type="FLOAT" description="X STERRING 1 CURRENT SETPOINT OFFSET" dbnr="11" startAdress="432"/>
+                <tag name="B0.X1.SGC01.XPscsprv" type="FLOAT" description="X STEERING 1 CURRENT SETPOINT EQUIPMENT" dbnr="1" startAdress="530"/>
+                <tag name="B0.X1.SGC01.XPscspslope" type="FLOAT" description="X STERRING 1 CURRENT SETPOINT SLOPE" dbnr="11" startAdress="428"/>
+                <tag name="B0.X1.SGC01.YPscspoffset" type="FLOAT" description="Y STERRING 1 CURRENT SETPOINT OFFSET" dbnr="11" startAdress="464"/>
+                <tag name="B0.X1.SGC01.YPscsprv" type="FLOAT" description="Y STEERING 1 CURRENT SETPOINT EQUIPMENT" dbnr="1" startAdress="536"/>
+                <tag name="B0.X1.SGC01.YPscspslope" type="FLOAT" description="Y STERRING 1 CURRENT SETPOINT SLOPE" dbnr="11" startAdress="460"/>
+                <tag name="B0.X1.SGC02.XPscspoffset" type="FLOAT" description="X STERRING 2 CURRENT SETPOINT OFFSET" dbnr="11" startAdress="440"/>
+                <tag name="B0.X1.SGC02.XPscsprv" type="FLOAT" description="X STEERING 2 CURRENT SETPOINT EQUIPMENT" dbnr="1" startAdress="542"/>
+                <tag name="B0.X1.SGC02.XPscspslope" type="FLOAT" description="X STERRING 2 CURRENT SETPOINT SLOPE" dbnr="11" startAdress="436"/>
+                <tag name="B0.X1.SGC02.YPscsprv" type="FLOAT" description="Y STEERING 2 CURRENT SETPOINT EQUIPMENT" dbnr="1" startAdress="548"/>
+                <tag name="B0.X1.SGC02.YPscspoffset" type="FLOAT" description="Y STERRING 2 CURRENT SETPOINT OFFSET" dbnr="11" startAdress="472"/>
+                <tag name="B0.X1.SGC02.YPscspslope" type="FLOAT" description="Y STERRING 2 CURRENT SETPOINT SLOPE" dbnr="11" startAdress="468"/>
+            </tags>
+        </tagGroup>
+    </deviceType>
+    <deviceType class="com.iba.device.BcreuHttpDevice" name="BcreuHttp">
+        <tagGroup type="READ">
+            <parameter index="0" type="STRING">info</parameter>
+            <tags>
+                <tag description="Lookup" name="Lookup" type="OTHER" info="0"/>
+                <tag description="Running State" name="Running State" type="STRING" info="html"/>
+                <tag description="Lookup Table State" name="Lookup Table State" type="STRING" info="html"/>
+                <tag description="Max Beam Current in nA" name="Max Beam Current in nA" type="FLOAT" info="html"/>
+                <tag description="Max Beam Current in digits" name="Max Beam Current in digits" type="INT" info="html"/>
+                <tag description="IC Cyclo Current in nA" name="IC Cyclo Current in nA" type="FLOAT" info="html"/>
+                <tag description="IC Cyclo Current in digits" name="IC Cyclo Current in digits" type="INT" info="html"/>
+            </tags>
+        </tagGroup>
+    </deviceType>
+    <!--<deviceType class="com.iba.pts.bms.bss.bps.devices.impl.LlrfProxy" name="Llrf">-->
+        <!--<tagGroup type="READ">-->
+            <!--<parameter index="0" type="STRING">info</parameter>-->
+            <!--<tags>-->
+                <!--<tag description="Lookup" name="Lookup" type="OTHER" info="0"/>-->
+                <!--<tag description="DeeVoltage1" name="DeeVoltage1" type="STRING" info="html"/>-->
+                <!--<tag description="Lookup Table State" name="Lookup Table State" type="STRING" info="html"/>-->
+                <!--<tag description="Max Beam Current in nA" name="Max Beam Current in nA" type="FLOAT" info="html"/>-->
+                <!--<tag description="Max Beam Current in digits" name="Max Beam Current in digits" type="INT" info="html"/>-->
+                <!--<tag description="IC Cyclo Current in nA" name="IC Cyclo Current in nA" type="FLOAT" info="html"/>-->
+                <!--<tag description="IC Cyclo Current in digits" name="IC Cyclo Current in digits" type="INT" info="html"/>-->
+            <!--</tags>-->
+        <!--</tagGroup>-->
+    <!--</deviceType>-->
+</deviceTypes>

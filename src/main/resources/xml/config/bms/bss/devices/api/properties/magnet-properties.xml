@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<propertyDefinitions>
+   <component>
+      <name>ModbusMagnet</name>
+      <propertyDefinition>
+         <name>OnStandby</name>
+         <type>INTEGER</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>The Magnet standby</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>RegulationOk</name>
+         <type>INTEGER</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>The Magnet regulation</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>InternalInterlockOk</name>
+         <type>INTEGER</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>The Magnet interlock</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>NoFailure</name>
+         <type>INTEGER</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>The Power Supply interlock</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>LocalControlMode</name>
+         <type>INTEGER</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>The Magnet local/remote control mode</description>
+      </propertyDefinition>
+   </component>
+   <component>
+      <name>Magnet</name>
+      <propertyDefinition>
+         <name>Current</name>
+         <type>DOUBLE</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>The Magnet current</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>RequestedCurrent</name>
+         <type>DOUBLE</type>
+         <indexed>false</indexed>
+         <writable>true</writable>
+         <description>The Magnet current setpoint requested</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>CurrentSetpointFeedback</name>
+         <type>DOUBLE</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>The Magnet current setpoint feedback</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>Field</name>
+         <type>DOUBLE</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>The Magnet field</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>RequestedField</name>
+         <type>DOUBLE</type>
+         <indexed>false</indexed>
+         <writable>true</writable>
+         <description>The Magnet requested field</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>RegulationOk</name>
+         <type>BOOLEAN</type>
+         <indexed>false</indexed>
+         <writable>true</writable>
+         <description>The Magnet regulation state (true if ok)</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>InternalInterlockOk</name>
+         <type>BOOLEAN</type>
+         <indexed>false</indexed>
+         <writable>true</writable>
+         <description>The Magnet internal interlock status (true if ok)</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>WaterflowOk</name>
+         <type>BOOLEAN</type>
+         <indexed>false</indexed>
+         <writable>true</writable>
+         <description>The Magnet waterflow status (true if ok)</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>ThermalSwitchOk</name>
+         <type>BOOLEAN</type>
+         <indexed>false</indexed>
+         <writable>true</writable>
+         <description>The Magnet thermal switch status (true if ok)</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>PowerStatus</name>
+         <type>BOOLEAN</type>
+         <indexed>false</indexed>
+         <writable>true</writable>
+         <description>The Magnet power status (true if on)</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>LocalControlMode</name>
+         <type>BOOLEAN</type>
+         <indexed>false</indexed>
+         <writable>true</writable>
+         <description>The Magnet local control mode state (true if in local control mode)</description>
+      </propertyDefinition>
+   </component>
+</propertyDefinitions>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<propertyDefinitions>
+   <component>
+      <name>Range</name>
+      <propertyDefinition>
+         <name>rangeStatus</name>
+         <type>INTEGER</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>The global range status</description>
+      </propertyDefinition>
+   </component>
+</propertyDefinitions>

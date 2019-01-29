@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<propertyDefinitions>
+   <component>
+      <name>Degrader</name>
+      <propertyDefinition>
+         <name>beamStopCurrent</name>
+         <type>DOUBLE</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>Degrader Beam Stop Current</description>
+      </propertyDefinition>
+   </component>
+</propertyDefinitions>

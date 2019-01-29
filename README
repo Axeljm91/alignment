@@ -1,0 +1,27 @@
+Introduction:
+-------------
+
+This README documentation provides the necessary information to build and use the adaptAlign utility, which interfaces with the PT system to automate extraction steering optimization. Please note that adaptAlign is distinct from its predecessor iAlign, which performed the same task but can be considered obsolete.
+
+Version Dependencies:
+---------------------
+
+Currently the adaptAlign tool is known to support PTS-8.5.x with the T19 configuration. Additional testing will be required to confirm the support of previous versions as well as other configurations. Note that to build adaptAlign you must have Maven v3.2.1 and Java v1.8. 
+
+Windows 7 Build Instructions:
+-----------------------------
+
+1) Export the adaptAlign code to your local machine from the repository location http://subversion.lln.iba/repos/tc/alcyone/trunk/dev/se/alignment. 
+2) Refer to the projects head pom.xml file to determine the compatible blak version by locating the groupId "com.iba.blak".
+3) Export the Blak branch associated with the version found in the previous step to your local machine (ex. http://subversion.lln.iba/repos/tc/alcyone/branches/BLAK-8.5.x/). 
+4) Within a command window, navigate to the folder containing the head pom.xml for the entire Blak branch. Execute the command "mvn clean install" in order to install Blak and its dependencies to the local maven repository.
+5) In the same command navigate to the folder containing the head pom.xml for adaptAlign and execute the command "mvn package shade:shade" in order to package the adaptAlign tool;
+6) Once the packaging is complete, the "beam-ialign-8.x-SNAPSHOT-deploy.jar" can be found in the newly created "target" folder. 
+
+adaptAlign Startup Instructions:
+--------------------------------
+
+1) Copy the generated file "beam-ialign-8.x-SNAPSHOT-deploy.jar" to the head of the adaptAlign export along with "siteconfig.xml", "BeamLineDescription-ESS.csv", and start_align.bat. 
+2) Modify the "siteconfig.xml" file in order to match the configuration of your site.
+3) Execute the "start_align.bat" script to start up adaptAlign and connect to the equipment on site. Note that this must be done on the production network to allow for a connection. 
+4) set up notif-server port in siteconfig.xml, and also support notif-server port define in command line by add "comm.notif.port=xxxxx". defination in command line has high priority.

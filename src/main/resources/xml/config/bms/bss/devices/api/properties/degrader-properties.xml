@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<propertyDefinitions>
+   <component>
+      <name>Degrader</name>
+      <propertyDefinition>
+         <name>Position</name>
+         <type>INTEGER</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>The Degrader position</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>RequestedPosition</name>
+         <type>INTEGER</type>
+         <indexed>false</indexed>
+         <writable>true</writable>
+         <description>The Degrader requested position</description>
+      </propertyDefinition>
+   </component>
+</propertyDefinitions>

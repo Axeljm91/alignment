@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sites>
+	<site name="Wanjie" location="Wanjie, China" timezone="Asia/Shanghai">
+		<device name="acu230" type="Acu230" ip="10.1.10.41" info="2002;2003"/>
+		<device name="smartSocket" type="SmartSocket" ip="10.1.10.10" info="TCS_T02;mcr_mcrhcidg"/>
+		<device name="llrf" type="Llrf" ip="10.1.10.44" info="10001"/>
+		<device name="weather" type="Weather" ip="http://weather.yahooapis.com/forecastrss?w=2168257&amp;u=c"/>
+	</site>
+	<site name="Seoul" location="Seoul, Korea" timezone="Asia/Seoul">
+		<device name="acu230" type="Acu230" ip="10.1.30.41" info="2002;2003"/>
+		<device name="smartSocket" type="SmartSocket" ip="10.1.30.10" info="TCS_T03;mcr_mcrhcidg"/>
+		<device name="llrf" type="Llrf" ip="10.1.30.44" info="10001"/>
+		<device name="weather" type="Weather" ip="http://weather.yahooapis.com/forecastrss?w=1132599&amp;u=c"/>
+	</site>
+	<site name="Jacksonville" location="Jacksonville, USA" timezone="US/Eastern">
+		<device name="acu230" type="Acu230" ip="10.1.40.41" info="2002;2003"/>
+		<device name="smartSocket" type="SmartSocket" ip="10.1.40.10" info="TCS_T06;mcr_mcrhcidg"/>
+		<device name="llrf" type="Llrf" ip="10.1.40.44" info="10001"/>
+		<device name="weather" type="Weather" ip="http://weather.yahooapis.com/forecastrss?w=2428344&amp;u=c"/>
+	</site>
+	<site name="Philadelphia" location="Philadelphia, USA" timezone="US/Eastern">
+		<device name="acu230" type="Acu230" ip="10.1.50.41" info="2002;2003"/>
+		<device name="smartSocket" type="SmartSocket" ip="10.1.50.10" info="TCS_T09;mcr_mcrhcidg"/>
+		<device name="llrf" type="Llrf" ip="10.1.50.113" info="10001"/>
+		<device name="bcreu" type="BcreuModbus" ip="10.1.50.48" info="502"/>
+		<device name="bcreu-http" type="BcreuHttp" ip="10.1.50.48" info="bcreu"/>
+		<device name="weather" type="Weather" ip="http://weather.yahooapis.com/forecastrss?w=2471217&amp;u=c"/>	
+	</site>
+	<site name="Oklahoma" location="Oklahoma, USA" timezone="US/Central">
+		<device name="acu230" type="Acu230" ip="10.1.60.41" info="2002;2003"/>
+		<device name="smartSocket" type="SmartSocket" ip="10.1.60.10" info="TCS_T10;mcr_mcrhcidg"/>
+		<device name="llrf" type="Llrf" ip="10.1.60.44" info="10001"/>
+		<device name="bcreu" type="BcreuModbus" ip="10.1.60.48" info="bcreu"/>
+		<device name="bcreu-http" type="BcreuHttp" ip="10.1.60.48" info="bcreu"/>
+		<device name="weather" type="Weather" ip="http://weather.yahooapis.com/forecastrss?w=2464592&amp;u=c"/>
+	</site>
+	<site name="Essen" location="Essen, Germany" timezone="Europe/Berlin">
+		<device name="acu230" type="Acu230" ip="10.1.70.41" info="2002;2003"/>	
+		<device name="smartSocket" type="SmartSocket" ip="10.1.70.10" info="TCS_T07;mcr_mcrhcidg"/>
+		<device name="llrf" type="Llrf" ip="10.1.70.125" info="10001"/>
+		<device name="bcreu" type="BcreuModbus" ip="10.1.70.48" info="502"/>
+		<device name="bcreu-http" type="BcreuHttp" ip="10.1.70.48" info="bcreu"/>
+		<device name="weather" type="Weather" ip="http://weather.yahooapis.com/forecastrss?w=648820&amp;u=c"/>
+	</site>
+	<site name="Orsay" location="Orsay, France" timezone="Europe/Paris">
+		<device name="acu230" type="Acu230" ip="10.1.80.41" info="2002;2003"/>
+		<device name="smartSocket" type="SmartSocket" ip="10.1.80.10" info="TCS_T11;mcr_mcrhcidg"/>
+		<device name="llrf" type="Llrf" ip="10.1.80.44" info="10001"/>
+		<device name="bcreu" type="BcreuModbus" ip="10.1.80.48" info="502"/>
+		<device name="bcceu" type="BcceuSerial" ip="COM1" info="COM1;9600"/>
+		<device name="bcreu-http" type="BcreuHttp" ip="10.1.80.48" info="bcreu"/>
+		<device name="weather" type="Weather" ip="http://weather.yahooapis.com/forecastrss?w=55863553&amp;u=c"/>
+	</site>
+	<site name="Hampton" location="Hampton, USA" timezone="US/Eastern">
+		<device name="acu230" type="Acu230" ip="10.1.90.41" info="2002;2003"/>
+		<device name="smartSocket" type="SmartSocket" ip="10.1.90.10" info="TCS_T08;mcr_mcrhcidg"/>
+		<device name="llrf" type="Llrf" ip="10.1.90.54" info="10001"/>
+		<device name="bcreu" type="BcreuModbus" ip="10.1.90.48" info="502"/>
+		<device name="bcreu-http" type="BcreuHttp" ip="10.1.90.48" info="bcreu"/>
+		<device name="weather" type="Weather" ip="http://weather.yahooapis.com/forecastrss?w=2416847&amp;u=c"/>
+	</site>
+	<site name="Chicago" location="Chicago, USA" timezone="US/Eastern">
+		<device name="acu230" type="Acu230" ip="10.1.100.41" info="2002;2003"/>
+		<device name="smartSocket" type="SmartSocket" ip="10.1.100.10" info="TCS_T12;mcr_mcrhcidg"/>
+		<device name="llrf" type="Llrf" ip="10.1.100.44" info="10001"/>
+		<device name="bcreu" type="BcreuModbus" ip="10.1.100.48" info="502"/>
+		<device name="bcreu-http" type="BcreuHttp" ip="10.1.100.48" info="bcreu"/>	
+		<device name="weather" type="Weather" ip="http://weather.yahooapis.com/forecastrss?w=2379574&amp;u=c"/>
+	</site>
+	<site name="New Jersey" location="New Jersey, USA" timezone="US/Eastern">
+		<device name="acu230" type="Acu230" ip="10.1.110.41" info="2002;2003"/>
+		<device name="smartSocket" type="SmartSocket" ip="10.1.110.10" info="TCS_T13;mcr_mcrhcidg"/>
+		<device name="llrf" type="Llrf" ip="10.1.110.113" info="10001"/>
+		<device name="bcreu" type="BcreuModbus" ip="10.1.110.48" info="502"/>
+		<device name="electrometer" type="Electrometer" ip="10.1.110.190" info="502"/>	
+		<device name="bcreu-http" type="BcreuHttp" ip="10.1.110.48" info="bcreu"/>
+		<device name="weather" type="Weather" ip="http://weather.yahooapis.com/forecastrss?w=22664138&amp;u=c"/>
+	</site>
+	<site name="Prague" location="Prague, Czech Republic" timezone="Europe/Berlin">
+		<device name="acu230" type="Acu230" ip="10.1.120.41" info="2002;2003"/>
+		<device name="smartSocket" type="SmartSocket" ip="10.1.120.10" info="TCS_T14;mcr_mcrhcidg"/>
+		<device name="llrf" type="Llrf" ip="10.1.120.44" info="10001"/>
+		<device name="bcreu" type="BcreuModbus" ip="10.1.120.48" info="502"/>
+		<device name="electrometer" type="Electrometer" ip="10.1.120.190" info="502"/>		
+		<device name="bcreu-http" type="BcreuHttp" ip="10.1.120.48" info="bcreu"/>
+		<device name="weather" type="Weather" ip="http://weather.yahooapis.com/forecastrss?w=796597&amp;u=c"/>	
+	</site>
+	<site name="Trento" location="Trento, Italy" timezone="Europe/Berlin">
+		<device name="acu230" type="Acu230" ip="10.1.130.41" info="2003;2003"/>
+		<device name="smartSocket" type="SmartSocket" ip="10.1.130.10" info="TCS_T14;mcr_mcrhcidg"/>
+		<device name="llrf" type="Llrf" ip="10.1.130.44" info="10001"/>
+		<device name="bcreu" type="BcreuModbus" ip="10.1.130.48" info="502"/>
+		<device name="bcreu-http" type="BcreuHttp" ip="10.1.130.48" info="bcreu"/>	
+		<device name="electrometer" type="Electrometer" ip="10.1.130.190" info="502"/>	
+		<device name="weather" type="Weather" ip="http://weather.yahooapis.com/forecastrss?w=725257&amp;u=c"/>			
+	</site>
+	<site name="Seattle" location="Seattle, USA" timezone="US/Eastern">
+		<device name="acu230" type="Acu230" ip="10.1.140.41" info="2002;2003"/>
+		<device name="smartSocket" type="SmartSocket" ip="10.1.140.10" info="TCS_T14;mcr_mcrhcidg"/>
+		<device name="llrf" type="Llrf" ip="10.1.140.44" info="10001"/>
+		<device name="bcreu" type="BcreuModbus" ip="10.1.140.48" info="502"/>
+		<device name="bcreu-http" type="BcreuHttp" ip="10.1.140.48" info="bcreu"/>	
+		<device name="electrometer" type="Electrometer" ip="10.1.140.190" info="502"/>		
+		<device name="weather" type="Weather" ip="http://weather.yahooapis.com/forecastrss?w=2490383&amp;u=c"/>			
+	</site>
+	<site name="Krakow" location="Krakow, Poland" timezone="Europe/Berlin">
+		<device name="acu230" type="Acu230" ip="10.1.150.41" info="2002;2003"/>	
+		<device name="smartSocket" type="SmartSocket" ip="10.1.150.10" info="TCS_T14;mcr_mcrhcidg"/>
+		<device name="llrf" type="Llrf" ip="10.1.150.44" info="10001"/>
+		<device name="bcreu" type="BcreuModbus" ip="10.1.150.196" info="502"/>
+		<device name="bcreu-http" type="BcreuHttp" ip="10.1.150.48" info="bcreu"/>		
+		<device name="electrometer" type="Electrometer" ip="10.1.150.190" info="502"/>		
+		<device name="mssqlC230" type="MsSqlC230" ip="10.1.150.247" info="1433;Runtime;wwUser;wwUser"/>
+		<device name="weather" type="Weather" ip="http://weather.yahooapis.com/forecastrss?w=502075&amp;u=c"/>			
+	</site>
+	<site name="Knoxville" location="Knoxville, USA" timezone="US/Eastern">
+		<device name="acu230" type="Acu230" ip="10.1.170.41" info="2002;2003"/>	
+		<device name="smartSocket" type="SmartSocket" ip="10.1.170.10" info="TCS_T14;mcr_mcrhcidg"/>
+		<device name="llrf" type="Llrf" ip="10.1.170.202" info="10001"/>
+		<device name="bcreu" type="BcreuModbus" ip="10.1.170.48" info="502"/>
+		<device name="bcreu-http" type="BcreuHttp" ip="10.1.170.48" info="bcreu"/>		
+		<device name="electrometer" type="Electrometer" ip="10.1.170.190" info="502"/>		
+		<device name="weather" type="Weather" ip="http://weather.yahooapis.com/forecastrss?w=2433662&amp;u=c"/>			
+	</site>
+	<site name="Dresden" location="Dresden, Germany" timezone="Europe/Berlin">
+		<device name="acu230" type="Acu230" ip="10.1.180.41" info="2002;2003"/>	
+		<device name="smartSocket" type="SmartSocket" ip="10.1.180.10" info="TCS_T14;mcr_mcrhcidg"/>
+		<device name="llrf" type="Llrf" ip="10.1.180.198" info="8000"/>
+		<device name="bcreu" type="BcreuModbus" ip="10.1.180.199" info="502"/>
+		<device name="bcreu-http" type="BcreuHttp" ip="10.1.180.48" info="bcreu"/>		
+		<device name="electrometer" type="Electrometer" ip="10.1.180.190" info="502"/>		
+		<device name="weather" type="Weather" ip="http://weather.yahooapis.com/forecastrss?w=12831235&amp;u=c"/>			
+	</site>
+	<site name="Uppsala" location="Uppsala, Sweden" timezone="Europe/Berlin">
+		<device name="acu230" type="Acu230" ip="10.1.190.41" info="2002;2003"/>	
+		<device name="smartSocket" type="SmartSocket" ip="10.1.190.10" info="TCS_T14;mcr_mcrhcidg"/>
+		<device name="llrf" type="Llrf" ip="10.1.190.198" info="8000"/>
+		<device name="bcreu" type="BcreuModbus" ip="10.1.190.199" info="502"/>
+		<device name="bcreu-http" type="BcreuHttp" ip="10.1.190.48" info="bcreu"/>		
+		<device name="electrometer" type="Electrometer" ip="10.1.190.190" info="502"/>		
+		<device name="weather" type="Weather" ip="http://weather.yahooapis.com/forecastrss?w=908572&amp;u=c"/>			
+	</site>
+	<site name="Lln-Vault.1" location="Louvain-la-Neuve, Belgium" timezone="Europe/Brussels">
+		<device name="bcreu" type="BcreuModbus" ip="10.100.47.48" info="502"/>
+		<device name="acu230" type="Acu230" ip="10.100.47.22" info="2002;2003"/>
+		<device name="llrf" type="Llrf" ip="10.100.47.26" info="10001"/>
+		<device name="electrometer" type="Electrometer" ip="10.100.47.24" info="502"/>
+		<device name="mssqlC230" type="MsSqlC230" ip="" info="1433;Runtime;signalAnalyzer;signalAnalyzer"/>
+		<device name="bnr" type="Modbus" ip="10.1.70.98" info="502"/>	
+		<device name="filament" type="FilamentPS" ip="" info="8462"/>
+		<device name="weather" type="Weather" ip="http://weather.yahooapis.com/forecastrss?w=968019&amp;u=c"/>
+	</site>
+	<site name="Lln-Vault.7" location="Louvain-la-Neuve, Belgium" timezone="Europe/Brussels">
+		<device name="bcreu" type="BcreuModbus" ip="10.100.47.15" info="502"/>
+		<device name="acu230" type="Acu230" ip="10.100.47.12" info="2002;2003"/>
+		<device name="llrf" type="Llrf" ip="10.100.47.13" info="10001"/>
+		<device name="electrometer" type="Electrometer" ip="10.100.47.14" info="502"/>
+		<device name="mssqlC230" type="MsSqlC230" ip="" info="1433;Runtime;signalAnalyzer;signalAnalyzer"/>
+		<device name="bnr" type="Modbus" ip="10.100.40.161" info="502"/>	
+		<device name="filament" type="FilamentPS" ip="" info="8462"/>
+		<device name="weather" type="Weather" ip="http://weather.yahooapis.com/forecastrss?w=968019&amp;u=c"/>
+	</site>	
+	<site name="Lln-Vault.6" location="Louvain-la-Neuve, Belgium" timezone="Europe/Brussels">
+		<device name="bcreu" type="BcreuModbus" ip="10.100.47.6" info="502"/>
+		<device name="acu230" type="Acu230" ip="10.100.47.2" info="2002;2003"/>
+		<device name="llrf" type="Llrf" ip="10.100.47.7" info="10001"/>
+		<device name="electrometer" type="Electrometer" ip="10.100.47.4" info="502"/>
+		<device name="mssqlC230" type="MsSqlC230" ip="" info="1433;Runtime;signalAnalyzer;signalAnalyzer"/>
+		<device name="bnr" type="Modbus" ip="10.100.40.161" info="502"/>	
+		<device name="filament" type="FilamentPS" ip="" info="8462"/>	
+		<device name="weather" type="Weather" ip="http://weather.yahooapis.com/forecastrss?w=968019&amp;u=c"/>
+	</site>	
+	<site name="Lln-Hall" location="Louvain-la-Neuve, Belgium" timezone="Europe/Brussels">
+		<device name="opcS2C2" type="OpcS2C2" ip="10.100.10.30" info="ArchestrA.DASSIDirect;control01;ibapass;500"/>
+		<device name="weather" type="Weather" ip="http://weather.yahooapis.com/forecastrss?w=968019&amp;u=c"/>
+		<device name="mssqlS2C2" type="MsSqlS2C2" ip="10.100.10.30" info="1433;Runtime;wwUser;wwUser"/>
+	</site>		
+</sites>

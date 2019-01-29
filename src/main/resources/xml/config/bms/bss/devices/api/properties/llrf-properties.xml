@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<propertyDefinitions>
+   <component>
+      <name>Llrf</name>
+      <propertyDefinition>
+         <name>DeeVoltage1</name>
+         <type>DOUBLE</type>
+         <indexed>false</indexed>
+         <writable>true</writable>
+         <description>Llrf Dee Voltage 1</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>DeeVoltage2</name>
+         <type>DOUBLE</type>
+         <indexed>false</indexed>
+         <writable>true</writable>
+         <description>Llrf Dee Voltage 2</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>DeeVoltageRegulation</name>
+         <type>INTEGER</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>Buffer containing the info if llrf dee voltage is in regulation</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>RfStatus</name>
+         <type>INTEGER</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>Status whose first bit indicates whether RF is on or off</description>
+      </propertyDefinition>
+   </component>
+</propertyDefinitions>

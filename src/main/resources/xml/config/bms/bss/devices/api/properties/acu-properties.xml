@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<propertyDefinitions>
+	<component>
+		<name>Acu</name>
+		<propertyDefinition>
+			<name>OkForTreatmentInt</name>
+			<type>INTEGER</type>
+			<indexed>false</indexed>
+			<writable>false</writable>
+			<description>ACU Ok for Treatment (Integer).</description>
+		</propertyDefinition>
+		<propertyDefinition>
+			<name>ConfigurationChecksum</name>
+			<type>INTEGER</type>
+			<indexed>false</indexed>
+			<writable>false</writable>
+			<description>ACU Configuration checksum</description>
+		</propertyDefinition>
+		<propertyDefinition>
+			<name>SoftwareChecksum</name>
+			<type>INTEGER</type>
+			<indexed>false</indexed>
+			<writable>false</writable>
+			<description>ACU software checksum</description>
+		</propertyDefinition>
+		<propertyDefinition>
+			<name>HardwareChecksum</name>
+			<type>INTEGER</type>
+			<indexed>false</indexed>
+			<writable>false</writable>
+			<description>ACU hardware checksum</description>
+		</propertyDefinition>
+		<propertyDefinition>
+			<name>FirmwareVersion</name>
+			<type>STRING</type>
+			<indexed>false</indexed>
+			<writable>false</writable>
+			<description>ACU firmware version</description>
+		</propertyDefinition>
+	</component>
+</propertyDefinitions>

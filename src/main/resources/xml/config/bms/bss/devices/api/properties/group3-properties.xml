@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<propertyDefinitions>
+   <component>
+      <name>Group3</name>
+      <propertyDefinition>
+         <name>Field</name>
+         <type>DOUBLE</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>Field property of the Group3</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>RequestedField</name>
+         <type>DOUBLE</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>Requested Field property of the Group3</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>RawField</name>
+         <type>DOUBLE</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>Raw Field property of the Group3</description>
+      </propertyDefinition>
+   </component>   
+</propertyDefinitions>

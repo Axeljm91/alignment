@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ ///////////////////////////////////////////////////////////////////
+  ~ Copyright (c) by Ion Beam Applications S.A.
+  ~ All rights reserved
+  ~ Rue du cyclotron, 3
+  ~ B-1348 Louvain-la-Neuve
+  ~ Tel : +32.10.47.58.11
+  ~ ///////////////////////////////////////////////////////////////////
+  -->
+
+<!--Dictionary of ICOMP properties for the BAEU -->
+
+<propertyDefinitions>
+   <component>
+      <name>BAEU</name>
+      <propertyDefinition>
+         <name>RbsoLevel1CheckActive</name>
+         <type>BOOLEAN</type>
+         <description>Indicates whether RBSO Level 1 check is active.</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>RbsoLevel1CheckOk</name>
+         <type>BOOLEAN</type>
+         <description>Indicates whether the RBSO check is Ok.</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>RbsoLevel2CheckActive</name>
+         <type>BOOLEAN</type>
+         <description>Indicates whether RBSO Level 2 check is active.</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>RbsoLevel2CheckOk</name>
+         <type>BOOLEAN</type>
+         <description>Indicates whether the RBSO check is Ok.</description>
+      </propertyDefinition>
+
+      <propertyDefinition>
+         <name>LargeGapIcCurrent</name>
+         <type>DOUBLE</type>
+         <description>Value of the Ic Cyclo LG current averaged over 1s.</description>
+      </propertyDefinition>
+
+      <propertyDefinition>
+         <name>BaeuState</name>
+         <type>String</type>
+         <description>The state of the Bireu: Idle, Ready, BcmCheckStarted, Unknown.</description>
+      </propertyDefinition>
+
+
+
+   </component>
+</propertyDefinitions>

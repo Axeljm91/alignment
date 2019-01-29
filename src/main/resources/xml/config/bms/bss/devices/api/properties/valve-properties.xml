@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<propertyDefinitions>
+   <component>
+      <name>Valve</name>
+      <propertyDefinition>
+         <name>Opened</name>
+         <type>BOOLEAN</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>The Valve is opened</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>Closed</name>
+         <type>BOOLEAN</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>The Valve is closed</description>
+      </propertyDefinition>
+   </component>
+</propertyDefinitions>
