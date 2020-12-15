@@ -4,7 +4,7 @@
 		<beamline file="./BeamLineDescription-ESS.csv"/>
 		<results file="./adapt_align.csv"/>
 		<!--device name="llrf" type="Llrf" ip="10.1.100.44" info="10001"/-->
-		<device name="acu230" type="Acu230" ip="acu.ptccdh.org" info="2002;2003"/>
+		<device name="acu230" type="Acu230" ip="acu.ptccdh.org" info="2000;2001"/>
 		<!--device name="bcreu-http" type="BcreuHttp" ip="bcreu.ptccdh.org" info="bcreu;0.15258"/-->
 		<device name="bcreu-http" type="BcreuHttp" ip="bcreu.ptccdh.org" info="bcreu;0.15258"/>
 		<gx_parameters G11="-0.29952381" G12="-0.58380952" G21="-0.13107143" G22="-0.51511905"/>
@@ -12,15 +12,15 @@
 		<!-- "t1_x;t1_y;t2_x;t2_y" -->
 		<magnets min="-55;-55;-40;-40" max="35;35;70;70"/>
 		<!-- "p1e_x;p1e_y;p2e_x;p2e_y" -->
-		<bpm_center target="0;0.0;0;0.0" tolerance="0.20;0.20;0.90;0.90"/>
+		<bpm_center target="0;0;0;0" tolerance="0.20;0.20;0.90;0.90"/>
 		<bpm_sigma target="2;2;12;12" tolerance="2;2;4;4"/>
-		<!--automation max_attempts="6" retries="1" wait_time="500" max_diverge="0.1"/-->
-		<notifserver ip_address="10.1.100.13" port="18385"/>
+		<automation max_attempts="6" retries="1" wait_time="500" max_diverge="0.1"/>
+		<notifserver ip_address="10.1.100.13" port="16540"/>
 		<ecubtcu ip_address="10.1.100.40"/>
 		<!-- default monitor is 0 -->
 		<monitor number="0"/>
 		<!-- tolerance for warning highlight;PopUpLevel-->
-		<deflector voltage="49.0"/>
+		<deflector voltage="51.5"/>
 		<!-- "t1_x;t1_y;t2_x;t2_y" -->
 		<restore_magnets current="-42;-45;-14;53"/>
 		<!-- maximum current(A) change allowed per magnet per apply -->

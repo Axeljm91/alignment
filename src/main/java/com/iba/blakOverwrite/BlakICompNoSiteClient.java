@@ -9,6 +9,9 @@
 
 package com.iba.blakOverwrite;
 
+import com.iba.blak.Blak;
+import com.iba.blak.BlakConstants;
+import com.iba.blak.BlakPreferences;
 import com.iba.ialign.Controller;
 import com.iba.icomp.core.event.DefaultEventFactory;
 import com.iba.icomp.core.event.EventBus;
@@ -26,6 +29,7 @@ import com.iba.icomp.core.timer.TimerFactory;
 import com.iba.icomp.core.util.Logger;
 import com.iba.pts.bms.common.URNEventRouter;
 import com.iba.pts.bms.datatypes.api.TherapyCentre;
+import com.iba.pts.bms.datatypes.impl.TherapyCentreImpl;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -201,25 +205,13 @@ public class BlakICompNoSiteClient
       // setup bcreu and bpscontrollerproxy only if we connected to NotifServer
       // meaning we are using BMS8.0+
       Controller.beam.setupBpsController();
+      Controller.beam.setupLlrf();
       //Controller.beam.setupDegrader();
       Controller.beam.setBeamControlMode(1);
       Controller.beam.setupBcreu();
       Controller.beam.setupBeamScheduler();
       Controller.beam.setupBssController();
-      Controller.beam.setupLlrf();
-      Controller.beam.setupBAPP1();
-      Controller.beam.setupBAPP4();
-      //Controller.beam.setupTSM1();
-      Controller.beam.setupVCEU3();
-      Controller.beam.setupSMEU3();
-      Controller.beam.setupSSEU3();
-      Controller.beam.setupTSM3();
-      Controller.beam.setupISEU1();
-      //Controller.beam.setupISEU4();
-      //Controller.beam.setupXray();
-      Controller.beam.setupBLPSCU();
-      Controller.beam.setupESBTS();
-      Controller.beam.setupBdsController();
+ //     Blak.beam.setupBdsController();
    }
 
    private void setupRoutingMap()
@@ -232,51 +224,30 @@ public class BlakICompNoSiteClient
 
 //      mP2pMap.put("DEGRADER",
  //             new LinkedList<EventReceiver>(Arrays.<EventReceiver>asList(applicationQueue)));
+      mP2pMap.put("LLRF",
+              new LinkedList<EventReceiver>(Arrays.<EventReceiver>asList(applicationQueue)));
       mP2pMap.put("bpsController",
            new LinkedList<EventReceiver>(Arrays.<EventReceiver>asList(applicationQueue)));
-      mP2pMap.put("smpsController",
-            new LinkedList<EventReceiver>(Arrays.<EventReceiver>asList(applicationQueue)));
+//      mP2pMap.put("smpsController",
+//            new LinkedList<EventReceiver>(Arrays.<EventReceiver>asList(applicationQueue)));
       mP2pMap.put("bssController",
             new LinkedList<EventReceiver>(Arrays.<EventReceiver>asList(applicationQueue)));
       mP2pMap.put("beamScheduler",
             new LinkedList<EventReceiver>(Arrays.<EventReceiver>asList(applicationQueue)));
-      mP2pMap.put("BCREU",
-              new LinkedList<EventReceiver>(Arrays.<EventReceiver>asList(applicationQueue)));
+      mP2pMap.put("BCREU", new LinkedList<EventReceiver>(Arrays.<EventReceiver>asList(applicationQueue)));
       mP2pMap.put("BcreuComponent",
             new LinkedList<EventReceiver>(Arrays.<EventReceiver>asList(applicationQueue)));
-      mP2pMap.put("LLRF",
-              new LinkedList<EventReceiver>(Arrays.<EventReceiver>asList(applicationQueue)));
-      mP2pMap.put("urn:guimodel:tuneandirradiate:FBTR1",
-              new LinkedList<EventReceiver>(Arrays.<EventReceiver>asList(applicationQueue)));
-      mP2pMap.put("urn:guimodel:tuneandirradiate:GTR4",
-              new LinkedList<EventReceiver>(Arrays.<EventReceiver>asList(applicationQueue)));
-      mP2pMap.put("urn:device:vc:IBTR3",
-              new LinkedList<EventReceiver>(Arrays.<EventReceiver>asList(applicationQueue)));
-      mP2pMap.put("urn:device:sm:IBTR3",
-              new LinkedList<EventReceiver>(Arrays.<EventReceiver>asList(applicationQueue)));
-      mP2pMap.put("urn:device:ss:IBTR3",
-              new LinkedList<EventReceiver>(Arrays.<EventReceiver>asList(applicationQueue)));
-      mP2pMap.put("TSM",
-              new LinkedList<EventReceiver>(Arrays.<EventReceiver>asList(applicationQueue)));
-      mP2pMap.put("ISEU",
-              new LinkedList<EventReceiver>(Arrays.<EventReceiver>asList(applicationQueue)));
-       mP2pMap.put("ISA",
-               new LinkedList<EventReceiver>(Arrays.<EventReceiver>asList(applicationQueue)));
-       mP2pMap.put("PLC",
-               new LinkedList<EventReceiver>(Arrays.<EventReceiver>asList(applicationQueue)));
-       mP2pMap.put("BLPSCU",
-               new LinkedList<EventReceiver>(Arrays.<EventReceiver>asList(applicationQueue)));
-  //    mP2pMap.put("XRay",
-   //           new LinkedList<EventReceiver>(Arrays.<EventReceiver>asList(applicationQueue)));
 
 
 
 //      mNotifMap.put("DEGRADER",
  //            new LinkedList<EventReceiver>(Arrays.<EventReceiver>asList(applicationQueue)));
+      mNotifMap.put("LLRF",
+              new LinkedList<EventReceiver>(Arrays.<EventReceiver>asList(applicationQueue)));
       mNotifMap.put("bpsController",
             new LinkedList<EventReceiver>(Arrays.<EventReceiver>asList(applicationQueue)));
-      mNotifMap.put("smpsController",
-            new LinkedList<EventReceiver>(Arrays.<EventReceiver>asList(applicationQueue)));
+//      mNotifMap.put("smpsController",
+//            new LinkedList<EventReceiver>(Arrays.<EventReceiver>asList(applicationQueue)));
       mNotifMap.put("bssController",
             new LinkedList<EventReceiver>(Arrays.<EventReceiver>asList(applicationQueue)));
       mNotifMap.put("beamScheduler",
@@ -284,39 +255,17 @@ public class BlakICompNoSiteClient
       mNotifMap.put("BCREU", new LinkedList<EventReceiver>(Arrays.<EventReceiver>asList(applicationQueue)));
       mNotifMap.put("BcreuComponent",
             new LinkedList<EventReceiver>(Arrays.<EventReceiver>asList(applicationQueue)));
-      mNotifMap.put("LLRF",
-              new LinkedList<EventReceiver>(Arrays.<EventReceiver>asList(applicationQueue)));
-      mNotifMap.put("urn:guimodel:tuneandirradiate:FBTR1",
-              new LinkedList<EventReceiver>(Arrays.<EventReceiver>asList(applicationQueue)));
-      mNotifMap.put("urn:guimodel:tuneandirradiate:GTR4",
-              new LinkedList<EventReceiver>(Arrays.<EventReceiver>asList(applicationQueue)));
-      mNotifMap.put("urn:device:vc:IBTR3",
-              new LinkedList<EventReceiver>(Arrays.<EventReceiver>asList(applicationQueue)));
-      mNotifMap.put("urn:device:sm:IBTR3",
-              new LinkedList<EventReceiver>(Arrays.<EventReceiver>asList(applicationQueue)));
-      mNotifMap.put("urn:device:ss:IBTR3",
-              new LinkedList<EventReceiver>(Arrays.<EventReceiver>asList(applicationQueue)));
-      mNotifMap.put("TSM",
-              new LinkedList<EventReceiver>(Arrays.<EventReceiver>asList(applicationQueue)));
-      mNotifMap.put("ISEU",
-              new LinkedList<EventReceiver>(Arrays.<EventReceiver>asList(applicationQueue)));
-       mNotifMap.put("ISA",
-               new LinkedList<EventReceiver>(Arrays.<EventReceiver>asList(applicationQueue)));
-       mNotifMap.put("PLC",
-               new LinkedList<EventReceiver>(Arrays.<EventReceiver>asList(applicationQueue)));
-       mNotifMap.put("BLPSCU",
-               new LinkedList<EventReceiver>(Arrays.<EventReceiver>asList(applicationQueue)));
-   //   mNotifMap.put("XRay",
-   //           new LinkedList<EventReceiver>(Arrays.<EventReceiver>asList(applicationQueue)));
 
 
 
 //      mAppQueueNotifMap.put("DEGRADER",
   //            new LinkedList<EventReceiver>(Arrays.<EventReceiver>asList(Controller.beam.degrader)));
+      mAppQueueNotifMap.put("LLRF",
+              new LinkedList<EventReceiver>(Arrays.<EventReceiver>asList(Controller.beam.llrf)));
       mAppQueueNotifMap.put("bpsController",
             new LinkedList<EventReceiver>(Arrays.<EventReceiver>asList(Controller.beam.bpsController)));
-      mAppQueueNotifMap.put("smpsController",
-            new LinkedList<EventReceiver>(Arrays.<EventReceiver>asList(Controller.beam.smpsController)));
+//      mAppQueueNotifMap.put("smpsController",
+//            new LinkedList<EventReceiver>(Arrays.<EventReceiver>asList(Blak.beam.smpsController)));
       mAppQueueNotifMap.put("bssController",
             new LinkedList<EventReceiver>(Arrays.<EventReceiver>asList(Controller.beam.bssController)));
       mAppQueueNotifMap.put("beamScheduler",
@@ -325,32 +274,6 @@ public class BlakICompNoSiteClient
             new LinkedList<EventReceiver>(Arrays.<EventReceiver>asList(Controller.beam.bcreu)));
       mAppQueueNotifMap.put("BcreuComponent",
             new LinkedList<EventReceiver>(Arrays.<EventReceiver>asList(Controller.beam.bcreu)));
-      mAppQueueNotifMap.put("LLRF",
-              new LinkedList<EventReceiver>(Arrays.<EventReceiver>asList(Controller.beam.llrf)));
-      mAppQueueNotifMap.put("urn:guimodel:tuneandirradiate:FBTR1",
-              new LinkedList<EventReceiver>(Arrays.<EventReceiver>asList(Controller.beam.BAPP1)));
-      mAppQueueNotifMap.put("urn:guimodel:tuneandirradiate:GTR4",
-              new LinkedList<EventReceiver>(Arrays.<EventReceiver>asList(Controller.beam.BAPP4)));
-      mAppQueueNotifMap.put("urn:device:vc:IBTR3",
-              new LinkedList<EventReceiver>(Arrays.<EventReceiver>asList(Controller.beam.VCEU3)));
-      mAppQueueNotifMap.put("urn:device:sm:IBTR3",
-              new LinkedList<EventReceiver>(Arrays.<EventReceiver>asList(Controller.beam.SMEU3)));
-      mAppQueueNotifMap.put("urn:device:ss:IBTR3",
-              new LinkedList<EventReceiver>(Arrays.<EventReceiver>asList(Controller.beam.SSEU3)));
-//      mAppQueueNotifMap.put("TSM",
-//              new LinkedList<EventReceiver>(Arrays.<EventReceiver>asList(Controller.beam.TSM1)));
-      mAppQueueNotifMap.put("TSM",
-              new LinkedList<EventReceiver>(Arrays.<EventReceiver>asList(Controller.beam.TSM3)));
-      //mAppQueueNotifMap.put("ISEU",
-        //      new LinkedList<EventReceiver>(Arrays.<EventReceiver>asList(Controller.beam.ISEU1)));
-       mAppQueueNotifMap.put("ISA",
-               new LinkedList<EventReceiver>(Arrays.<EventReceiver>asList(Controller.beam.ISEU1)));
-      mAppQueueNotifMap.put("PLC",
-              new LinkedList<EventReceiver>(Arrays.<EventReceiver>asList(Controller.beam.blpscuCmdChannelProxy)));
-       mAppQueueNotifMap.put("BLPSCU",
-               new LinkedList<EventReceiver>(Arrays.<EventReceiver>asList(Controller.beam.blpscu)));
- //     mAppQueueNotifMap.put("XRay",
- //             new LinkedList<EventReceiver>(Arrays.<EventReceiver>asList(Controller.beam.xrayCtrl)));
    }
 
 
@@ -370,7 +293,7 @@ public class BlakICompNoSiteClient
       propertyList.add(new ClassPathResource("config/bms/bss/devices/api/properties/group3-properties.xml"));
       propertyList.add(new ClassPathResource("config/properties/dtm151-properties.xml"));
       propertyList.add(new ClassPathResource("config/properties/datarecorder-properties.xml"));
-      //propertyList.add(new ClassPathResource("config/properties/container-properties.xml"));
+      propertyList.add(new ClassPathResource("config/properties/container-properties.xml"));
       propertyList.add(new ClassPathResource("config/bms/bss/devices/api/properties/bcreu-properties.xml"));
       propertyList.add(new ClassPathResource("config/properties/device-properties.xml"));
       propertyList.add(new ClassPathResource("config/properties/service-properties.xml"));
@@ -378,35 +301,7 @@ public class BlakICompNoSiteClient
       propertyList.add(new ClassPathResource("config/properties/bss-controller-properties.xml"));
       propertyList.add(new ClassPathResource("config/bms/bss/devices/api/properties/llrf-properties.xml"));
       propertyList.add(new ClassPathResource("config/bms/bss/devices/api/properties/degraderbeamstop-properties.xml"));
-      propertyList.add(new ClassPathResource("xml/config/bms/bss/devices/api/properties/xray-properties.xml"));
-      propertyList.add(new ClassPathResource("xml/config/bms/bss/devices/api/properties/performance-properties.xml"));
-      propertyList.add(new ClassPathResource("xml/config/bms/bms/controller/impl/properties/bms-controller-properties.xml"));
-      propertyList.add(new ClassPathResource("xml/config/bms/bms/controller/impl/properties/tune-and-irradiate-properties.xml"));
-      propertyList.add(new ClassPathResource("xml/config/bms/bss/bapctrl/bss-prepare-activity-gui-model-properties.xml"));
-      propertyList.add(new ClassPathResource("xml/config/bms/bds/controller/impl/bds-prepare-nozzle-activity-gui-model-properties.xml"));
-      propertyList.add(new ClassPathResource("config/bms/bss/controller/api/properties/blpscu-properties.xml"));
-      propertyList.add(new ClassPathResource("config/bms/bms/devices/impl/properties/plc-properties.xml"));
-      propertyList.add(new ClassPathResource("config/bms/bds/devices/impl/properties/iseuchain-properties.xml"));
-      //propertyList.add(new ClassPathResource("config/icomp/devices/device-properties.xml"));
-      propertyList.add(new ClassPathResource("config/bms/bds/devices/impl/properties/vc-properties.xml"));
-      propertyList.add(new ClassPathResource("config/bms/bds/devices/impl/properties/tcu-properties.xml"));
-      propertyList.add(new ClassPathResource("config/bms/bds/devices/impl/properties/ss-properties.xml"));
-      propertyList.add(new ClassPathResource("config/bms/bds/devices/impl/properties/sm-properties.xml"));
-      propertyList.add(new ClassPathResource("config/bms/bds/devices/impl/properties/rv-properties.xml"));
-      propertyList.add(new ClassPathResource("config/bms/bds/devices/impl/properties/rma-properties.xml"));
-      propertyList.add(new ClassPathResource("config/bms/bds/devices/impl/properties/rm-properties.xml"));
-      //propertyList.add(new ClassPathResource("config/bms/bds/devices/impl/properties/isa-properties.xml"));
-      propertyList.add(new ClassPathResource("config/bms/bds/devices/impl/properties/dceu-properties.xml"));
-      propertyList.add(new ClassPathResource("config/bms/bds/devices/impl/properties/fs-properties.xml"));
-      propertyList.add(new ClassPathResource("xml/config/bms/bss/devices/api/properties/container-properties.xml"));
-
-
-      //propertyList.add(new ClassPathResource("config/treatmentRoomSession/treatmentRoomSessionProperties.xml"));
-      //propertyList.add(new ClassPathResource("xml/config/bms/bds/common/proxy/smpsControllerProxy.xml"));
-      //propertyList.add(new ClassPathResource("config/bms/bss/devices/api/properties/activity-controller-dictionary.xml"));
-      propertyList.add(new ClassPathResource("xml/config/bms/bss/devices/api/properties/cuDaq-properties.xml"));
-
-
+      //propertyList.add(new ClassPathResource("config/bms/bss/devices/api/properties/cuDaq-properties.xml"));
       dict.setPropertyFactory(new GenericPropertyFactory());
       dict.setXmlResources(propertyList);
       try

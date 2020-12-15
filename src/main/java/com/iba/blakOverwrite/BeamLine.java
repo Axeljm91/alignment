@@ -743,12 +743,12 @@ public class BeamLine
 
    public void printBeamline()
    {
-      Logger.getLogger().info("Beamline configuration :  -------------------------------------");
+      Logger.getLogger().error("Beamline configuration :  -------------------------------------");
       for (BeamLineElement ble : mElementsList)
       {
-         Logger.getLogger().info(ble.getName() + " " + ble.getClass());
+         Logger.getLogger().error(ble.getName() + " " + ble.getClass());
       }
-      Logger.getLogger().info("---------------------------------------------------------------");
+      Logger.getLogger().error("---------------------------------------------------------------");
    }
 
    @Override

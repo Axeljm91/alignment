@@ -5,13 +5,13 @@
 
       <name>CUDaq</name>
 
-<!--      <propertyDefinition>-->
-<!--         <name>LegacyVariable</name>-->
-<!--         <type>STRING</type>-->
-<!--         <indexed>false</indexed>-->
-<!--         <writable>true</writable>-->
-<!--         <description>A property containing a legacy (SmartSockets) variable with its type and latest value</description>-->
-<!--      </propertyDefinition>-->
+      <propertyDefinition>
+         <name>LegacyVariable</name>
+         <type>STRING</type>
+         <indexed>false</indexed>
+         <writable>true</writable>
+         <description>A property containing a legacy (SmartSockets) variable with its type and latest value</description>
+      </propertyDefinition>
 
       <propertyDefinition>
          <name>Connected</name>

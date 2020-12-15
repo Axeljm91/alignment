@@ -72,11 +72,6 @@ public abstract class BlakEcubtcuFeedbackClient implements PropertyChangeProvide
       mProfilingBpm = pBpm;
    }
 
-   public LegacyBeamProfileMonitor getProfilingBpm()
-   {
-      return mProfilingBpm;
-   }
-
    public class Receiver
    {
       public void setNumericCBValue(String name, double value)

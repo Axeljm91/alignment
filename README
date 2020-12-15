@@ -21,7 +21,7 @@ Windows 7 Build Instructions:
 adaptAlign Startup Instructions:
 --------------------------------
 
-1) Copy the generated file "beam-ialign-8.x-SNAPSHOT-deploy.jar"(now adaPT-assist-8.x) to the head of the adaptAlign export along with "siteconfig.xml", "BeamLineDescription-ESS.csv", and start_align.bat.
+1) Copy the generated file "beam-ialign-8.x-SNAPSHOT-deploy.jar" to the head of the adaptAlign export along with "siteconfig.xml", "BeamLineDescription-ESS.csv", and start_align.bat. 
 2) Modify the "siteconfig.xml" file in order to match the configuration of your site.
 3) Execute the "start_align.bat" script to start up adaptAlign and connect to the equipment on site. Note that this must be done on the production network to allow for a connection. 
 4) set up notif-server port in siteconfig.xml, and also support notif-server port define in command line by add "comm.notif.port=xxxxx". defination in command line has high priority.
