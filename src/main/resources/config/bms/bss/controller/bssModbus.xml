@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+    <bean id="bssIoModbus" class="com.iba.icomp.io.IoComponent">
+        <property name="eventBus" ref="eventBus" />
+        <property name="eventFactory" ref="eventFactory" />
+        <property name="name" value="BssIoModbus" />
+        <property name="connection">
+            <bean class="com.iba.icomp.io.modbus.BnrTcpModbusConnection">
+                <property name="serverAddress" value="10.1.100.50" />
+                <property name="serverPort" value="502" />
+                <property name="timeOut" value="2000" />
+                <!-- <property name="rawModbus" value="true" /> -->
+            </bean>
+        </property>
+        <!-- <property name="digitalInputMap">
+           <map>
+
+           </map>
+        </property>-->
+        <property name="digitalOutputMap">
+            <map>
+                <entry key="BssHeartBeat#HeartBeat.Trigger" value="0" />
+            </map>
+        </property>
+
+        <!-- don't handle exceptions so that service stops in case of communication loss -->
+        <property name="exceptionHandler">
+            <bean class="com.iba.icomp.core.util.handler.LogExceptionHandler">
+                <property name="handleExceptions" value="false" />
+            </bean>
+        </property>
+
+        <property name="ignoreEventsWhenStopped" value="true"/>
+    </bean>
+
+    <!-- Automatically reconnect to BSS IO Modbus -->
+    <bean id="bssIoModbusRestartWrapper" class="com.iba.pts.bms.common.utilities.AutoRestartServiceWrapper2">
+        <property name="name" value="BssIoModbusRestartWrapper"/>
+        <property name="wrappedService" ref="bssIoModbus"/>
+        <property name="timerFactory" ref="autoRestartServiceTimerFactory"/>
+    </bean>
+
+</beans>

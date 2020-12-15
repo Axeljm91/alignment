@@ -22,7 +22,7 @@ DEGRADER,Degrader,continuous
 #Slits
 SL1E,slits,
 SL2E,slits,
-#SL3E,slits,
+SL3E,slits,
 
 #BPMs
 P1E,bpm,degrader
@@ -128,6 +128,24 @@ B2I3, "bend",
 B12B4, "bend",
 B1G4, "bend",
 B2G4, "bend",
+
+#STEERINGS
+TRB34E, "steering",
+T1F1, "steering",
+T2F1, "steering",
+T1S1, "steering",
+T2S1, "steering",
+T3S1, "steering",
+T1S2, "steering",
+T2S2, "steering",
+T3S2, "steering",
+T1S3, "steering",
+T2S3, "steering",
+T3S3, "steering",
+TRB2B4, "steering",
+T1B4, "steering",
+T1G4, "steering",
+T2G4, "steering",
 
 #bcm1e
 #BCM1E,bcm,

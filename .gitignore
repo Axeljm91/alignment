@@ -11,9 +11,11 @@
 /src/main/resources/res
 
 
+
 ######################
 # Large Files #
 ######################
 .png
 .jar
 .log
+.csv

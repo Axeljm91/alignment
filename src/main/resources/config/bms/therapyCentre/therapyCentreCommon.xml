@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+ 
+   <bean id="therapyCentre" class="com.iba.pts.bms.datatypes.impl.TherapyCentreImpl">
+      <constructor-arg value="[TR1[FBTR1{PBS}[FBTR1]]]/[TR2[IBTR2{PBS|US}[IBTR2-90;IBTR2-30]]]/[TR3[IBTR3{US}[IBTR3-90;IBTR3-30]]]/[TR4[GTR4{PBS}[GTR4]]]" />
+   </bean>
+   
+   <bean class="org.springframework.beans.factory.config.CustomEditorConfigurer">
+      <property name="propertyEditorRegistrars">
+         <list>
+            <bean class="com.iba.pts.bms.datatypes.impl.TherapyCentrePropertyEditorsRegistrar">
+                <constructor-arg ref="therapyCentre"/>
+            </bean>
+          </list>
+      </property>
+   </bean>
+   
+   <bean name="nozzleTypes" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+      <property name="targetClass" value="com.iba.pts.bms.datatypes.impl.NozzleTypesBuilder"/>
+      <property name="targetMethod" value="getNozzleTypes"/>
+      <property name="arguments">
+         <list>
+            <ref bean="therapyCentre"/>
+            <value>${prop:bms.nozzletypes}</value>
+         </list>
+      </property>
+   </bean>
+   
+</beans>

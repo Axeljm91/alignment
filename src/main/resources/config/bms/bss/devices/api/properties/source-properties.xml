@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<propertyDefinitions>
+   <component>
+      <name>Source</name>
+      <propertyDefinition>
+         <name>Tuning</name>
+         <type>INTEGER</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>Source tuning status</description>
+      </propertyDefinition>
+   </component>
+</propertyDefinitions>

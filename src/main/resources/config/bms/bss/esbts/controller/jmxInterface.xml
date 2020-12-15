@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+   
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+   <bean id="esBtsControllerJmx" parent="abstractExportedBean">
+      <property name="interface" value="com.iba.pts.bms.bss.esbts.controller.api.EsBtsController" />
+      <property name="bean" ref="esBtsController" />
+      <property name="beanName" value="bean:name=esBtsController" />
+   </bean>
+
+   <bean id="blpscuJmx" parent="abstractExportedBean">
+      <property name="interface" value="com.iba.pts.bms.bss.esbts.blpscu.api.Blpscu" />
+      <property name="bean" ref="blpscuProxy" />
+      <property name="beanName" value="bean:name=blpscu" />
+   </bean>
+
+</beans>

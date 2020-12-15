@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd">
+
+<!--    <import resource="classpath:config/default.xml" />-->
+    <!-- PRS-72902 -->
+    <import resource="classpath:config/icomp/comm-notif/notif-clinicalprocess.xml" />
+    <import resource="classpath:config/bms/common/clinical-process-monitor.xml" />
+
+    <!-- IComP part : this is related to IComP config but specific for this verify. So, config is actually stored in the pts component -->
+    <import resource="classpath:config/bms/beamCommonProcess/icompPart/icompPart.xml" />
+
+    <!-- Therapy centre definition -->
+    <import resource="classpath:config/bms/therapyCentre/therapyCentreCommon.xml" />
+
+    <!-- Beam Scheduler configuration -->
+    <import resource="classpath:config/bms/bss/beamscheduler/beamScheduler.xml" />
+
+    <!-- MCR Treatment Session Mode -->
+    <import resource="classpath:config/bms/bss/treatmentroomsession/mcrTsm.xml" />
+
+    <!-- MCR Beam Detector -->
+    <import resource="classpath:config/bms/bss/mcrbeamdetector/mcrBeamDetector.xml" />
+
+    <!-- ES/BTS Controller configuration -->
+    <import resource="classpath:config/bms/bss/esbts/controller/esbtsController.xml" />
+    <import resource="classpath:config/bms/bss/esbts/controller/esbtsProperties.xml" />
+    <import resource="classpath:config/bms/bss/esbts/controller/esbtsServices.xml" />
+    <import resource="classpath:config/bms/bss/esbts/controller/esbtsBeamlineConfig.xml" />
+    <import resource="classpath:config/PAT.112/beamCommonProcess/opticalSolutionsConfig.xml" />
+    <import resource="classpath:config/bms/data/recorder/proxy/mcrProxy.xml"/>
+
+    <!-- BPS Controller configuration -->
+    <import resource="classpath:config/bms/bss/bps/controller/bpsRfLookup-ecubtcu.xml" />
+    <import resource="classpath:config/bms/bss/bps/controller/bpsLists.xml" />
+    <import resource="classpath:config/bms/bss/bps/controller/bpsIOControllers.xml" />
+    <import resource="classpath:config/bms/bss/bps/controller/bpsRouting.xml" />
+    <import resource="classpath:config/bms/bss/bps/controller/bpsDevices.xml" />
+    <import resource="classpath:config/bms/bss/bps/controller/bpsController.xml" />
+    <import resource="classpath:config/bms/bss/bps/controller/bpsServices.xml" />
+
+    <!-- BSS Check manager -->
+    <import resource="classpath:config/bms/bss/checks/bssCheckManager.xml" />
+    <import resource="classpath:config/bms/bss/checks/bssCheckRouting.xml" />
+
+    <!-- SMPS+BDS Controller configuration -->
+    <import resource="classpath:config/bms/beamCommonProcess/bds.xml" />
+
+    <!-- BSS Controller configuration -->
+    <import resource="classpath:config/bms/bss/controller/bssController.xml" />
+
+    <!--  ECUBTCU Services configuration -->
+    <import resource="classpath:config/bms/beamCommonProcess/ecubtcuDaq-true.xml" />
+    <import resource="classpath:config/bms/bss/devices/impl/ecubtcu.configurator.xml" />
+    <import resource="classpath:config/bms/bss/devices/impl/eventReporter.xml" />
+
+    <!-- JMX interface configuration -->
+    <import resource="classpath:config/bms/common/jmxInterface.xml" />
+    <import resource="classpath:config/bms/bss/beamscheduler/jmxInterface.xml" />
+    <import resource="classpath:config/bms/bss/esbts/controller/jmxInterface.xml" />
+    <import resource="classpath:config/bms/bss/bps/controller/jmxInterface.xml" />
+    <import resource="classpath:config/bms/bss/controller/jmxInterface.xml" />
+
+    <!-- TCU devices properties files for MCR Beam Profile proxies -->
+    <import resource="classpath:config/bms/bds/devices/tcu.properties.xml" />
+
+    <!-- MCR Service Screens and proxies for all rooms -->
+    <import resource="classpath:config/bms/mcrServiceScreens/mcr.bdsScreens.xml" />
+
+    <!-- OPC bridge -->
+    <import resource="classpath:config/bms/beamCommonProcess/icompPart/opcBridge.xml" />
+
+    <!-- BSS Gateway -->
+    <import resource="classpath:config/bms/bss/gateway/bssGateway-false.xml" />
+
+    <!-- Safety Parameter Checker -->
+    <import resource="classpath:config/bms/common/safetyParameterCheckerLocal.xml" />
+
+<!--    <bean id="placeholderConfig"-->
+<!--          class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">-->
+<!--        <property name="location" value="classpath:config/bms/beamCommonProcess/default.properties"/>-->
+<!--    </bean>-->
+
+    <!-- list of properties used by the BSS/BDS controller -->
+    <bean id="bssProperties"
+          class="com.iba.icomp.core.config.ResourceList">
+        <property name="list">
+            <bean class="com.iba.icomp.core.config.AggregatedList">
+                <property name="lists">
+                    <list>
+                        <list>
+                            <!--value>classpath:config/bms/devices/power-supply-properties.xml</value-->
+                            <value>classpath:config/bms/bss/bss-properties.xml</value>
+                            <value>classpath:config/icomp/core/service-properties.xml</value>
+                            <value>classpath:config/bms/bds/devices/impl/properties/ic-properties.xml</value>
+                            <value>classpath:config/bms/bds/devices/impl/properties/ic-dsus-properties.xml</value>
+                            <value>classpath:config/bms/bds/devices/impl/properties/ic-pbs-properties.xml</value>
+                            <value>classpath:config/bms/bds/devices/impl/properties/beam-monitor-properties.xml</value>
+                            <value>classpath:config/bms/bds/devices/impl/properties/dekimo-board-properties.xml</value>
+                            <value>classpath:config/bms/bds/devices/impl/properties/emio-properties.xml</value>
+                        </list>
+                        <ref bean="bpsPropertyFiles"/>
+                        <ref bean="esBtsPropertyFiles"/>
+                        <ref bean="tcuProperties"/>
+                        <ref bean="mcrTsmProperties" />
+                        <ref bean="mcrBeamDetectorProperties" />
+                    </list>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="bssServices" class="com.iba.icomp.core.config.AggregatedList">
+        <property name="lists">
+            <list>
+                <list>
+                    <ref bean="bssHeartBeatSynchronousTimerFactory" />
+                    <ref bean="bssHeartBeat" />
+                    <ref bean="bssIoModbusRestartWrapper" />
+                    <ref bean="ecubtcuConfigurator" />
+                    <ref bean="legacyEventReporterService" />
+                </list>
+                <ref bean="bpsServices" />
+                <ref bean="esBtsServices" />
+                <ref bean="ecubtcuDaqServices" />
+                <ref bean="bssGatewayServices" />
+                <ref bean="mcrTsmServices" />
+                <ref bean="mcrBeamDetectorServices" />
+            </list>
+        </property>
+    </bean>
+
+    <!-- bss controller ui -->
+    <import resource="classpath:config/bms/bss/controller/ui/bssUI.xml"/>
+
+    <!-- BLPSCU commands ids to turn on magnets individually, only commands for PBS magnets have to be defined -->
+    <bean name="blpscuTurnOnMagnetCommandsIds" class="com.iba.icomp.core.util.CsvHashMap">
+        <constructor-arg value="java.lang.String"/>
+        <constructor-arg value="java.lang.Short"/>
+        <constructor-arg value="${prop:bms.blpscuOnMagnetCommandIds}" />
+        <constructor-arg value=";" />
+    </bean>
+
+
+    <!-- BLPSCU commands ids to turn off magnets individually, only commands for PBS magnets and room entrance bending magnets have to be defined -->
+    <bean name="blpscuTurnOffMagnetCommandsIds" class="com.iba.icomp.core.util.CsvHashMap">
+        <constructor-arg value="java.lang.String"/>
+        <constructor-arg value="java.lang.Short"/>
+        <constructor-arg value="${prop:bms.blpscuOffMagnetCommandIds}" />
+        <constructor-arg value=";" />
+    </bean>
+
+    <!-- <bean id="eventInjector" class="com.iba.icompx.core.event.tools.EventInjector" init-method="display">
+       <property name="eventBus" ref="eventBus" />
+       <property name="eventFactory" ref="eventFactory" />
+       <property name="propertyDefinitionDictionary" ref="propertyDefinitionDictionary" />
+    </bean>
+     -->
+
+    <!-- Safety parameters -->
+    <bean name="bcpSafetyParameterChecker" class="com.iba.pts.bms.bss.config.BcpSafetyParameterChecker">
+        <property name="beamlineConfig" ref="beamlineConfig" />
+        <property name="properties" ref="containerProperties" />
+    </bean>
+
+    <beans profile="scanningController=pyramid">
+        <import resource="classpath:config/bms/bds/devices/impl/scanningControllerDriver.xml" />
+        <import resource="classpath:config/bms/tcrServiceScreens/ui.service.scanningController.xml" />
+    </beans>
+
+</beans>

@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="utf-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xmlns:util="http://www.springframework.org/schema/util"
+   xsi:schemaLocation="http://www.springframework.org/schema/beans
+                       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+                       http://www.springframework.org/schema/util
+                       http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+
+   <import resource="classpath:config/bms/bss/esbts/controller/blpscuBeans.xml" />
+
+    <bean id="blpscuIntConverter" class="com.iba.pts.bms.devices.impl.utils.BlpscuIntConverter" />
+    <bean id="blpscuFirmwareConverter"
+          class="com.iba.pts.bms.devices.impl.utils.BlpscuAsciiValueConverter" />
+
+    <util:map id="blpscuReaderChecksumAnalogInputMap" map-class="java.util.HashMap"
+              key-type="com.iba.icomp.core.property.PropertyInfo" value-type="com.iba.pts.bms.devices.impl.plc.PLCAddress">
+        <entry key="blpscu#BLPSCU.SoftwareChecksum"
+               value="DB101.DBD6" />
+        <entry key="blpscu#BLPSCU.HardwareChecksum"
+               value="DB101.DBD2" />
+        <entry key="blpscu#BLPSCU.FirmwareVersion" value="DB1.DBD2" />
+    </util:map>
+
+    <util:map id="blpscuReaderChecksumConverters">
+        <entry key="blpscu#BLPSCU.SoftwareChecksum" value-ref="blpscuIntConverter" />
+        <entry key="blpscu#BLPSCU.HardwareChecksum" value-ref="blpscuIntConverter" />
+        <entry key="blpscu#BLPSCU.FirmwareVersion" value-ref="blpscuFirmwareConverter" />
+    </util:map>
+
+   <bean id="blpscuServices" class="java.util.ArrayList">
+      <constructor-arg>
+         <list>
+            <ref bean="blpscuReaderRestartWrapper" />
+            <ref bean="blpscuReaderSyncSource" />
+            <ref bean="blpscuWriterRestartWrapper" />
+         </list>
+      </constructor-arg>
+   </bean>
+
+   <bean id="blpscuConnectionCheck" class="com.iba.icompx.core.checks.ComposedCheck">
+      <constructor-arg>
+         <array>
+            <bean class="com.iba.icompx.core.service.ServiceStartedCheck">
+               <constructor-arg ref="blpscuReader" />
+               <property name="activeEventQueue" ref="applicationQueue" />
+            </bean>
+            <bean class="com.iba.icompx.core.service.ServiceStartedCheck">
+               <constructor-arg ref="blpscuWriter" />
+               <property name="activeEventQueue" ref="applicationQueue" />
+            </bean>
+         </array>
+      </constructor-arg>
+      <property name="name" value="BlpscuConnectionCheck" />
+      <property name="group" value="BSS" />
+   </bean>
+
+
+   <!-- BLPSCU Reader ****************************************************** -->
+
+   <bean id="blpscuReaderSyncSource" class="com.iba.icomp.core.timer.SynchronizationSource">
+      <property name="eventBus" ref="eventBus" />
+      <property name="eventFactory" ref="eventFactory" />
+      <property name="name" value="BlpscuReaderSyncSource" />
+      <property name="origin" value="BlpscuReaderSyncSource" />
+      <property name="period" value="500" />
+      <property name="timerFactory" ref="synchronousTimerFactory" />
+   </bean>
+
+   <bean id="blpscuReaderStream" class="com.iba.icomp.core.io.SocketChannelStream">
+      <constructor-arg value="10.1.100.43" />
+      <constructor-arg value="2000" />
+      <property name="soTimeout" value="500" />
+      <property name="tcpNoDelay" value="true" />
+   </bean>
+
+   <bean id="blpscuReaderConnection" class="com.iba.pts.bms.devices.impl.plc.FetchWriteConnection">
+      <property name="channelStream" ref="blpscuReaderStream" />
+   </bean>
+
+	<bean id="blpscuAnalogInputs" class="com.iba.icomp.spring.SimplePropertyBasedFactoryBean">
+		<property name="propertyValue" value="simulator" />
+		<property name="inputObjects">
+			<map>
+<!--				<entry key="real">-->
+<!--					<bean class="com.iba.icomp.core.config.AggregatedMap">-->
+<!--						<property name="maps">-->
+<!--							<list>-->
+<!--								<ref bean="blpscuInputsMap" />-->
+<!--								<ref bean="blpscuReaderChecksumAnalogInputMap"/>-->
+<!--							</list>-->
+<!--						</property>-->
+<!--					</bean>-->
+<!--				</entry>-->
+				<entry key="simulator">
+					<ref bean="blpscuReaderChecksumAnalogInputMap"/>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<alias alias="blpscuInputConverters" name="blpscuReaderChecksumConverters"/>
+
+	<bean id="blpscuReader" class="com.iba.pts.bms.devices.impl.plc.PLCReader">
+		<property name="eventFactory" ref="eventFactory" />
+		<property name="eventBus" ref="eventBus" />
+		<property name="name" value="BlpscuReader" />
+		<property name="connection" ref="blpscuReaderConnection" />
+
+		<property name="inputs" ref="blpscuAnalogInputs" />
+		<property name="analogConverters" ref="blpscuInputConverters" />
+
+		<!-- don't handle exceptions so that service stops in case of communication 
+			loss -->
+		<property name="exceptionHandler">
+			<bean class="com.iba.icomp.core.util.handler.LogExceptionHandler">
+				<property name="handleExceptions" value="false" />
+			</bean>
+		</property>
+
+		<property name="ignoreEventsWhenStopped" value="true" />
+	</bean>
+
+   <!-- BLPSCU Writer ****************************************************** -->
+
+   <bean id="blpscuWriterStream" class="com.iba.icomp.core.io.SocketChannelStream">
+      <constructor-arg value="10.1.100.43   " />
+      <constructor-arg value="2001" />
+      <property name="soTimeout" value="500" />
+      <property name="tcpNoDelay" value="true" />
+   </bean>
+
+   <bean id="blpscuWriterConnection" class="com.iba.icomp.io.fetchwrite.FetchWriteConnectionNoOutputReading">
+      <property name="channelStream" ref="blpscuWriterStream" />
+   </bean>
+
+   <bean id="blpscuWriter" class="com.iba.icomp.io.IoComponent">
+      <property name="connection" ref="blpscuWriterConnection" />
+      <property name="name" value="BlpscuWriter" />
+      <property name="eventFactory" ref="eventFactory" />
+      <property name="eventBus" ref="eventBus" />
+      <property name="analogOutputMap" ref="blpscuAnalogOutputMap" />
+      <property name="analogConverters" ref="blpscuAnalogConverters" />
+
+      <!-- don't handle exceptions so that service stops in case of communication loss -->
+      <property name="exceptionHandler">
+         <bean class="com.iba.icomp.core.util.handler.LogExceptionHandler">
+            <property name="handleExceptions" value="false" />
+         </bean>
+      </property>
+
+      <property name="ignoreEventsWhenStopped" value="true" />
+   </bean>
+
+   <!-- Automatically reconnect lost cyclo connections -->
+   <bean id="blpscuReaderRestartWrapper" class="com.iba.pts.bms.common.utilities.AutoRestartServiceWrapper2">
+      <property name="name" value="BlpscuReaderRestartWrapper" />
+      <property name="wrappedService" ref="blpscuReader" />
+      <property name="timerFactory" ref="autoRestartServiceTimerFactory" />
+   </bean>
+
+   <bean id="blpscuWriterRestartWrapper" class="com.iba.pts.bms.common.utilities.AutoRestartServiceWrapper2">
+      <property name="name" value="BlpscuWriterRestartWrapper" />
+      <property name="wrappedService" ref="blpscuWriter" />
+      <property name="timerFactory" ref="autoRestartServiceTimerFactory" />
+   </bean>
+
+   <bean id="blpscuCommandChannelProxy" class="com.iba.pts.bms.devices.impl.plc.PLCCommandChannelProxy"
+      parent="abstractProxy">
+      <property name="name" value="BlpscuCommandChannelProxy" />
+      <property name="componentName" value="BlpscuCommandChannel" />
+   </bean>
+
+   <!-- Routing *********************************************************** -->
+
+   <bean id="blpscuNotificationRouteMap" class="java.util.HashMap">
+      <constructor-arg>
+         <map>
+            <entry key="BlpscuReaderSyncSource" value-ref="blpscuReader" />
+            <entry key="BlpscuCommandChannel" value-ref="nullEventReceiver" /> <!-- to avoid "cannot convert event" exception in ChannelSender, due to the TimeEvent creating in IoComponent.afterStart() -->
+            <!-- <entry key="PowerSupplySwitcher" value-ref="applicationQueue" /> -->
+         </map>
+      </constructor-arg>
+   </bean>
+
+   <bean id="blpscuPointToPointRouteMap" class="java.util.HashMap">
+      <constructor-arg>
+         <map>
+            <entry key="BlpscuCommandChannel" value-ref="blpscuWriter" />
+         </map>
+      </constructor-arg>
+   </bean>
+
+   <!-- I/O definitions *************************************************** -->
+
+   <!-- The "blpscuinputsMap" is site-specific ! -->
+
+<!--	<bean id="blpscuAnalogOutputMap" class="com.iba.icomp.core.config.AggregatedMap">-->
+<!--		<property name="maps" ref="myMap">-->
+<!--&lt;!&ndash;			<list>&ndash;&gt;-->
+<!--&lt;!&ndash;				<map>&ndash;&gt;-->
+<!--&lt;!&ndash;					<entry key="BlpscuCommandChannel#PLC.Command"&ndash;&gt;-->
+<!--&lt;!&ndash;						value="0x32003E" />&ndash;&gt;-->
+<!--&lt;!&ndash;				</map>&ndash;&gt;-->
+<!--&lt;!&ndash;			</list>&ndash;&gt;-->
+<!--		</property>-->
+<!--	</bean>-->
+
+    <util:map id="blpscuAnalogOutputMap" map-class="com.iba.icomp.core.config.AggregatedMap" key-type="com.iba.icomp.core.property.PropertyInfo" value-type="com.iba.icomp.io.RangeEditor">
+        <entry key="BlpscuCommandChannel#PLC.Command"
+               value="0x32003E" />
+    </util:map>
+
+	<bean id="blpscuAnalogConverters" class="com.iba.icomp.core.config.AggregatedMap">
+		<property name="maps">
+			<list>
+				<map>
+					<entry key="BlpscuCommandChannel#PLC.Command"
+						value-ref="int16Converter" />
+				</map>
+			</list>
+		</property>
+	</bean>
+
+   <bean id="int16Converter" class="com.iba.pts.bms.devices.impl.utils.Int16Converter" />
+
+   <!-- Gear for factories ************************************************* -->
+
+    <bean id="blpscuInfo" class="com.iba.pts.bms.bss.esbts.config.dev.factory.BlpscuInfo">
+    <constructor-arg ref="blpscuReader" />
+    <constructor-arg ref="blpscuWriter" />
+    <constructor-arg value="${prop:bms.blpscu.channel.command.name}" />
+
+    <property name="readerInputs" ref="blpscuInputsmap" />
+    <property name="analogOutputMap" ref="blpscuAnalogOutputMap" />
+    <property name="analogConverters" ref="blpscuAnalogConverters" />
+
+    <property name="commandChannelAddress" value="${prop:bms.blpscu.channel.command.address}" />
+    <property name="int16Converter" ref="int16Converter" />
+    </bean>
+
+</beans>

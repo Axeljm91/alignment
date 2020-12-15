@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<propertyDefinitions>
+
+   <component>
+      <name>Container</name>
+      <propertyDefinition>
+         <name>State</name>
+         <type>STRING</type>
+         <description>State of a container.</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>AliveTime</name>
+         <type>DATE</type>
+         <description>Alive time of a container.</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>Place</name>
+         <type>STRING</type>
+         <description>A string describing where the container is running physically</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>ProcessName</name>
+         <type>STRING</type>
+         <description>The process name as used by the foundation scripts</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>HostName</name>
+         <type>STRING</type>
+         <description>The host name running the process</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>FormalClasspath</name>
+         <type>STRING</type>
+         <description>The process is using only official location(s) for his classpath, typically no workspace, no SNAPSHOT jars,...</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>ClinicalProcess</name>
+         <type>STRING</type>
+         <description>False if the process is a not clinical process, like BMS standalone</description>
+      </propertyDefinition>
+   </component>
+
+   <component>
+      <name>ActivityController</name>
+      <propertyDefinition>
+         <name>CancelAllowed</name>
+         <type>BOOLEAN</type>
+         <description><![CDATA[Whether the current activity may be cancelled.]]></description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>CurrentActivityName</name>
+         <type>STRING</type>
+         <description>Name of the current activity.</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>CurrentActivityStatus</name>
+         <type>STRING</type>
+         <description>Status of the current activity.</description>
+      </propertyDefinition>
+   </component>
+
+   <component>
+      <name>Veto</name>
+      <propertyDefinition>
+         <name>Authorized</name>
+         <type>BOOLEAN</type>
+         <description><![CDATA[Whether the veto is authorized.]]></description>
+      </propertyDefinition>
+   </component>
+
+   <component>
+      <name>CheckManager</name>
+      <propertyDefinition>
+         <name>Operational</name>
+         <type>BOOLEAN</type>
+         <description>Whether the CheckManager is operational.</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>NumberOfChecks</name>
+         <type>INTEGER</type>
+         <description>Number of existing checks.</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>CheckName</name>
+         <type>STRING</type>
+         <indexed>true</indexed>
+         <description><![CDATA[Name of a check. Index between [1, CheckNumber].]]></description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>CheckGroup</name>
+         <type>STRING</type>
+         <indexed>true</indexed>
+         <description><![CDATA[Group name of a check. Index between [1, CheckNumber].]]></description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>CheckActive</name>
+         <type>BOOLEAN</type>
+         <indexed>true</indexed>
+         <description><![CDATA[Whether a check is active. Index between [1, CheckNumber].]]></description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>CheckResult</name>
+         <type>STRING</type>
+         <indexed>true</indexed>
+         <description><![CDATA[Result of a check. Index between [1, CheckNumber].]]></description>
+      </propertyDefinition>
+   </component>
+
+</propertyDefinitions>

@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://www.springframework.org/schema/beans
+      http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+   <bean id="initialInferencesMap" class="java.util.HashMap">
+      <constructor-arg>
+         <map>
+			<!--  produced by an inference engine rule -->
+			<entry key="mcr_ecubtcu.cextr1.cfeedback" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.cextr2.cfeedback" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.cextr3.cfeedback" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.cextr4.cfeedback" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.rp1.cfeedback" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.rp2.cfeedback" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.c1e.cfeedback" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.c1e.calibrated" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.sl1e.c1feedback" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.sl1e.j1cfeedback" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.sl1e.j1calibrated" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.sl1e.j1datatype" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.sl1e.c2feedback" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.sl1e.j2cfeedback" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.sl1e.j2calibrated" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.sl1e.j2datatype" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.sl2e.c1feedback" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.sl2e.j1cfeedback" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.sl2e.j1calibrated" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.sl2e.j1datatype" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.sl2e.c2feedback" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.sl2e.j2cfeedback" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.sl2e.j2calibrated" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.sl2e.j2datatype" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.sl3e.c1feedback" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.sl3e.j1cfeedback" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.sl3e.j1calibrated" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.sl3e.j1datatype" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.sl3e.c2feedback" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.sl3e.j2cfeedback" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.sl3e.j2calibrated" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.sl3e.j2datatype" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.c4exj1.cfeedback" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.c4ex.j1cfeedback" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.c4ex.j1calibrated" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.c4ex.j1datatype" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.c4exj2.cfeedback" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.c4ex.j2cfeedback" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.c4ex.j2calibrated" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.c4ex.j2datatype" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.c4eyj1.cfeedback" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.c4ey.j1cfeedback" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.c4ey.j1calibrated" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.c4ey.j1datatype" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.c4eyj2.cfeedback" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.c4ey.j2cfeedback" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.c4ey.j2calibrated" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.c4ey.j2datatype" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.s1e.cfeedback" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.s1e.calibrated" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.s2e.cfeedback" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.s2e.calibrated" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.s1b1.cfeedback" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.s1b1.calibrated" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.s1b2.cfeedback" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.s1b2.calibrated" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.s1b3.cfeedback" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.s1b3.calibrated" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.s1b4.cfeedback" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.s1b4.calibrated" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.s1f2.cfeedback" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.s1f2.calibrated" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.s1f3.cfeedback" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.s1f3.calibrated" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.p1e.sstechswitchyard_status" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.p2e.sstechswitchyard_status" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.p3e.sstechswitchyard_status" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.p1b1.sstechswitchyard_status" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.p2b1.sstechswitchyard_status" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.p1s1.sstechswitchyard_status" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.p2s1.sstechswitchyard_status" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.p1b2.sstechswitchyard_status" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.p2b2.sstechswitchyard_status" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.p1f2.sstechswitchyard_status" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.p1i2.sstechswitchyard_status" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.p2i2.sstechswitchyard_status" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.p3i2.sstechswitchyard_status" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.p1s2.sstechswitchyard_status" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.p2s2.sstechswitchyard_status" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.p1b3.sstechswitchyard_status" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.p2b3.sstechswitchyard_status" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.p1f3.sstechswitchyard_status" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.p1i3.sstechswitchyard_status" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.p2i3.sstechswitchyard_status" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.p3i3.sstechswitchyard_status" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.p1s3.sstechswitchyard_status" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.p2s3.sstechswitchyard_status" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.p1b4.sstechswitchyard_status" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.p2b4.sstechswitchyard_status" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.p1g4.sstechswitchyard_status" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.p2g4.sstechswitchyard_status" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.p3g4.sstechswitchyard_status" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.p4g4.sstechswitchyard_status" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.bcm1c.sstechswitchyard_status" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.bcm1e.sstechswitchyard_status" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.bcm2e.sstechswitchyard_status" value="#{new Float(0)}" />
+			<entry key="mcr_ecubtcu.bcm1s2.sstechswitchyard_status" value="#{new Float(0)}" />
+         </map>
+      </constructor-arg>
+   </bean>
+
+   <bean id="inferenceRules" class="java.util.HashMap">
+      <constructor-arg>
+         <map>
+           <entry key="mcr_ecubtcu.cextr1.cfeedback" value="mcr_ecubtcu_bcm1c_cchnl2" />
+           <entry key="mcr_ecubtcu.cextr2.cfeedback" value="mcr_ecubtcu_bcm1c_cchnl3" />
+           <entry key="mcr_ecubtcu.cextr3.cfeedback" value="mcr_ecubtcu_bcm1c_cchnl4" />
+           <entry key="mcr_ecubtcu.cextr4.cfeedback" value="mcr_ecubtcu_bcm1c_cchnl5" />
+           <entry key="mcr_ecubtcu.rp1.cfeedback" value="mcr_ecubtcu_bcm1c_cchnl0" />
+           <entry key="mcr_ecubtcu.rp2.cfeedback" value="mcr_ecubtcu_bcm1c_cchnl1" />
+           <entry key="mcr_ecubtcu.c1e.cfeedback" value="mcr_ecubtcu_bcm1c_cchnl7" />
+           <entry key="mcr_ecubtcu.c1e.calibrated" value="mcr_ecubtcu.bcm1c.calibration_status" />
+           <entry key="mcr_ecubtcu.sl1e.c1feedback" value="mcr_ecubtcu_bcm1e_cchnl0" />
+           <entry key="mcr_ecubtcu.sl1e.j1cfeedback" value="mcr_ecubtcu_bcm1e_cchnl0" />
+           <entry key="mcr_ecubtcu.sl1e.j1calibrated" value="mcr_ecubtcu.bcm1e.calibration_status" />
+           <entry key="mcr_ecubtcu.sl1e.j1datatype" value="mcr_ecubtcu.bcm1e.data_type" />
+           <entry key="mcr_ecubtcu.sl1e.c2feedback" value="mcr_ecubtcu_bcm1e_cchnl1" />
+           <entry key="mcr_ecubtcu.sl1e.j2cfeedback" value="mcr_ecubtcu_bcm1e_cchnl1" />
+           <entry key="mcr_ecubtcu.sl1e.j2calibrated" value="mcr_ecubtcu.bcm1e.calibration_status" />
+           <entry key="mcr_ecubtcu.sl1e.j2datatype" value="mcr_ecubtcu.bcm1e.data_type" />
+           <entry key="mcr_ecubtcu.sl2e.c1feedback" value="mcr_ecubtcu_bcm1e_cchnl2" />
+           <entry key="mcr_ecubtcu.sl2e.j1cfeedback" value="mcr_ecubtcu_bcm1e_cchnl2" />
+           <entry key="mcr_ecubtcu.sl2e.j1calibrated" value="mcr_ecubtcu.bcm1e.calibration_status" />
+           <entry key="mcr_ecubtcu.sl2e.j1datatype" value="mcr_ecubtcu_bcm1e_data_type" />
+           <entry key="mcr_ecubtcu.sl2e.c2feedback" value="mcr_ecubtcu_bcm1e_cchnl3" />
+           <entry key="mcr_ecubtcu.sl2e.j2cfeedback" value="mcr_ecubtcu_bcm1e_cchnl3" />
+           <entry key="mcr_ecubtcu.sl2e.j2calibrated" value="mcr_ecubtcu.bcm1e.calibration_status" />
+           <entry key="mcr_ecubtcu.sl2e.j2datatype" value="mcr_ecubtcu.bcm1e.data_type" />
+           <entry key="mcr_ecubtcu.sl3e.c1feedback" value="mcr_ecubtcu_bcm1e_cchnl4" />
+           <entry key="mcr_ecubtcu.sl3e.j1cfeedback" value="mcr_ecubtcu_bcm1e_cchnl4" />
+           <entry key="mcr_ecubtcu.sl3e.j1calibrated" value="mcr_ecubtcu.bcm1e.calibration_status" />
+           <entry key="mcr_ecubtcu.sl3e.j1datatype" value="mcr_ecubtcu.bcm1e.data_type" />
+           <entry key="mcr_ecubtcu.sl3e.c2feedback" value="mcr_ecubtcu_bcm1e_cchnl5" />
+           <entry key="mcr_ecubtcu.sl3e.j2cfeedback" value="mcr_ecubtcu_bcm1e_cchnl5" />
+           <entry key="mcr_ecubtcu.sl3e.j2calibrated" value="mcr_ecubtcu.bcm1e.calibration_status" />
+           <entry key="mcr_ecubtcu.sl3e.j2datatype" value="mcr_ecubtcu.bcm1e.data_type" />
+           <entry key="mcr_ecubtcu.c4exj1.cfeedback" value="mcr_ecubtcu_bcm2e_cchnl0" />
+           <entry key="mcr_ecubtcu.c4ex.j1cfeedback" value="mcr_ecubtcu_bcm2e_cchnl0" />
+           <entry key="mcr_ecubtcu.c4ex.j1calibrated" value="mcr_ecubtcu.bcm2e.calibration_status" />
+           <entry key="mcr_ecubtcu.c4ex.j1datatype" value="mcr_ecubtcu.bcm2e.data_type" />
+           <entry key="mcr_ecubtcu.c4exj2.cfeedback" value="mcr_ecubtcu_bcm2e_cchnl2" />
+           <entry key="mcr_ecubtcu.c4ex.j2cfeedback" value="mcr_ecubtcu_bcm2e_cchnl2" />
+           <entry key="mcr_ecubtcu.c4ex.j2calibrated" value="mcr_ecubtcu.bcm2e.calibration_status" />
+           <entry key="mcr_ecubtcu.c4ex.j2datatype" value="mcr_ecubtcu.bcm2e.data_type" />
+           <entry key="mcr_ecubtcu.c4eyj1.cfeedback" value="mcr_ecubtcu_bcm2e_cchnl1" />
+           <entry key="mcr_ecubtcu.c4ey.j1cfeedback" value="mcr_ecubtcu_bcm2e_cchnl1" />
+           <entry key="mcr_ecubtcu.c4ey.j1calibrated" value="mcr_ecubtcu.bcm2e.calibration_status" />
+           <entry key="mcr_ecubtcu.c4ey.j1datatype" value="mcr_ecubtcu.bcm2e.data_type" />
+           <entry key="mcr_ecubtcu.c4eyj2.cfeedback" value="mcr_ecubtcu_bcm2e_cchnl3" />
+           <entry key="mcr_ecubtcu.c4ey.j2cfeedback" value="mcr_ecubtcu_bcm2e_cchnl3" />
+           <entry key="mcr_ecubtcu.c4ey.j2calibrated" value="mcr_ecubtcu.bcm2e.calibration_status" />
+           <entry key="mcr_ecubtcu.c4ey.j2datatype" value="mcr_ecubtcu.bcm2e.data_type" />
+           <entry key="mcr_ecubtcu.s1e.cfeedback" value="mcr_ecubtcu_bcm1c_cchnl6" />
+           <entry key="mcr_ecubtcu.s1e.calibrated" value="mcr_ecubtcu_bcm1c_calibration_status" />
+           <entry key="mcr_ecubtcu.s2e.cfeedback" value="mcr_ecubtcu_bcm1e_cchnl7" />
+           <entry key="mcr_ecubtcu.s2e.calibrated" value="mcr_ecubtcu_bcm1e_calibration_status" />
+           <entry key="mcr_ecubtcu.s1b1.cfeedback" value="mcr_ecubtcu_bcm1s2_cchnl0" />
+           <entry key="mcr_ecubtcu.s1b1.calibrated" value="mcr_ecubtcu_bcm1s2_calibration_status" />
+           <entry key="mcr_ecubtcu.s1b2.cfeedback" value="mcr_ecubtcu_bcm1s2_cchnl1" />
+           <entry key="mcr_ecubtcu.s1b2.calibrated" value="mcr_ecubtcu_bcm1s2_calibration_status" />
+           <entry key="mcr_ecubtcu.s1b3.cfeedback" value="mcr_ecubtcu_bcm1s2_cchnl3" />
+           <entry key="mcr_ecubtcu.s1b3.calibrated" value="mcr_ecubtcu_bcm1s2_calibration_status" />
+           <entry key="mcr_ecubtcu.s1b4.cfeedback" value="mcr_ecubtcu_bcm1s2_cchnl5" />
+           <entry key="mcr_ecubtcu.s1b4.calibrated" value="mcr_ecubtcu_bcm1s2_calibration_status" />
+           <entry key="mcr_ecubtcu.s1f2.cfeedback" value="mcr_ecubtcu_bcm1s2_cchnl2" />
+           <entry key="mcr_ecubtcu.s1f2.calibrated" value="mcr_ecubtcu_bcm1s2_calibration_status" />
+           <entry key="mcr_ecubtcu.s1f3.cfeedback" value="mcr_ecubtcu_bcm1s2_cchnl4" />
+           <entry key="mcr_ecubtcu.s1f3.calibrated" value="mcr_ecubtcu_bcm1s2_calibration_status" />
+           <entry key="mcr_ecubtcu.p1e.sstechswitchyard_status" value="mcr_ecubtcu_p1e_sstechswitchyard1_status" />
+           <entry key="mcr_ecubtcu.p2e.sstechswitchyard_status" value="mcr_ecubtcu_p2e_sstechswitchyard1_status" />
+           <entry key="mcr_ecubtcu.p3e.sstechswitchyard_status" value="mcr_ecubtcu_p3e_sstechswitchyard1_status" />
+           <entry key="mcr_ecubtcu.p1b1.sstechswitchyard_status" value="mcr_ecubtcu_p1b1_sstechswitchyard1_status" />
+           <entry key="mcr_ecubtcu.p2b1.sstechswitchyard_status" value="mcr_ecubtcu_p2b1_sstechswitchyard1_status" />
+           <entry key="mcr_ecubtcu.p1s1.sstechswitchyard_status" value="mcr_ecubtcu_p1s1_sstechswitchyard2_status" />
+           <entry key="mcr_ecubtcu.p2s1.sstechswitchyard_status" value="mcr_ecubtcu_p2s1_sstechswitchyard2_status" />
+           <entry key="mcr_ecubtcu.p1b2.sstechswitchyard_status" value="mcr_ecubtcu_p1b2_sstechswitchyard2_status" />
+           <entry key="mcr_ecubtcu.p2b2.sstechswitchyard_status" value="mcr_ecubtcu_p2b2_sstechswitchyard2_status" />
+           <entry key="mcr_ecubtcu.p1f2.sstechswitchyard_status" value="mcr_ecubtcu_p1f2_sstechswitchyard2_status" />
+           <entry key="mcr_ecubtcu.p1i2.sstechswitchyard_status" value="mcr_ecubtcu_p1i2_sstechswitchyard2_status" />
+           <entry key="mcr_ecubtcu.p2i2.sstechswitchyard_status" value="mcr_ecubtcu_p2i2_sstechswitchyard2_status" />
+           <entry key="mcr_ecubtcu.p3i2.sstechswitchyard_status" value="mcr_ecubtcu_p3i2_sstechswitchyard2_status" />
+           <entry key="mcr_ecubtcu.p1s2.sstechswitchyard_status" value="mcr_ecubtcu_p1s2_sstechswitchyard3_status" />
+           <entry key="mcr_ecubtcu.p2s2.sstechswitchyard_status" value="mcr_ecubtcu_p2s2_sstechswitchyard3_status" />
+           <entry key="mcr_ecubtcu.p1b3.sstechswitchyard_status" value="mcr_ecubtcu_p1b3_sstechswitchyard3_status" />
+           <entry key="mcr_ecubtcu.p2b3.sstechswitchyard_status" value="mcr_ecubtcu_p2b3_sstechswitchyard3_status" />
+           <entry key="mcr_ecubtcu.p1f3.sstechswitchyard_status" value="mcr_ecubtcu_p1f3_sstechswitchyard3_status" />
+           <entry key="mcr_ecubtcu.p1i3.sstechswitchyard_status" value="mcr_ecubtcu_p1i3_sstechswitchyard3_status" />
+           <entry key="mcr_ecubtcu.p2i3.sstechswitchyard_status" value="mcr_ecubtcu_p2i3_sstechswitchyard3_status" />
+           <entry key="mcr_ecubtcu.p3i3.sstechswitchyard_status" value="mcr_ecubtcu_p3i3_sstechswitchyard3_status" />
+           <entry key="mcr_ecubtcu.p1s3.sstechswitchyard_status" value="mcr_ecubtcu_p1s3_sstechswitchyard4_status" />
+           <entry key="mcr_ecubtcu.p2s3.sstechswitchyard_status" value="mcr_ecubtcu_p2s3_sstechswitchyard4_status" />
+           <entry key="mcr_ecubtcu.p1b4.sstechswitchyard_status" value="mcr_ecubtcu_p1b4_sstechswitchyard4_status" />
+           <entry key="mcr_ecubtcu.p2b4.sstechswitchyard_status" value="mcr_ecubtcu_p2b4_sstechswitchyard4_status" />
+           <entry key="mcr_ecubtcu.p1g4.sstechswitchyard_status" value="mcr_ecubtcu_p1g4_sstechswitchyard4_status" />
+           <entry key="mcr_ecubtcu.p2g4.sstechswitchyard_status" value="mcr_ecubtcu_p2g4_sstechswitchyard4_status" />
+           <entry key="mcr_ecubtcu.p3g4.sstechswitchyard_status" value="mcr_ecubtcu_p3g4_sstechswitchyard4_status" />
+           <entry key="mcr_ecubtcu.p4g4.sstechswitchyard_status" value="mcr_ecubtcu_p4g4_sstechswitchyard4_status" />
+           <entry key="mcr_ecubtcu.bcm1c.sstechswitchyard_status" value="mcr_ecubtcu_bcm1c_sstechswitchyard1_status" />
+           <entry key="mcr_ecubtcu.bcm1e.sstechswitchyard_status" value="mcr_ecubtcu_bcm1e_sstechswitchyard1_status" />
+           <entry key="mcr_ecubtcu.bcm2e.sstechswitchyard_status" value="mcr_ecubtcu_bcm2e_sstechswitchyard1_status" />
+           <entry key="mcr_ecubtcu.bcm1s2.sstechswitchyard_status" value="mcr_ecubtcu_bcm1s2_sstechswitchyard1_status" />
+
+            <!-- Global calibration status -->
+            <entry key="mcr_rtieecubtcu.bpm.calibration_status"
+value="mcr_ecubtcu.p1e.calibration_status &amp;
+	mcr_ecubtcu.p2e.calibration_status &amp;
+	mcr_ecubtcu.p3e.calibration_status &amp;
+	mcr_ecubtcu.p1b1.calibration_status &amp;
+	mcr_ecubtcu.p2b1.calibration_status &amp;
+	mcr_ecubtcu.p1s1.calibration_status &amp;
+	mcr_ecubtcu.p2s1.calibration_status &amp;
+	mcr_ecubtcu.p1b2.calibration_status &amp;
+	mcr_ecubtcu.p2b2.calibration_status &amp;
+	mcr_ecubtcu.p1f2.calibration_status &amp;
+        mcr_ecubtcu.p1i2.calibration_status &amp;
+        mcr_ecubtcu.p2i2.calibration_status &amp;
+        mcr_ecubtcu.p3i2.calibration_status &amp;
+        mcr_ecubtcu.p1s2.calibration_status &amp;
+	mcr_ecubtcu.p2s2.calibration_status &amp;
+	mcr_ecubtcu.p1b3.calibration_status &amp;
+        mcr_ecubtcu.p2b3.calibration_status &amp;
+        mcr_ecubtcu.p1f3.calibration_status &amp;
+        mcr_ecubtcu.p1i3.calibration_status &amp;
+        mcr_ecubtcu.p2i3.calibration_status &amp;
+	mcr_ecubtcu.p3i3.calibration_status &amp;
+	mcr_ecubtcu.p1s3.calibration_status &amp;
+        mcr_ecubtcu.p2s3.calibration_status &amp;
+        mcr_ecubtcu.p1b4.calibration_status &amp;
+        mcr_ecubtcu.p2b4.calibration_status &amp;
+        mcr_ecubtcu.p1g4.calibration_status &amp;
+        mcr_ecubtcu.p2g4.calibration_status &amp;
+        mcr_ecubtcu.p3g4.calibration_status &amp;
+	mcr_ecubtcu.p4g4.calibration_status" />
+
+            <entry key="mcr_rtieecubtcu.bcm.calibration_status"
+value="mcr_ecubtcu.bcm1c.calibration_status &amp;
+	mcr_ecubtcu.bcm1e.calibration_status &amp;
+	mcr_ecubtcu.bcm2e.calibration_status &amp;
+	mcr_ecubtcu.bcm1s2.calibration_status" />
+
+         </map>
+      </constructor-arg>
+   </bean>
+</beans>

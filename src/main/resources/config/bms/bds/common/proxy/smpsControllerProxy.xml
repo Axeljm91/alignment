@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+    <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+    <!-- SERVICES -->
+    <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+
+    <bean id="smpsControllerProxyNotifSender" parent="parentNotifChannelSender">
+        <property name="name" value="smpsControllerProxyNotifSender"/>
+        <property name="channel" value="#{T(com.iba.pts.bms.common.config.constant.ChannelConstants).SMPS_CONTROLLER_COMMAND}"/>
+    </bean>
+
+    <bean id="smpsControllerProxyNotifReceiver" parent="parentNotifChannelReceiver">
+        <property name="name" value="smpsControllerProxyNotifReceiver"/>
+        <property name="channel" value="#{T(com.iba.pts.bms.common.config.constant.ChannelConstants).SMPS_CONTROLLER_NOTIF}"/>
+    </bean>
+
+    <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+    <!-- PROXY DEFINITION -->
+    <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+
+    <bean name="smpsControllerProxy" class="com.iba.pts.bms.bds.common.proxy.SmpsControllerProxy" parent="abstractProxy">
+        <property name="name" value="smpsControllerProxy"/>
+        <property name="componentName" value="smpsController"/>
+        <property name="responseTimeOut" value="${prop:bms.smps.controller.response.timeout_ms}"/>
+    </bean>
+
+    <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+    <!-- EVENT ROUTING -->
+    <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+
+    <!-- Route notification events from the smps controller via the applicationQueue to the proxy and
+         route request events directly to the smpsControllerProxyNotifSender -->
+    <bean class="com.iba.icompx.core.component.EndPointProxy">
+        <property name="inputChannel" ref="smpsControllerProxyNotifReceiver"/>
+        <property name="component" ref="smpsControllerProxy"/>
+        <property name="intermediary" ref="applicationQueue"/>
+        <property name="outputChannel" ref="smpsControllerProxyNotifSender"/>
+    </bean>
+
+</beans>

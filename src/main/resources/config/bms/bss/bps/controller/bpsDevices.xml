@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd">
+
+    <bean id="bcmMeasureBeam" class="com.iba.pts.bms.bss.bps.devices.impl.CycloBcmCurrentMeasure">
+        <constructor-arg ref="degraderBeamStopProxy"/>
+        <constructor-arg value="${prop:bms.bps.lookupgen.nbrofmeasuresperstep}"/>
+        <property name="checkBcmCalibration" value="#{'${prop:config.rfLookup}' == 'ecubtcu'}" />
+    </bean>
+
+    <bean id="CycloCurrentMeasureList" class="com.iba.icomp.core.config.AggregatedList">
+        <property name="lists">
+            <list>
+                <list>
+                    <ref bean="bcmMeasureBeam" />
+                </list>
+                <ref bean="bireuCycloCurrentMeasureList"/>
+                <ref bean="baeuCycloCurrentMeasureList"/>
+            </list>
+        </property>
+    </bean>
+
+    <!--BIREU -->
+    <import resource="classpath:config/bms/bss/devices/impl/bireu-false.xml"/>
+    <!--BAEU -->
+    <import resource="classpath:config/bms/bss/devices/impl/baeu-false.xml"/>
+
+    <!-- Proxies -->
+
+    <beans>
+        <bean id="acuCommandChannelProxy" class="com.iba.pts.bms.devices.impl.plc.PLCCommandChannelProxy"
+              parent="abstractProxy">
+            <property name="name" value="${prop:bms.acu.channel.command.name}Proxy" />
+            <property name="componentName" value="${prop:bms.acu.channel.command.name}" />
+        </bean>
+
+        <bean id="arcProxy" parent="abstractProxy" class="com.iba.pts.bms.bss.bps.devices.impl.ArcProxy">
+            <property name="name" value="ARC-PROXY" />
+            <property name="componentName" value="ARC" />
+            <property name="plcCommandChannel" ref="acuCommandChannelProxy" />
+        </bean>
+
+        <bean id="llrfProxy" parent="abstractProxy" class="com.iba.pts.bms.bss.bps.devices.impl.LlrfProxy">
+            <property name="name" value="LLRF-PROXY" />
+            <property name="componentName" value="LLRF" />
+            <property name="plcCommandChannel" ref="acuCommandChannelProxy" />
+            <property name="maxVoltage" value="${prop:bms.llrf.maxVoltage}" />
+        </bean>
+
+        <bean id="filamentProxy" parent="abstractProxy" class="com.iba.pts.bms.bss.bps.devices.impl.FilamentProxy">
+            <property name="name" value="FILAMENT-PROXY" />
+            <property name="componentName" value="FILAMENT" />
+            <property name="plcCommandChannel" ref="acuCommandChannelProxy" />
+        </bean>
+
+        <bean id="mainCoilProxy" parent="abstractProxy" class="com.iba.pts.bms.bss.bps.devices.impl.MainCoilProxy">
+            <property name="name" value="MAINCOIL-PROXY" />
+            <property name="componentName" value="MAINCOIL" />
+        </bean>
+
+        <bean id="sourceProxy" parent="abstractProxy" class="com.iba.pts.bms.bss.bps.devices.impl.SourceProxy">
+            <property name="name" value="SOURCE-PROXY" />
+            <property name="componentName" value="SOURCE" />
+            <property name="plcCommandChannel" ref="acuCommandChannelProxy" />
+        </bean>
+
+        <bean id="acuProxy" parent="abstractProxy" class="com.iba.pts.bms.bss.bps.devices.impl.AcuProxy">
+            <property name="name" value="ACU-PROXY" />
+            <property name="componentName" value="ACU" />
+            <property name="expectedFirmwareVersion" value="${prop:bms.cyclo.expectedFirmwareVersion}" />
+            <property name="expectedConfigurationChecksum" value="${prop:bms.cyclo.expectedConfigurationChecksum}" />
+            <property name="expectedHardwareChecksum" value="${prop:bms.cyclo.expectedHardwareChecksum}" />
+            <property name="expectedSoftwareChecksum" value="${prop:bms.cyclo.expectedSoftwareChecksum}" />
+            <property name="plcCommandChannel" ref="acuCommandChannelProxy" />
+            <property name="acuUpgradedForRfGlitch" value="true" />
+        </bean>
+
+        <bean id="degraderBeamStopProxy" parent="abstractProxy" class="com.iba.pts.bms.bss.bps.devices.impl.DegraderBeamStopProxy">
+            <property name="name" value="DEGRADER-PROXY" />
+            <property name="componentName" value="DEGRADER" />
+        </bean>
+
+        <bean id="deflectorProxy" parent="abstractProxy" class="com.iba.pts.bms.bss.bps.devices.impl.DeflectorProxy">
+            <property name="name" value="DEFLECTOR-PROXY" />
+            <property name="componentName" value="DEFLECTOR" />
+        </bean>
+    </beans>
+
+    <!-- BCREU Proxy -->
+    <beans>
+
+        <bean id="abstractBcreuProxy" parent="abstractProxy" abstract="true">
+            <property name="eventFactory" ref="eventFactoryWithConfirmationEvent" />
+            <property name="name" value="BCREU-PROXY" />
+            <property name="componentName" value="BCREU" />
+            <property name="regulationErrorThresholdDsUsEye" value="5000" />
+            <property name="regulationErrorThresholdNoMode" value="5000" />
+        </bean>
+
+        <bean id="eventFactoryWithConfirmationEvent" class="com.iba.icomp.core.event.EventFactoryWithConfirmationEvent">
+            <constructor-arg ref="eventFactory" />
+        </bean>
+
+        <!-- The available BCREU firmware versions -->
+        <bean id="bcreu1.23Proxy" parent="abstractBcreuProxy" class="com.iba.pts.bms.bss.bps.devices.impl.Bcreu123Proxy" />
+        <bean id="bcreu1.24Proxy" parent="abstractBcreuProxy" class="com.iba.pts.bms.bss.bps.devices.impl.Bcreu124Proxy" />
+        <bean id="bcreu1.25Proxy" parent="abstractBcreuProxy" class="com.iba.pts.bms.bss.bps.devices.impl.Bcreu125Proxy" />
+        <bean id="bcreu1.26Proxy" parent="abstractBcreuProxy" class="com.iba.pts.bms.bss.bps.devices.impl.Bcreu126Proxy" />
+
+        <alias name="bcreu1.26Proxy" alias="bcreuProxy"/>
+
+    </beans>
+</beans>

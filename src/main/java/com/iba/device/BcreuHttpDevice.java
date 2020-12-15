@@ -375,7 +375,7 @@ public class BcreuHttpDevice extends Device
 			}
         }
         
-        log.debug("Loopup transfered to the network microcontroller.");
+        log.debug("Lookup transfered to the network microcontroller.");
         log.debug("Requesting the csv file");
         response=doGet("http://"+ip+"/lkp00.csv");
         if (response==null)

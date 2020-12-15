@@ -10,17 +10,22 @@
 package com.iba.ialign;
 
 import com.google.gson.JsonElement;
-import com.iba.blak.Blak;
-import com.iba.icompx.ibalaf.laf.painter.ColorFactory;
+import com.iba.blak.device.api.Insertable;
+import com.iba.ialign.borders.TitledBorderNoEdge;
+import com.iba.icompx.core.activity.ActivityStatus;
+import com.iba.icompx.ui.util.ResourceManager;
+import com.iba.pts.bms.bds.common.api.SmpsControllerActivityId;
+import com.iba.pts.bms.bss.beamscheduler.api.BeamAllocation;
+import com.iba.pts.bms.bss.beamscheduler.api.BeamPriority;
+import com.iba.pts.bms.bss.beamscheduler.api.BeamSchedulerControl;
 import com.iba.pts.bms.bss.beamscheduler.api.PendingBeamRequest;
-import com.iba.pts.bms.bss.controller.api.BssController.OperatingMode;
+import com.iba.pts.bms.bss.beamscheduler.ui.BeamSchedulerPanel;
+import com.iba.pts.bms.bss.controller.api.BssActivityId;
 
 import java.net.ConnectException;
-import java.sql.Time;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
 import java.util.*;
-import java.time.LocalTime;
 
 import com.iba.ialign.charts.BpmDataset;
 import com.iba.ialign.charts.GaussianDataset;
@@ -29,27 +34,26 @@ import com.iba.ialign.common.TaskListDialog;
 
 import com.iba.blak.common.Distribution;
 
+import com.iba.pts.bms.tcrServiceScreens.TcuVceuPanel;
+import com.iba.pts.treatmentroomsession.TreatmentRoomSession;
 import com.opcOpenInterface.Rest;
+import org.apache.commons.lang.time.DurationFormatUtils;
 import org.apache.log4j.Logger;
-import org.jdesktop.swingx.JXLabel;
-import org.jdesktop.swingx.painter.Painter;
-import org.jdesktop.swingx.renderer.JRendererLabel;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.annotations.XYTitleAnnotation;
 import org.jfree.chart.axis.*;
 import org.jfree.chart.block.BlockBorder;
-import org.jfree.chart.labels.StandardXYToolTipGenerator;
+import org.jfree.chart.labels.*;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.*;
 import org.jfree.chart.title.LegendTitle;
-import org.jfree.data.Range;
 import org.jfree.data.time.*;
 import org.jfree.ui.RectangleAnchor;
 import org.jfree.ui.RectangleEdge;
-import org.jfree.ui.VerticalAlignment;
+import org.python.google.common.collect.ImmutableSet;
 import org.sikuli.basics.Debug;
 import org.sikuli.script.ImagePath;
 import org.sikuli.script.Screen;
@@ -61,26 +65,18 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 //import java.util.Timer;
-import javax.swing.AbstractAction;
-import javax.swing.Action;
+import javax.annotation.Resource;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
-import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartPanel;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.plot.XYPlot;
+
 import org.jfree.data.xy.XYDataset;
-import org.jfree.ui.ApplicationFrame;
-import com.opcOpenInterface.type.Trend;
 
 import javax.swing.*;
 import javax.swing.Timer;
 import javax.swing.border.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.*;
 import java.io.BufferedWriter;
@@ -91,15 +87,12 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 
 import java.awt.Dimension;
-import java.awt.GridBagLayout;
 import java.util.List;
 
 
 import javax.swing.JPanel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.text.SimpleAttributeSet;
-import javax.swing.text.StyleConstants;
 
 public class Gui extends JFrame implements ActionListener, ItemListener {
 
@@ -107,24 +100,45 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
      * The logger. See http://logging.apache.org/log4j/1.2/index.html for more information.
      */
     private static Logger log = Logger.getLogger(new Throwable().getStackTrace()[0].getClassName());
+    public static boolean readyForServiceBeam;
 
-    private Controller controller;
+    public Controller controller;
     private ConstantWorker mTask;
     private ConstantWorker2 mTask2;
     private BcreuWorker mBcreuProxy;
     private SetpointWorker mSetpointWorker;
     private RefreshWorker mRefreshWorker = null;
-    private int IPADY_DEFAULT = 10;
+    private static int IPADY_DEFAULT = 10;
+
+//    @Resource(name="blpscuReaderChecksumAnalogInputMap")
+//    private Map<PropertyInfo, PLCAddress> blpscuReaderChecksumAnalogInputMap;
+
+    @Resource
+    private Properties blpscuReaderChecksumAnalogInputMap;
+
+    @Resource
+    private Properties blpscuAnalogOutputMap;
 
     // Decimal format with 3 decimal points and US locale.
     final private DecimalFormat mDecFormat = new DecimalFormat("#.###", (new DecimalFormatSymbols(Locale.US)));
     private double[] mTolerances, mSigmaTargets, mSigmaTolerances;
     private LogPanel logPanel;
     private JTabbedPane mTabs, mTabs2;
+    public static EsbtsPanel mEsbtsPanel;
+    public static BeamSchedulerPanel beamSchedulerPanel;
+    public TcuVceuPanel VceuPanel;
+    public JPanel mSchedulerPanel;
+    public static JPanel mBeamTimer;
+    public static File beamResults = new File("");
+    public static JButton startBeamButton;
+    public static JCheckBox timedRunCB;
+    public static JTextField timedRunText;
+    public static JComboBox postRunAction;
+    public ScanningController mScanningControllerPanel;
     public JPanel mExtractionPanel, mMainCoilPanel, mVNCPanel, mRestorePanel, mSourcePanel, mAutomaticPanel, tuningPanel, MCTuningPanel, outputPanel, interlockPanel, interlockPanel_L, interlockPanel_R;
-    public JPanel powerSavePanel, powerSaveTR1, powerSaveTR2, powerSaveTR3, powerSaveTR4, powerSaveInterlocks, mainCoilSweepPanel, iAlignPanel;
+    public JPanel powerSavePanel, powerSaveTR1, powerSaveTR2, powerSaveTR3, powerSaveTR4, powerSaveInterlocks, mainCoilSweepPanel, iAlignPanel, ICCPanel;
     public JPanel mainPanel, displayPanel, blePanel, ble2Panel, bcreuPanel, cycloPanel, magnetPanel, dfPanel, VNCDisplayPanel, testPanel, magnetTuningPanel, sourceTuningPanel, LLRFTuningPanel, tuningInstructionPanel;
-    private JButton refreshButton, computeButton, cancelButton, cancelButton2, applyButton, mainCoilButton, PCVueButton, cancelTuneButton, alignMeButton, saveMeButton, burnInButton, rfLUTButton,
+    private JButton refreshButton, computeButton, cancelButton, cancelButton2, applyButton, mainCoilButton, PCVueButton, cancelTuneButton, alignMeButton, saveMeButton, burnInLockButton, rfLUTButton,
             Dee1plus, Dee1minus, Dee2plus, Dee2minus, Filplus, Filminus, Arcplus, Arcminus, CCoilplus, CCoilminus, MCoilplus, MCoilminus, MCoilStep1, MCoilStep2, MCoilStep3, HCoil1plus, HCoil1minus, HCoil2plus, HCoil2minus;
     private BpmDataset mBpmXdata, mBpmYdata;
     private GaussianDataset mGaussXdata, mGaussYdata;
@@ -134,9 +148,10 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
             sigmaText[], statusText[], statusText2[], bcreuText[], cycloText[], MCTuningText[], VDeeFB, VDeeSP, VDeeSP2, FilFB, FilSP, ArcFB, ArcSP, ArcVolt,
             CCoilFB, CCoilSP, MCoilFB, MCoilSP, HCoil1FB, HCoil1SP, HCoil2FB, HCoil2SP;
     private Screen screen = new Screen();
-    private Rest restManager = new Rest();
+    private static Rest restManager = new Rest();
     private JLabel operModeLabel = new JLabel();
     private JLabel operModeLabel2 = new JLabel();
+    private JLabel operModeLabel3 = new JLabel();
     private JLabel outputLabel = new JLabel();
     public JLabel LLRFLabel = new JLabel();
     public JLabel SourceLabel = new JLabel();
@@ -152,6 +167,12 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
     public boolean readCurrent = false;
     public boolean isRefreshing = false;
     public boolean keepRefreshing = false;
+    public boolean isAutomaticMode = false;
+    public boolean isBeamline4Selected = false;
+    public boolean isXrayTubeRetracted = false;
+    public boolean isTR3SearchedInServiceMode = false;
+    public SmpsControllerActivityId mScanMagActivity = null;
+    public static boolean isADLogout = false;
     public int counter = 0;
     public JsonElement curr;
     public JsonElement var;
@@ -167,10 +188,25 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
     private volatile int status = 1;
     private double changePerClick = 0.005;
     private boolean updated = false;
+    public boolean idle = true;
     private int width = 0;
     private int height = 0;
+    private boolean requestWarning = false;
+    private boolean searchWarning = false;
+    private boolean locked = true;
+    private int minFilSP = 125;
+    private int maxFilSP = 200;
+    private int minArcSP = 0;
+    private int maxArcSP = 125;
+    private int minDuration = 0;
+    private int maxDuration = 20;
 
     private double val = 0;
+    private boolean printBeamline1 = true;
+    private boolean printBeamline4 = true;
+
+    private BssActivityId mCurrentActivityName;
+    private ActivityStatus mCurrentActivityStatus;
 
     private TimeSeriesCollection dataset;
     private JComboBox comboBox;
@@ -185,12 +221,24 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
     private XYPlot plot;
     private ValueAxis valueAxis;
     public LinkedList<Float> list = null;
+    public LinkedList<Float> list1 = null;
+    public LinkedList<Float> list2 = null;
+    public List<Integer> ints =  new ArrayList<Integer>();
+    final StandardXYItemRenderer renderer = new StandardXYItemRenderer();
+    final StandardXYItemRenderer renderer2 = new StandardXYItemRenderer();
+
+    public static JLabel rfSparkDetected = new JLabel("RF OK", SwingConstants.CENTER);
 
 
-    public Gui(Controller controller) {
+    public Gui(Controller controller) throws IOException {
 
         this.setExtendedState(JFrame.MAXIMIZED_BOTH);
         this.controller = controller;
+
+        UIManager.put("JCheckBox.disabledForeground", Color.BLACK);
+        UIManager.put("ToolTip.font",
+                new Font("SansSerif", Font.BOLD, 16));
+
 
         GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
         width = gd.getDisplayMode().getWidth();
@@ -200,6 +248,13 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
         int oneHundredPixels = width * (125 / 24) / 100;
         int seventyFivePixels = width * (125 / 32) / 100;
         int fiftyPixels = width * (125 / 48) / 100;
+
+        Dimension fullscreen = new Dimension(width, height);
+
+        Font bigFont = new Font(Font.DIALOG, Font.BOLD, 16);
+        Font bigTitle = new Font(Font.DIALOG, Font.BOLD, 14);
+
+        readyForServiceBeam = false;
 
         logPanel = new LogPanel();
         mainPanel = new JPanel();
@@ -249,6 +304,36 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
         interlockPanel.setLayout(new GridBagLayout());
         interlockPanel.setBackground(IbaColors.BT_GRAY);
 
+        mainCoilSweepPanel = new MainCoilSweep();
+        //mainCoilSweepPanel.setLayout(new GridBagLayout());
+        mainCoilSweepPanel.setBackground(IbaColors.BT_GRAY);
+
+        ICCPanel = new S1EvsICC(this);
+        ICCPanel.setBackground(IbaColors.BT_GRAY);
+
+        mEsbtsPanel = new EsbtsPanel();
+        mEsbtsPanel.setBackground(IbaColors.BT_GRAY);
+
+
+        mScanningControllerPanel = new ScanningController();
+        mScanningControllerPanel.setLayout(new GridBagLayout());
+        mScanningControllerPanel.setBackground(IbaColors.BT_GRAY);
+
+//        VceuPanel = new TcuVceuPanel();
+//        mBDSPanel.add("VCEU", VceuPanel);
+//        mBDSPanel.add("SSEU", new TcuSseuPanel());
+//        mBDSPanel.add("SMEU", new ScanningMagnetsPanel());
+
+        mSchedulerPanel = new JPanel();
+        mSchedulerPanel.setFont(bigTitle);
+        mSchedulerPanel.setLayout(new GridBagLayout());
+        mSchedulerPanel.setBackground(IbaColors.BT_GRAY);
+
+        TitledBorder title = new TitledBorder("Beam Scheduler");
+        title.setTitleFont(bigTitle);
+        title.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.lightGray));
+        mSchedulerPanel.setBorder(title);
+
         iAlignPanel = new JPanel();
         iAlignPanel.setLayout(new GridBagLayout());
         iAlignPanel.setBackground(IbaColors.BT_GRAY);
@@ -276,30 +361,70 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
             targetText[i].setEditable(false);
             targetText[i].setHorizontalAlignment(SwingConstants.CENTER);
             targetText[i].setBackground(IbaColors.BT_GRAY);
+            if (i == 3) {
+                targetText[i].setBorder(BorderFactory.createMatteBorder(1, 1, 0, 1, Color.BLACK));
+            }else {
+                targetText[i].setBorder(BorderFactory.createMatteBorder(1, 1, 0, 0, Color.BLACK));
+            }
             oldCurrText[i] = new JTextField();
             oldCurrText[i].setEditable(false);
             oldCurrText[i].setHorizontalAlignment(SwingConstants.CENTER);
             oldCurrText[i].setBackground(IbaColors.BT_GRAY);
+            if (i == 3) {
+                oldCurrText[i].setBorder(BorderFactory.createMatteBorder(1, 1, 0, 1, Color.BLACK));
+            }else {
+                oldCurrText[i].setBorder(BorderFactory.createMatteBorder(1, 1, 0, 0, Color.BLACK));
+            }
             newCurrText[i] = new JTextField();
             newCurrText[i].setHorizontalAlignment(SwingConstants.CENTER);
+            if (i == 3) {
+                newCurrText[i].setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.BLACK));
+            }else {
+                newCurrText[i].setBorder(BorderFactory.createMatteBorder(1, 1, 1, 0, Color.BLACK));
+            }
             diffText[i] = new JTextField();
             diffText[i].setEditable(false);
             diffText[i].setHorizontalAlignment(SwingConstants.CENTER);
             diffText[i].setBackground(IbaColors.BT_GRAY);
+            if (i == 3) {
+                diffText[i].setBorder(BorderFactory.createMatteBorder(1, 1, 0, 1, Color.BLACK));
+            }else {
+                diffText[i].setBorder(BorderFactory.createMatteBorder(1, 1, 0, 0, Color.BLACK));
+            }
             toleranceText[i] = new JTextField();
             toleranceText[i].setEditable(false);
             toleranceText[i].setHorizontalAlignment(SwingConstants.CENTER);
             toleranceText[i].setBackground(IbaColors.BT_GRAY);
+            if (i == 3) {
+                toleranceText[i].setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.BLACK));
+            }else {
+                toleranceText[i].setBorder(BorderFactory.createMatteBorder(1, 1, 1, 0, Color.BLACK));
+            }
             sigmaText[i] = new JTextField();
             sigmaText[i].setEditable(false);
             sigmaText[i].setHorizontalAlignment(SwingConstants.CENTER);
             sigmaText[i].setBackground(IbaColors.BT_GRAY);
+            if (i == 3) {
+                sigmaText[i].setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.BLACK));
+            }else {
+                sigmaText[i].setBorder(BorderFactory.createMatteBorder(1, 1, 1, 0, Color.BLACK));
+            }
             oldCurrText2[i] = new JTextField();
             oldCurrText2[i].setEditable(false);
             oldCurrText2[i].setHorizontalAlignment(SwingConstants.CENTER);
             oldCurrText2[i].setBackground(IbaColors.BT_GRAY);
+            if (i == 3) {
+                oldCurrText2[i].setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.BLACK));
+            }else {
+                oldCurrText2[i].setBorder(BorderFactory.createMatteBorder(1, 1, 1, 0, Color.BLACK));
+            }
             newCurrText2[i] = new JTextField();
             newCurrText2[i].setHorizontalAlignment(SwingConstants.CENTER);
+            if (i == 3) {
+                newCurrText2[i].setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.BLACK));
+            }else {
+                newCurrText2[i].setBorder(BorderFactory.createMatteBorder(1, 1, 1, 0, Color.BLACK));
+            }
         }
 
         c.gridx = 0;
@@ -391,7 +516,10 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
         c.weightx = 1; // full width
         int numElem = Status.BLE_names.length;
         blePanel = new JPanel();
-        TitledBorder title = new TitledBorder("Beamline Components");
+
+        title = new TitledBorder("Beamline Components");
+        title.setTitleFont(bigTitle);
+        title.setBorder(BorderFactory.createMatteBorder(1,1,1,1, Color.lightGray));
         blePanel.setBorder(title);
         blePanel.setLayout(new GridBagLayout());
         for (String str : Status.BLE_names) {
@@ -401,6 +529,7 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
                 c.weightx = 1;
             }
             tempLabel = new JLabel(str, JLabel.CENTER);
+            tempLabel.setFont(new Font(Font.DIALOG, Font.BOLD, 16));
             tempLabel.setVerticalAlignment(JLabel.BOTTOM);
             tempLabel.setBackground(IbaColors.BT_GRAY);
             blePanel.add(tempLabel, c);
@@ -417,7 +546,13 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
             statusText[i] = new JTextField();
             statusText[i].setEditable(false);
             statusText[i].setHorizontalAlignment(SwingConstants.CENTER);
+            statusText[i].setFont(new Font(Font.DIALOG, Font.BOLD, 16));
             statusText[i].setBackground(IbaColors.BT_GRAY);
+            if (i == numElem-1) {
+                statusText[i].setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.BLACK));
+            }else {
+                statusText[i].setBorder(BorderFactory.createMatteBorder(1, 1, 1, 0, Color.BLACK));
+            }
             blePanel.add(statusText[i], c);
         }
 
@@ -428,6 +563,8 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
         numElem = Status.BCREU_names.length;
         bcreuPanel = new JPanel();
         title = new TitledBorder("Beam Current Regulator (BCREU)");
+        title.setTitleFont(bigTitle);
+        title.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.lightGray));
         bcreuPanel.setBorder(title);
         bcreuPanel.setLayout(new GridBagLayout());
         for (String str : Status.BCREU_names) {
@@ -437,6 +574,7 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
                 c.weightx = 1;
             }
             tempLabel = new JLabel(str, JLabel.CENTER);
+            tempLabel.setFont(new Font(Font.DIALOG, Font.BOLD, 16));
             tempLabel.setVerticalAlignment(JLabel.BOTTOM);
             bcreuPanel.add(tempLabel, c);
             c.gridx += 1;
@@ -451,8 +589,14 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
             c.gridx = i;
             bcreuText[i] = new JTextField();
             bcreuText[i].setEditable(false);
+            bcreuText[i].setFont(new Font(Font.DIALOG, Font.BOLD, 16));
             bcreuText[i].setHorizontalAlignment(SwingConstants.CENTER);
             bcreuText[i].setBackground(IbaColors.BT_GRAY);
+            if (i == numElem-1){
+                bcreuText[i].setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.BLACK));
+            }else {
+                bcreuText[i].setBorder(BorderFactory.createMatteBorder(1, 1, 1, 0, Color.BLACK));
+            }
             bcreuPanel.add(bcreuText[i], c);
         }
 
@@ -464,6 +608,7 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
         numElem = Status.Cyclo_names.length;
         cycloPanel = new JPanel();
         title = new TitledBorder("Cyclotron (BPS)");
+        title.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.BLACK));
         cycloPanel.setBorder(title);
         cycloPanel.setLayout(new GridBagLayout());
         for (String str : Status.Cyclo_names) {
@@ -484,6 +629,11 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
             cycloText[i].setEditable(false);
             cycloText[i].setHorizontalAlignment(SwingConstants.CENTER);
             cycloText[i].setBackground(IbaColors.BT_GRAY);
+            if (i == numElem-1){
+                cycloText[i].setBorder(BorderFactory.createMatteBorder(1,1,1,1, Color.BLACK));
+            }else {
+                cycloText[i].setBorder(BorderFactory.createMatteBorder(1,1,1,0, Color.BLACK));
+            }
             cycloPanel.add(cycloText[i], c);
         }
 
@@ -792,6 +942,8 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
 
         ble2Panel = new JPanel(new GridBagLayout());
         title = new TitledBorder("Beamline Components");
+        //title.setTitleFont(bigTitle);
+        title.setBorder(BorderFactory.createMatteBorder(1,1,1,1, Color.BLACK));
         ble2Panel.setBorder(title);
         ble2Panel.setBackground(IbaColors.BT_GRAY);
         for (String str : Status.BLE_names2) {
@@ -818,6 +970,11 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
             statusText2[i].setEditable(false);
             statusText2[i].setHorizontalAlignment(SwingConstants.CENTER);
             statusText2[i].setBackground(IbaColors.BT_GRAY);
+            if (i == numElem-1) {
+                statusText2[i].setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.BLACK));
+            }else {
+                statusText2[i].setBorder(BorderFactory.createMatteBorder(1, 1, 1, 0, Color.BLACK));
+            }
             ble2Panel.add(statusText2[i], c);
         }
 //        c = new GridBagConstraints();
@@ -879,22 +1036,26 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
 
         mTabs = new JTabbedPane();
 
-        mTabs.addTab("Extraction Steering", mExtractionPanel);
+        //mTabs.addTab("Extraction Steering", mExtractionPanel);
         //mTabs.addTab("VNC viewer", mVNCPanel);
 
         //mTabs.addTab("Restore Magnets", mRestorePanel);
 
-        mTabs.addTab("Main Coil Tuning", tuningPanel);
+        //mTabs.addTab("Main Coil Tuning", tuningPanel);
+
+        //mTabs.addTab("Main Coil Sweep", mainCoilSweepPanel);
 
         //mTabs.addTab("Automatic Alignment", mAutomaticPanel);
 
-        mTabs.addTab("Source Burn-in", mSourcePanel);
+        //mTabs.addTab("Source Burn-in", mSourcePanel);
 
-        mTabs.addTab("Power Save Mode", powerSavePanel);
+        //mTabs.addTab("Power Save Mode", powerSavePanel);
 
         //mTabs.addTab("Interlocks", interlockPanel);
 
-        //mTabs.addTab("Main Coil Sweep", mainCoilSweepPanel);
+        //mTabs.addTab("S1E vs ICC", ICCPanel);
+
+        //mTabs.addTab("Service Beam", mBlankPanel);
 
 
         ChangeListener changeListener = new ChangeListener() {
@@ -903,6 +1064,7 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
                 int index = sourceTabbedPane.getSelectedIndex();
                 System.out.println("Tab changed to: " + sourceTabbedPane.getTitleAt(index));
 
+                mainPanel.remove(mScanningControllerPanel);
 
                 GridBagConstraints c = new GridBagConstraints();
                 c.fill = GridBagConstraints.BOTH;
@@ -933,9 +1095,10 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
                     //logPanel.setPreferredSize(dim);
                     mainPanel.add(logPanel, c);
                     mainPanel.updateUI();
+                    logPanel.updateUI();
                     //Gui.this.pack();
                 }
-                if (index == 1) {
+                if (index == 1 || index == 5) {
                     mainPanel.remove(bcreuPanel);
                     mainPanel.remove(cycloPanel);
                     mainPanel.remove(logPanel);
@@ -958,9 +1121,10 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
 //                        tuningPanel.updateUI();
 //                        tuningPanel.validate();
                     mainPanel.updateUI();
+                    logPanel.updateUI();
 //                    });
                 }
-                if (index == 3) {
+                if (index == 4) {
                     mainPanel.remove(bcreuPanel);
                     mainPanel.remove(cycloPanel);
                     mainPanel.remove(logPanel);
@@ -972,6 +1136,22 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
                     c.gridheight = 1;
                     powerSavePanel.add(logPanel, c);
                     mainPanel.updateUI();
+                    logPanel.updateUI();
+                }
+                if (index == 6) {
+                    mainPanel.remove(bcreuPanel);
+                    mainPanel.remove(cycloPanel);
+                    mainPanel.remove(logPanel);
+                    mainPanel.add(mScanningControllerPanel, c);
+//                    c.gridy = 3;
+//                    c.weighty = 2;
+//                    c.gridwidth = 4;
+//                    c.anchor = GridBagConstraints.PAGE_END;
+//                    c.fill = GridBagConstraints.BOTH;
+//                    c.gridheight = 1;
+//                    mainCoilSweepPanel.add(logPanel, c);
+                    mainPanel.updateUI();
+//                    logPanel.updateUI();
                 }
 
             }
@@ -1050,7 +1230,7 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
         allocatedLabelTR1.setFont(new Font("Dialog", Font.BOLD, 20));
         allocatedLabelTR1.setText("Allocated");
         allocatedLabelTR1.setHorizontalAlignment(SwingConstants.CENTER);
-        allocatedLabelTR1.setForeground(IbaColors.BT_GRAY);
+        allocatedLabelTR1.setForeground(IbaColors.LT_GRAY);
         allocatedLabelTR1.setBorder(BorderFactory.createMatteBorder(3, 3, 3, 3, Color.darkGray));
         //allocatedLabelTR1.setPreferredSize(labelSize);
 
@@ -1070,7 +1250,7 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
         queuedLabelTR1.setFont(new Font("Dialog", Font.BOLD, 20));
         queuedLabelTR1.setText("Queued");
         queuedLabelTR1.setHorizontalAlignment(SwingConstants.CENTER);
-        queuedLabelTR1.setForeground(IbaColors.BT_GRAY);
+        queuedLabelTR1.setForeground(IbaColors.LT_GRAY);
         queuedLabelTR1.setBorder(BorderFactory.createMatteBorder(3, 3, 3, 3, Color.darkGray));
         //queuedLabelTR1.setPreferredSize(labelSize);
 
@@ -1089,7 +1269,7 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
         searchingLabelTR1.setFont(new Font("Dialog", Font.BOLD, 20));
         searchingLabelTR1.setText("Searching");
         searchingLabelTR1.setHorizontalAlignment(SwingConstants.CENTER);
-        searchingLabelTR1.setForeground(IbaColors.BT_GRAY);
+        searchingLabelTR1.setForeground(IbaColors.LT_GRAY);
         searchingLabelTR1.setBorder(BorderFactory.createMatteBorder(3, 3, 3, 3, Color.darkGray));
         //searchingLabelTR1.setPreferredSize(labelSize);
 
@@ -1109,7 +1289,7 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
         secureLabelTR1.setFont(new Font("Dialog", Font.BOLD, 20));
         secureLabelTR1.setText("Secured");
         secureLabelTR1.setHorizontalAlignment(SwingConstants.CENTER);
-        secureLabelTR1.setForeground(IbaColors.BT_GRAY);
+        secureLabelTR1.setForeground(IbaColors.LT_GRAY);
         secureLabelTR1.setBorder(BorderFactory.createMatteBorder(3, 3, 3, 3, Color.darkGray));
         //secureLabelTR1.setPreferredSize(labelSize);
 
@@ -1169,7 +1349,7 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
         allocatedLabelTR2.setFont(new Font("Dialog", Font.BOLD, 20));
         allocatedLabelTR2.setText("Allocated");
         allocatedLabelTR2.setHorizontalAlignment(SwingConstants.CENTER);
-        allocatedLabelTR2.setForeground(IbaColors.BT_GRAY);
+        allocatedLabelTR2.setForeground(IbaColors.LT_GRAY);
         allocatedLabelTR2.setBorder(BorderFactory.createMatteBorder(3, 3, 3, 3, Color.darkGray));
         //allocatedLabelTR2.setPreferredSize(labelSize);
 
@@ -1189,7 +1369,7 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
         queuedLabelTR2.setFont(new Font("Dialog", Font.BOLD, 20));
         queuedLabelTR2.setText("Queued");
         queuedLabelTR2.setHorizontalAlignment(SwingConstants.CENTER);
-        queuedLabelTR2.setForeground(IbaColors.BT_GRAY);
+        queuedLabelTR2.setForeground(IbaColors.LT_GRAY);
         queuedLabelTR2.setBorder(BorderFactory.createMatteBorder(3, 3, 3, 3, Color.darkGray));
         //queuedLabelTR2.setPreferredSize(labelSize);
 
@@ -1208,7 +1388,7 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
         searchingLabelTR2.setFont(new Font("Dialog", Font.BOLD, 20));
         searchingLabelTR2.setText("Searching");
         searchingLabelTR2.setHorizontalAlignment(SwingConstants.CENTER);
-        searchingLabelTR2.setForeground(IbaColors.BT_GRAY);
+        searchingLabelTR2.setForeground(IbaColors.LT_GRAY);
         searchingLabelTR2.setBorder(BorderFactory.createMatteBorder(3, 3, 3, 3, Color.darkGray));
         //searchingLabelTR2.setPreferredSize(labelSize);
 
@@ -1228,7 +1408,7 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
         secureLabelTR2.setFont(new Font("Dialog", Font.BOLD, 20));
         secureLabelTR2.setText("Secured");
         secureLabelTR2.setHorizontalAlignment(SwingConstants.CENTER);
-        secureLabelTR2.setForeground(IbaColors.BT_GRAY);
+        secureLabelTR2.setForeground(IbaColors.LT_GRAY);
         secureLabelTR2.setBorder(BorderFactory.createMatteBorder(3, 3, 3, 3, Color.darkGray));
         //secureLabelTR2.setPreferredSize(labelSize);
 
@@ -1288,7 +1468,7 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
         allocatedLabelTR3.setFont(new Font("Dialog", Font.BOLD, 20));
         allocatedLabelTR3.setText("Allocated");
         allocatedLabelTR3.setHorizontalAlignment(SwingConstants.CENTER);
-        allocatedLabelTR3.setForeground(IbaColors.BT_GRAY);
+        allocatedLabelTR3.setForeground(IbaColors.LT_GRAY);
         allocatedLabelTR3.setBorder(BorderFactory.createMatteBorder(3, 3, 3, 3, Color.darkGray));
         //allocatedLabelTR3.setPreferredSize(labelSize);
 
@@ -1308,7 +1488,7 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
         queuedLabelTR3.setFont(new Font("Dialog", Font.BOLD, 20));
         queuedLabelTR3.setText("Queued");
         queuedLabelTR3.setHorizontalAlignment(SwingConstants.CENTER);
-        queuedLabelTR3.setForeground(IbaColors.BT_GRAY);
+        queuedLabelTR3.setForeground(IbaColors.LT_GRAY);
         queuedLabelTR3.setBorder(BorderFactory.createMatteBorder(3, 3, 3, 3, Color.darkGray));
         //queuedLabelTR3.setPreferredSize(labelSize);
 
@@ -1327,7 +1507,7 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
         searchingLabelTR3.setFont(new Font("Dialog", Font.BOLD, 20));
         searchingLabelTR3.setText("Searching");
         searchingLabelTR3.setHorizontalAlignment(SwingConstants.CENTER);
-        searchingLabelTR3.setForeground(IbaColors.BT_GRAY);
+        searchingLabelTR3.setForeground(IbaColors.LT_GRAY);
         searchingLabelTR3.setBorder(BorderFactory.createMatteBorder(3, 3, 3, 3, Color.darkGray));
         //searchingLabelTR3.setPreferredSize(labelSize);
 
@@ -1347,7 +1527,7 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
         secureLabelTR3.setFont(new Font("Dialog", Font.BOLD, 20));
         secureLabelTR3.setText("Secured");
         secureLabelTR3.setHorizontalAlignment(SwingConstants.CENTER);
-        secureLabelTR3.setForeground(IbaColors.BT_GRAY);
+        secureLabelTR3.setForeground(IbaColors.LT_GRAY);
         secureLabelTR3.setBorder(BorderFactory.createMatteBorder(3, 3, 3, 3, Color.darkGray));
         //secureLabelTR3.setPreferredSize(labelSize);
 
@@ -1407,7 +1587,7 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
         allocatedLabelTR4.setFont(new Font("Dialog", Font.BOLD, 20));
         allocatedLabelTR4.setText("Allocated");
         allocatedLabelTR4.setHorizontalAlignment(SwingConstants.CENTER);
-        allocatedLabelTR4.setForeground(IbaColors.BT_GRAY);
+        allocatedLabelTR4.setForeground(IbaColors.LT_GRAY);
         allocatedLabelTR4.setBorder(BorderFactory.createMatteBorder(3, 3, 3, 3, Color.darkGray));
         //allocatedLabelTR4.setPreferredSize(labelSize);
 
@@ -1427,7 +1607,7 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
         queuedLabelTR4.setFont(new Font("Dialog", Font.BOLD, 20));
         queuedLabelTR4.setText("Queued");
         queuedLabelTR4.setHorizontalAlignment(SwingConstants.CENTER);
-        queuedLabelTR4.setForeground(IbaColors.BT_GRAY);
+        queuedLabelTR4.setForeground(IbaColors.LT_GRAY);
         queuedLabelTR4.setBorder(BorderFactory.createMatteBorder(3, 3, 3, 3, Color.darkGray));
         //queuedLabelTR4.setPreferredSize(labelSize);
 
@@ -1446,7 +1626,7 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
         searchingLabelTR4.setFont(new Font("Dialog", Font.BOLD, 20));
         searchingLabelTR4.setText("Searching");
         searchingLabelTR4.setHorizontalAlignment(SwingConstants.CENTER);
-        searchingLabelTR4.setForeground(IbaColors.BT_GRAY);
+        searchingLabelTR4.setForeground(IbaColors.LT_GRAY);
         searchingLabelTR4.setBorder(BorderFactory.createMatteBorder(3, 3, 3, 3, Color.darkGray));
         //searchingLabelTR4.setPreferredSize(labelSize);
 
@@ -1467,7 +1647,7 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
         secureLabelTR4.setText("Secured");
         secureLabelTR4.setHorizontalAlignment(SwingConstants.CENTER);
         ;
-        secureLabelTR4.setForeground(IbaColors.BT_GRAY);
+        secureLabelTR4.setForeground(IbaColors.LT_GRAY);
         secureLabelTR4.setBorder(BorderFactory.createMatteBorder(3, 3, 3, 3, Color.darkGray));
         //secureLabelTR4.setPreferredSize(labelSize);
 
@@ -1877,6 +2057,7 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
         this.outputLabel.setFont(new Font("Dialog", 1, 30));
         title = new TitledBorder("nA");
         title.setTitleJustification(3);
+        title.setBorder(BorderFactory.createMatteBorder(1,1,1,1, Color.BLACK));
         Border margin = new EmptyBorder(10, 20, 10, 20);
         this.outputLabel.setBorder(new CompoundBorder(title, margin));
         this.outputLabel.setHorizontalTextPosition(0);
@@ -2038,6 +2219,7 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
         title = new TitledBorder("Output");
         title.setTitleJustification(TitledBorder.CENTER);
         title.setTitleFont(new Font("Dialog", Font.BOLD, 20));
+        title.setBorder(BorderFactory.createMatteBorder(1,1,1,1, Color.BLACK));
         outputPanel.setBorder(title);
 
         tuningPanel.add(outputPanel, c);
@@ -2072,6 +2254,7 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
         FilFB.setEditable(false);
         title = new TitledBorder("A");
         title.setTitleJustification(TitledBorder.RIGHT);
+        title.setBorder(BorderFactory.createMatteBorder(1,1,1,1, Color.BLACK));
         FilFB.setBorder(title);
         FilFB.setBackground(IbaColors.BT_GRAY);
         FilFB.setHorizontalAlignment(SwingConstants.CENTER);
@@ -2088,6 +2271,7 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
 
         FilSP = new JTextField();
         title = new TitledBorder("Fil");
+        title.setBorder(BorderFactory.createMatteBorder(1,1,1,1, Color.BLACK));
         FilSP.setBorder(title);
         FilSP.setColumns(7);
         FilSP.setHorizontalAlignment(SwingConstants.CENTER);
@@ -2102,7 +2286,7 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
                     if (Double.parseDouble(FilSP.getText()) >= 125.00 && Double.parseDouble(FilSP.getText()) <= 220.00) {
-                        controller.acu.setTagValue(Status.Fil_write, Double.parseDouble(FilSP.getText()) + 0.001);
+                        controller.acu.setTagValue(Status.Fil_write, Double.parseDouble(FilSP.getText()));
                         log.warn("Filament set to " + String.format("%.2f", Double.parseDouble(FilSP.getText())));
                         if (beamCurrent != null) {
                             beamCurrent.clear();
@@ -2166,6 +2350,7 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
         ArcFB.setEditable(false);
         title = new TitledBorder("mA");
         title.setTitleJustification(TitledBorder.RIGHT);
+        title.setBorder(BorderFactory.createMatteBorder(1,1,1,1, Color.BLACK));
         ArcFB.setBorder(title);
         ArcFB.setBackground(IbaColors.BT_GRAY);
         ArcFB.setHorizontalAlignment(SwingConstants.CENTER);
@@ -2182,6 +2367,7 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
 
         ArcSP = new JTextField();
         title = new TitledBorder("Arc");
+        title.setBorder(BorderFactory.createMatteBorder(1,1,1,1, Color.BLACK));
         ArcSP.setBorder(title);
         ArcSP.setColumns(7);
         ArcSP.setHorizontalAlignment(SwingConstants.CENTER);
@@ -2196,8 +2382,8 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
                     if (Double.parseDouble(ArcSP.getText()) >= 1.00 && Double.parseDouble(ArcSP.getText()) <= 250.00) {
-                        controller.acu.setTagValue(Status.Arc_write, Double.parseDouble(ArcSP.getText()) + 0.001);
-                        log.warn("Arc set to " + String.format("%.2f", Double.parseDouble(ArcSP.getText())));
+                        controller.acu.setTagValue(Status.Arc_write, Double.parseDouble(ArcSP.getText()));
+                        log.warn("[TUNE] Arc set to " + String.format("%.2f", Double.parseDouble(ArcSP.getText())));
                         if (beamCurrent != null) {
                             beamCurrent.clear();
                         }
@@ -2256,6 +2442,7 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
         ArcVolt.setEditable(false);
         title = new TitledBorder("V");
         title.setTitleJustification(TitledBorder.RIGHT);
+        title.setBorder(BorderFactory.createMatteBorder(1,1,1,1, Color.BLACK));
         ArcVolt.setBorder(title);
         ArcVolt.setBackground(IbaColors.BT_GRAY);
         ArcVolt.setHorizontalAlignment(SwingConstants.CENTER);
@@ -2284,6 +2471,7 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
         title = new TitledBorder("Source");
         title.setTitleJustification(TitledBorder.CENTER);
         title.setTitleFont(new Font("Dialog", Font.BOLD, 20));
+        title.setBorder(BorderFactory.createMatteBorder(1,1,1,1, Color.BLACK));
         sourceTuningPanel.setBorder(title);
 
         tuningPanel.add(sourceTuningPanel, c);
@@ -2413,6 +2601,7 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
         MCoilFB.setEditable(false);
         title = new TitledBorder("A");
         title.setTitleJustification(TitledBorder.RIGHT);
+        title.setBorder(BorderFactory.createMatteBorder(1,1,1,1, Color.BLACK));
         MCoilFB.setBorder(title);
         MCoilFB.setBackground(IbaColors.BT_GRAY);
         MCoilFB.setHorizontalAlignment(SwingConstants.CENTER);
@@ -2430,6 +2619,7 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
 
         MCoilSP = new JTextField();
         title = new TitledBorder("MCoil");
+        title.setBorder(BorderFactory.createMatteBorder(1,1,1,1, Color.BLACK));
         MCoilSP.setBorder(title);
         MCoilSP.setColumns(7);
         MCoilSP.setHorizontalAlignment(SwingConstants.CENTER);
@@ -2739,6 +2929,7 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
         title = new TitledBorder("Magnet");
         title.setTitleJustification(TitledBorder.CENTER);
         title.setTitleFont(new Font("Dialog", Font.BOLD, 20));
+        title.setBorder(BorderFactory.createMatteBorder(1,1,1,1, Color.BLACK));
         magnetTuningPanel.setBorder(title);
 
         tuningPanel.add(magnetTuningPanel, c);
@@ -2882,6 +3073,7 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
         title = new TitledBorder("Instructions");
         title.setTitleJustification(TitledBorder.CENTER);
         title.setTitleFont(new Font("Dialog", Font.BOLD, 20));
+        title.setBorder(BorderFactory.createMatteBorder(1,1,1,1, Color.BLACK));
         tuningInstructionPanel.setBorder(title);
 
         //tuningPanel.add(tuningInstructionPanel, c);
@@ -2899,6 +3091,7 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
         numElem = Status.CycloTuning_names.length;
         MCTuningPanel = new JPanel();
         title = new TitledBorder("Cyclotron (BPS)");
+        title.setBorder(BorderFactory.createMatteBorder(1,1,1,1, Color.BLACK));
         MCTuningPanel.setBorder(title);
         MCTuningPanel.setLayout(new GridBagLayout());
         for (String str : Status.CycloTuning_names) {
@@ -2927,6 +3120,11 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
             MCTuningText[i].setEditable(false);
             MCTuningText[i].setHorizontalAlignment(SwingConstants.CENTER);
             MCTuningText[i].setBackground(IbaColors.BT_GRAY);
+            if (i == numElem-1) {
+                MCTuningText[i].setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.BLACK));
+            }else{
+                MCTuningText[i].setBorder(BorderFactory.createMatteBorder(1, 1, 1, 0, Color.BLACK));
+            }
             MCTuningPanel.add(MCTuningText[i], c);
         }
 
@@ -3075,29 +3273,60 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
         c.gridx = 0;
         c.gridy = 0;
         c.gridwidth = 3;
-        //c.gridheight = 1;
+        c.gridheight = 2;
 
-        mainPanel.add(mTabs, c);
-        c.weighty = 0;
-        c.insets = new Insets(5, 0, 0, 0);  //top padding
+        mainPanel.add(mEsbtsPanel, c);
+        c.gridx = 3;
+        c.ipadx = 0;
+        c.ipady = 0;
+        c.weightx = 2; // full width
+        c.weighty = 2; // full width
+        c.gridheight = 1;
+        //mainPanel.add(mScanningControllerPanel, c);
+
+        mBeamTimer = new TimerPanel();
+        title = new TitledBorder("Beam Timer");
+        title.setTitleFont(bigTitle);
+        title.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.lightGray));
+        mBeamTimer.setBorder(title);
+
+        mainPanel.add(mBeamTimer, c);
         c.gridy = 1;
+        mainPanel.add(mSchedulerPanel, c);
+
+        c.weighty = 0;
+        c.weightx = 1;
+        c.insets = new Insets(5, 0, 0, 0);  //top padding
+        c.gridy++;
         // mainPanel.add(bcreuPanel, c);
         // c.gridy     = 2;
-        mainPanel.add(cycloPanel, c);
-        c.gridy = 4;
+        c.gridwidth = 6;
+        c.gridx = 0;
+        mainPanel.add(bcreuPanel, c);
+        c.gridy++;
+        mainPanel.add(blePanel, c);
+        //c.gridy = 3;
         //c.gridwidth = 3;
         //c.gridheight = 20;
         c.weighty = 20;   //request any extra vertical space
         c.anchor = GridBagConstraints.PAGE_END; //bottom of space
         c.fill = GridBagConstraints.BOTH;
-        mainPanel.add(logPanel, c);
+        c.gridy = 4;
+        //c.gridwidth = 3;
+        //c.gridheight = 1;
+        //c.weighty = 1;   //request any extra vertical space
+        //c.anchor = GridBagConstraints.PAGE_END; //bottom of space
+        //c.fill = GridBagConstraints.BOTH;
+        //Dimension dim = new Dimension(1920, 300);
+        //logPanel.setPreferredSize(dim);
+        //mainPanel.add(logPanel, c);
         this.add(mainPanel);
 
 
         // mAutomaticPanel.add(alignMeButton, c);
 
 
-        mRestorePanel.setLayout(new GridBagLayout());
+        //mRestorePanel.setLayout(new GridBagLayout());
 
 
         // Row of buttons:
@@ -3174,20 +3403,143 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
 
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        this.setSize(new Dimension(screenSize.width / 2, screenSize.height * 3 / 4));
-        this.setLocation(screenSize.width / 4, screenSize.height / 12);
+        //this.setSize(new Dimension(screenSize.width / 2, screenSize.height * 3 / 4));
+        this.setSize(fullscreen);
+        //this.setLocation(screenSize.width / 4, screenSize.height / 12);
 //		this.setResizable(false);
-        this.setTitle("adaPT Assist");
+        this.setTitle("Service Beam GUI");
 //		URL logoUrl=Main.class.getClassLoader().getResource("iba-logo.gif");
 //		setIconImage(Toolkit.getDefaultToolkit().getImage(logoUrl));
         //Adding pack() to properly set GUI
-        this.pack();
-        this.setVisible(true);
+//        this.pack();
+//        this.setVisible(true);
 
 
         // Initialize controller
         controller.initialize();
-        refreshTargets();
+
+        //ApplicationContext context = new ClassPathXmlApplicationContext("xml/config/bms/bms/controller/impl/properties/ui.service.uniNozzle.xml");
+
+        //BeanFactory beanFactory = new XmlBeanFactory(new ClassPathResource("config/pts/bmsTcrServiceScreens/container.xml"));
+
+//       Properties props = new Properties(new ClassPathResource("config/bms/beamCommonProcess/container.xml"));
+//       BeanWrapper wrapper = new BeanWrapperImpl();
+//            // will throw an exception if the Properties object
+//            // contains any unknown keys
+//        wrapper.setPropertyValues(props);
+
+        //TcuVariableCollimator vceu =  (TcuVariableCollimator) context.getBean("abstractTcuDeviceEndPoint");
+
+        //BeanFactory beanFactory = new XmlBeanFactory(new ClassPathResource("config/bms/beamCommonProcess/container.xml"));
+
+//        Resource resource = new ClassPathResource("config/bms/beamCommonProcess/default.properties");
+//        Properties props = PropertiesLoaderUtils.loadProperties(resource);
+//        BeanWrapper wrapper = new BeanWrapperImpl(beanFactory.getBean("esBtsController"));
+//            // will throw an exception if the Properties object
+//            // contains any unknown keys
+//        wrapper.setPropertyValues(props);
+
+ /**       BeanFactory beanFactory = new XmlBeanFactory(new ClassPathResource("config/bms/beamCommonProcess/container.xml"));  */
+        //BeanWrapper wrapper = new BeanWrapperImpl(beanFactory.getBean("esBtsController"));
+
+        //EsBtsControllerImpl esbtscontroller = new EsBtsControllerImpl();
+
+        //BeamlineConfig beamline = (BeamlineConfig) beanFactory.getBean("beamlineConfig");
+        //esbtscontroller.setBeamlinesInfrastructure((BeamlinesInfrastructure)beanFactory.getBean("beamlinesInfrastructure"));
+
+        //PropertyPlaceholderConfigurer configurer = (PropertyPlaceholderConfigurer)beanFactory.getBean("placeholderConfig");
+        //configurer.postProcessBeanFactory(beanFactory);
+        //EsBtsControllerImpl EsbtsController = (EsBtsControllerImpl) beanFactory.getBean("esBtsControllerJmx");
+
+
+        //TcuVariableCollimator vceu =  (TcuVariableCollimator) context.getBean("abstractTcuDeviceEndPoint");
+
+        beamSchedulerPanel = new BeamSchedulerPanel(Controller.beam.beamScheduler, new BeamSchedulerControl() {
+            @Override
+            public Set<String> getBeamSupplyPointsIds() {
+                return ImmutableSet.of("IBTR3-90");
+            }
+
+            @Override
+            public void setAutomaticScheduling(boolean pAutomaticScheduling) {
+                Controller.beam.beamScheduler.setAutomaticScheduling(pAutomaticScheduling);
+            }
+
+            @Override
+            public void cancelPendingBeamRequests() {
+                Controller.beam.beamScheduler.cancelPendingBeamRequests();
+            }
+
+            @Override
+            public void cancelPendingBeamRequests(BeamPriority pPriority) {
+                Controller.beam.beamScheduler.cancelPendingBeamRequests(pPriority);
+            }
+
+            @Override
+            public void stepUpBeamRequest(String pBeamSupplyPointId) {
+                Controller.beam.beamScheduler.stepUpBeamRequest(pBeamSupplyPointId);
+            }
+
+            @Override
+            public void stepDownBeamRequest(String pBeamSupplyPointId) {
+                Controller.beam.beamScheduler.stepDownBeamRequest(pBeamSupplyPointId);
+            }
+
+            @Override
+            public void acceptBeamRequest(String pBeamSupplyPointId) {
+                Controller.beam.beamScheduler.acceptBeamRequest(pBeamSupplyPointId);
+            }
+
+            @Override
+            public void rejectBeamRequest(String pBeamSupplyPointId) {
+                Controller.beam.beamScheduler.rejectBeamRequest(pBeamSupplyPointId);
+            }
+        });
+       // beamSchedulerPanel.setPreferredSize(new Dimension(800,800));
+
+        c = new GridBagConstraints();
+        c.fill = GridBagConstraints.BOTH;
+        c.ipady = 0; // reset ipady
+//        c.weightx = 1; // full width
+//        c.weighty = 2; // full width
+        c.gridx = 3;
+        c.gridy = 2;
+//        c.gridwidth = 2;
+//        c.gridheight = 2;
+
+//        mainPanel.add(mSchedulerPanel, c);
+        c.gridx = 0;
+        c.gridy = 2;
+        c.ipadx = 0;
+        c.ipady = 0;
+        c.weightx = 1; // full width
+        c.weighty = 0.5; // full width
+        c.gridwidth = 1;
+        c.gridheight = 2;
+        //mainPanel.add(mScanningControllerPanel, c);
+        mSchedulerPanel.add(beamSchedulerPanel.createQueuePanel(), c);
+
+        c.gridx = 1;
+        c.gridheight = 1;
+        c.weighty = 0.5;
+        mSchedulerPanel.add(beamSchedulerPanel.createBeamRequestPanel(), c);
+        c.gridy = 3;
+        mSchedulerPanel.add(beamSchedulerPanel.createAllocatedPanel(), c);
+
+
+
+
+//        mBDSPanel.add(beamSchedulerPanel.createBeamRequestPanel());
+//        mBDSPanel.add(beamSchedulerPanel.createAllocatedPanel());
+//
+//        VceuPanel = (TcuVceuPanel) beanFactory.getBean("tcuVceuPanel");
+//
+//        mBDSPanel.add("VCEU", VceuPanel);
+//        mBDSPanel.add("SSEU", new TcuSseuPanel());
+//        mBDSPanel.add("SMEU", new ScanningMagnetsPanel());
+        //log.warn("controller initialize complete");
+        //refreshTargets();
+        //log.warn("refresh targets complete");
 
 //        double[] dbl = controller.getSafeCurrents();
 //        for (int i=0; i<4; i++){
@@ -3207,12 +3559,15 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
 
 
         (mTask = new ConstantWorker()).execute();
-        (mTask2 = new ConstantWorker2()).execute();
+        //(mTask2 = new ConstantWorker2()).execute();
         (mBcreuProxy = new BcreuWorker()).execute();
         //(mSetpointWorker = new SetpointWorker()).execute();
 
 
         controller.feedbackClient.retreiveMcrFeedbacks();
+
+        this.pack();
+        this.setVisible(true);
 
 //        try{
 //            getDegraderCurrent();
@@ -3229,6 +3584,10 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
         });
     }
 
+    public static EsbtsPanel getEsbtsPanel() {
+        return mEsbtsPanel;
+    }
+
     /***********************************************
 
      END of GUI SETUP
@@ -3238,11 +3597,39 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
 
     public void exitProcedure() {
         log.info("Preparing to exit...");
-        if (controller.acu.isConnected() && controller.ecubtcu.isConnected()) {
-            Controller.bcreu.disconnect();
-            if (controller.beam.bssController.getOperatingMode() == OperatingMode.MANUAL) {
+        if (readyForServiceBeam){
+            BeamAllocation allocation = Controller.beam.beamScheduler.getCurrentBeamAllocation();
+            if (allocation != null) {
+                if(allocation.getBeamSupplyPointId().contains("IBTR3")){
+                    //Controller.beam.bssController.startIdleActivity(Controller.beam.beamScheduler.getCurrentBeamAllocation().getBeamSupplyPointId());
+                    //controller.prepareForTreatment();
+                    Controller.beam.bpsController.startIdleActivity();
+                    Controller.beam.smpsController.startIdleActivity();
+                    try {
+                        Controller.beam.bssController.startDisableBeamActivity(Controller.beam.beamScheduler.getCurrentBeamAllocation().getBeamSupplyPointId());
+                        Thread.sleep(1000);
+                        if (Controller.S2E.getPosition() == Insertable.Position.MOVING || Controller.S2E.getPosition() == Insertable.Position.INSERTED) {
+                            //do nothing
+                        } else {
+                            Controller.ecubtcu.bsInsert("S2E");
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    Controller.beam.beamScheduler.releaseBeam(Controller.beam.beamScheduler.getCurrentBeamAllocation().getBeamSupplyPointId(), false);
+                }
+            } else {
+                Controller.beam.bpsController.startIdleActivity();
                 controller.prepareForTreatment();
+                Controller.beam.smpsController.startIdleActivity();
             }
+
+        if (controller.bcreu.isConnected()) {
+            Controller.bcreu.disconnect();
+        }
+//            if (controller.beam.bssController.getOperatingMode() == OperatingMode.MANUAL) {
+//                controller.prepareForTreatment();
+//            }
         }
         this.dispose();
         System.exit(0);
@@ -3470,23 +3857,23 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
         }
 
         //AMO - check if data is good
-        if ((dist[0].getMaximumY() < 1) || (dist[1].getMaximumY() < 1) || (dist[2].getMaximumY() < 1) || (dist[3].getMaximumY() < 1)) {
-            log.error("Need to recapture BPM data");
-            applyButton.setEnabled(false);
-            keepRefreshing = true;
-
-            if (controller.refreshAll()) {
-                refresh();
-            }
-
-            if (!keepRefreshing) {
-                return newCurrents;
-            }
-        }
+//        if ((dist[0].getMaximumY() < 1) || (dist[1].getMaximumY() < 1) || (dist[2].getMaximumY() < 1) || (dist[3].getMaximumY() < 1)) {
+//            log.error("[REFRESH] Need to recapture BPM data");
+//            applyButton.setEnabled(false);
+//            //keepRefreshing = true;
+//
+//            if (controller.refreshAll()) {
+//                refresh();
+//            }
+//
+//            if (!keepRefreshing) {
+//                return newCurrents;
+//            }
+//        }
 
         //AMO - check if data is good
         if ((Math.abs(sigmas[0] - mSigmaTargets[0]) > mSigmaTolerances[0]) || (Math.abs(sigmas[1] - mSigmaTargets[1]) > mSigmaTolerances[1]) || (Math.abs(sigmas[2] - mSigmaTargets[2]) > mSigmaTolerances[2]) || (Math.abs(sigmas[3] - mSigmaTargets[3]) > mSigmaTolerances[3])) {
-            log.error("Sigma out of tolerance, refreshing again");
+            log.error("[REFRESH] Sigma out of tolerance, refreshing again");
             keepRefreshing = true;
 
             if (controller.refreshAll()) {
@@ -3596,7 +3983,7 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
 //                    break;
 //                }
 
-                log.warn("Button refresh has been pressed");
+                log.warn("[REFRESH] Button has been pressed");
                 if (!controller.bcreu.isConnected()) {
                     controller.bcreu.connect();
                 }
@@ -3637,15 +4024,20 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
                     }
 
                 } else {
-                    log.error("Refresh process already running.");
+                    log.error("[REFRESH] Process already running.");
                     //log.error("Refresh process test complete.");
                 }
                 break;
             case "cancel":
                 // Cancel and interrupt
+                idle = false;
                 readCurrent = false;
                 isRefreshing = false;
                 keepRefreshing = false;
+                log.info("[IDLE] Preparing system for treatment and idling.");
+                mainCoilButton.setEnabled(false);
+                rfLUTButton.setEnabled(false);
+                cancelButton2.setEnabled(false);
                 controller.stopAlignment();
                 this.setTitle("adaPT Assist");
                 mainPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
@@ -3657,21 +4049,47 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
                     mRefreshWorker.cancel(true);
                 }
 
+                mainCoilButton.setEnabled(false);
+                rfLUTButton.setEnabled(false);
+                cancelButton2.setEnabled(false);
+
                 if (controller.isSystemManual()) {
-                    log.info("Preparing system for treatment.");
 //                    VDeeSP.setText("41.00");
 //                    VDeeSP2.setText("41.00");
-                    mainCoilButton.setEnabled(true);
-                    controller.prepareForTreatment();
+
+                    SwingUtilities.invokeLater(
+                            new Runnable(){
+                                public void run(){
+                                    try {
+                                        controller.prepareForTreatment();
+
+                                        try {
+                                            Thread.sleep(4500);
+                                        } catch (InterruptedException ex) {
+                                            log.error(ex);
+                                        }
+
+                                        idle = true;
+                                        mainCoilButton.setEnabled(true);
+                                        rfLUTButton.setEnabled(true);
+                                        cancelButton2.setEnabled(true);
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            });
+
+//                   controller.prepareForTreatment();
+
                 } else {
                     log.error("System is in automatic mode, cannot prepare for treatment.");
                 }
 
-                try {
-                    Thread.sleep(2000);
-                } catch (InterruptedException ex) {
-                    log.error(ex);
-                }
+//                try {
+//                    Thread.sleep(2000);
+//                } catch (InterruptedException ex) {
+//                    log.error(ex);
+//                }
                 // AMO test to keep BCREU feedback going
                 // Controller.bcreu.disconnect();
                 if (!refreshButton.isEnabled()) {
@@ -3682,7 +4100,7 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
                 }
                 break;
             case "compute":
-                log.debug("Button compute has been pressed");
+                log.debug("[COMPUTE] Button has been pressed");
                 /* Send to BPM objects the positions in the text fields on the screen */
                 double[] centerings = new double[4];
                 for (int i = 0; i < 4; i++) {
@@ -3758,7 +4176,7 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
                 double maxCurrentChange = Controller.getMaxApply();
                 if (controller.isSystemManual()) {
                     String rounded = "";
-                    log.debug("Button apply has been pressed");
+                    log.debug("[APPLY] Button has been pressed");
                     if (newCurrText[0].getText().equals("")) {
                         log.error("New currents need to be specified before they can be applied.");
                     }
@@ -3818,7 +4236,7 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
                     controller.setCurrents(newCurrents);
                     log.debug("New currents sent to controller");
                     for (int i = 0; i < 4; i++) {
-                        positionText[i].setText("");
+//                        positionText[i].setText("");
 //                    oldCurrText[i].setText("");
                     }
 
@@ -3836,19 +4254,33 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
                 break;
             case "output":
                 readCurrent = true;
+                idle = false;
 
-                log.info("Check output button has been pressed");
+                log.info("[TUNE] Set RF has been pressed");
 
                 mainCoilButton.setEnabled(false);
+                rfLUTButton.setEnabled(false);
 
                 if (!controller.isSystemManual()) {
-                    log.error("System is in automatic mode. Please switch to manual mode.");
+                    log.error("[TUNE] System is in automatic mode. Please switch to manual mode.");
                     mainCoilButton.setEnabled(true);
+                    rfLUTButton.setEnabled(true);
                     break;
                 }
 
 
-                controller.prepareForTune();
+                SwingUtilities.invokeLater(
+                        new Runnable(){
+                            public void run(){
+                                try {
+                                    controller.prepareForTune();
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+
+                //controller.prepareForTune();
 
 //                VDeeSP.setText("41.00");
 //                VDeeSP2.setText("56.00");
@@ -3867,12 +4299,15 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
 
 
                             } catch (Exception f) {
-                                log.error("Could not get degrader current from OPC server");
+                                log.error("[SET RF] Could not get degrader current from OPC server");
                                 f.printStackTrace();
 //                                VDeeSP.setText("41.00");
 //                                VDeeSP2.setText("41.00");
-                                mainCoilButton.setEnabled(true);
+                                log.info("[IDLE] Preparing system for treatment and idling.");
                                 controller.prepareForTreatment();
+                                idle = true;
+                                mainCoilButton.setEnabled(true);
+                                rfLUTButton.setEnabled(true);
                             }
 
                             if (curr.getAsDouble() > 250.0) {
@@ -3913,8 +4348,9 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
                 }
 
                 if (controller.isSystemManual()) {
-                    log.info("Preparing system for treatment.");
+                    log.info("[IDLE] Preparing system for treatment and idling.");
                     controller.prepareForTreatment();
+                    idle = true;
                 } else {
                     log.error("System is in automatic mode, cannot prepare for treatment.");
                 }
@@ -4112,7 +4548,7 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
                 if ((Double.parseDouble(FilSP.getText()) - 1.00) >= 125.00) {
                     FilSP.setText(String.format("%.2f", Double.parseDouble(FilSP.getText()) - 1.00));
                     controller.acu.setTagValue(Status.Fil_write, Double.parseDouble(FilSP.getText()));
-                    log.warn("Filament set to " + String.format("%.2f", Double.parseDouble(FilSP.getText())));
+                    log.warn("[TUNE] Filament set to " + String.format("%.2f", Double.parseDouble(FilSP.getText())));
                     if (beamCurrent != null) {
                         beamCurrent.clear();
                     }
@@ -4123,14 +4559,14 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
                 } else {
                     FilSP.setText("125.00");
                     controller.acu.setTagValue(Status.Fil_write, 125.00);
-                    log.warn("Filament set to minimum of 125.00A");
+                    log.warn("[TUNE] Filament set to minimum of 125.00A");
                 }
                 break;
             case "Filplus":
                 if ((Double.parseDouble(FilSP.getText()) + 1.00) <= 220.00) {
                     FilSP.setText(String.format("%.2f", Double.parseDouble(FilSP.getText()) + 1.00));
                     controller.acu.setTagValue(Status.Fil_write, Double.parseDouble(FilSP.getText()));
-                    log.warn("Filament set to " + String.format("%.2f", Double.parseDouble(FilSP.getText())));
+                    log.warn("[TUNE] Filament set to " + String.format("%.2f", Double.parseDouble(FilSP.getText())));
                     if (beamCurrent != null) {
                         beamCurrent.clear();
                     }
@@ -4141,7 +4577,7 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
                 } else {
                     FilSP.setText("220.00");
                     controller.acu.setTagValue(Status.Fil_write, 220.00);
-                    log.warn("Filament set to maximum of 220.00A");
+                    log.warn("[TUNE] Filament set to maximum of 220.00A");
                 }
                 break;
             case "Arcminus":
@@ -4162,7 +4598,7 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
                         f.printStackTrace();
                     }
 
-                    log.warn("Arc set to " + String.format("%.2f", Double.parseDouble(ArcSP.getText())));
+                    log.warn("[TUNE] Arc set to " + String.format("%.2f", Double.parseDouble(ArcSP.getText())));
                     if (beamCurrent != null) {
                         beamCurrent.clear();
                     }
@@ -4180,7 +4616,7 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
                 } else {
                     ArcSP.setText("1.00");
                     controller.acu.setTagValue(Status.Arc_write, 1.00D);
-                    log.warn("Arc set to minimum of 1.00mA");
+                    log.warn("[TUNE] Arc set to minimum of 1.00mA");
                 }
                 break;
             case "Arcplus":
@@ -4201,7 +4637,7 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
                         f.printStackTrace();
                     }
 
-                    log.warn("Arc set to " + String.format("%.2f", Double.parseDouble(ArcSP.getText())));
+                    log.warn("[TUNE] Arc set to " + String.format("%.2f", Double.parseDouble(ArcSP.getText())));
                     if (beamCurrent != null) {
                         beamCurrent.clear();
                     }
@@ -4219,7 +4655,7 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
                 } else {
                     ArcSP.setText("250.00");
                     controller.acu.setTagValue(Status.Arc_write, 250.00);
-                    log.warn("Arc set to maximum of 250.00mA");
+                    log.warn("[TUNE] Arc set to maximum of 250.00mA");
                 }
                 break;
             case "CCoilminus":
@@ -4270,7 +4706,7 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
                         g.printStackTrace();
                     }
 
-                    log.warn("Main coil set to " + String.format("%.3f", Double.parseDouble(MCoilSP.getText())));
+                    log.warn("[TUNE] Main coil set to " + String.format("%.3f", Double.parseDouble(MCoilSP.getText())));
                     if (beamCurrent != null) {
                         beamCurrent.clear();
                     }
@@ -4281,7 +4717,7 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
                 } else {
                     MCoilSP.setText("735.00");
                     controller.acu.setTagValue(Status.MC_write, 735.00);
-                    log.warn("Main coil set to minimum of 735.00A");
+                    log.warn("[TUNE] Main coil set to minimum of 735.00A");
                 }
                 break;
             case "MCoilplus":
@@ -4302,7 +4738,7 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
                         g.printStackTrace();
                     }
 
-                    log.warn("Main coil set to " + String.format("%.3f", Double.parseDouble(MCoilSP.getText())));
+                    log.warn("[TUNE] Main coil set to " + String.format("%.3f", Double.parseDouble(MCoilSP.getText())));
                     if (beamCurrent != null) {
                         beamCurrent.clear();
                     }
@@ -4313,7 +4749,7 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
                 } else {
                     MCoilSP.setText("755.00");
                     controller.acu.setTagValue(Status.MC_write, 755.00);
-                    log.warn("Main coil set to maximum of 755.00A");
+                    log.warn("[TUNE] Main coil set to maximum of 755.00A");
                 }
                 break;
             case "HCoil1minus":
@@ -4378,12 +4814,80 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
                 break;
             case "RFLUT":
                 if (controller.isSystemManual()) {
-                    controller.beam.llrf.setMaxVoltage(56.00);
-                    controller.beam.bpsController.startGenerateRfLookupActivity(47.00, 56.00, 9);
+
+                    idle = false;
+                    rfLUTButton.setEnabled(false);
+                    cancelButton2.setEnabled(false);
+                    mainCoilButton.setEnabled(false);
+                    log.warn("[RF LUT] Generating RF look up table, please wait.");
+
+                    SwingUtilities.invokeLater(
+                            new Runnable(){
+                                public void run(){
+                                    try {
+                                        controller.beam.llrf.setMaxVoltage(56.00);
+                                        controller.beam.bpsController.startGenerateRfLookupActivity(47.00, 56.00, 9);
+
+                                        Thread.sleep(8000);
+
+                                        while(Double.parseDouble(controller.acu.getTagValue(Status.VD1_equip).toString()) > 42.00 && !controller.sparkDetected()) {
+                                            Thread.sleep(1000);
+                                        }
+                                        if (controller.sparkDetected()){
+                                            log.error("[RF LUT] Spark detected, LUT has failed. Please try again.");
+                                        }else {
+                                            log.warn("[RF LUT] Table generation has completed.");
+                                        }
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    } finally {
+                                        log.info("[IDLE] Preparing system for treatment and idling.");
+                                        SwingUtilities.invokeLater(
+                                                new Runnable(){
+                                                    public void run(){
+                                                        try {
+                                                            controller.prepareForTreatment();
+
+                                                            Thread.sleep(4500);
+
+                                                            idle = true;
+                                                            mainCoilButton.setEnabled(true);
+                                                            rfLUTButton.setEnabled(true);
+                                                            cancelButton2.setEnabled(true);
+                                                        } catch (Exception e) {
+                                                            e.printStackTrace();
+                                                        }
+                                                    }
+                                                });
+                                    }
+                                }
+                            });
+
+
+//                    log.info("[IDLE] Preparing system for treatment and idling.");
+//                    SwingUtilities.invokeLater(
+//                            new Runnable(){
+//                                public void run(){
+//                                    try {
+//                                        controller.prepareForTreatment();
+//
+//                                        Thread.sleep(4500);
+//
+//                                        idle = true;
+//                                        mainCoilButton.setEnabled(true);
+//                                        rfLUTButton.setEnabled(true);
+//                                        cancelButton2.setEnabled(true);
+//                                    } catch (Exception e) {
+//                                        e.printStackTrace();
+//                                    }
+//                                }
+//                            });
                 }
                 break;
             case "update":
                 updated = true;
+
+                //controller.updateButtonTest();
 
                 while (FilSP.getText().equalsIgnoreCase("-")) {
                     try {
@@ -4440,21 +4944,21 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
                 MCoilStep1.setBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, manual));
                 MCoilStep2.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.lightGray));
                 MCoilStep3.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.lightGray));
-                log.warn("Main Coil step changed to 0.010");
+                log.warn("[TUNE] Main Coil step changed to 0.010");
                 break;
             case "MCoilStep2":
                 changePerClick = 0.005;
                 MCoilStep1.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.lightGray));
                 MCoilStep2.setBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, manual));
                 MCoilStep3.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.lightGray));
-                log.warn("Main Coil step changed to 0.005");
+                log.warn("[TUNE] Main Coil step changed to 0.005");
                 break;
             case "MCoilStep3":
                 changePerClick = 0.001;
                 MCoilStep1.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.lightGray));
                 MCoilStep2.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.lightGray));
                 MCoilStep3.setBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, manual));
-                log.warn("Main Coil step changed to 0.001");
+                log.warn("[TUNE] Main Coil step changed to 0.001");
                 break;
             default:
                 // Do nothing
@@ -4524,7 +5028,7 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
         }
     }
 
-    private JsonElement getDegraderCurrent() throws Exception {
+    public JsonElement getDegraderCurrent() throws Exception {
         String degraderCurr = "E0.E1.BSB01.cfeedback";
 
         JsonElement current = restManager.getVariable(degraderCurr).get("value");
@@ -4536,7 +5040,7 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
         return current;
     }
 
-    private JsonElement getRestVariable(String str) throws Exception {
+    public static JsonElement getRestVariable(String str) throws Exception {
 
         JsonElement var = restManager.getVariable(str).get("value");
 
@@ -4552,7 +5056,7 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
         return var;
     }
 
-    private boolean isStable(LinkedList<Float> list) {
+    public boolean isStable(LinkedList<Float> list) {
         Double firstSum = 0.0;
         Double secondSum = 0.0;
         Double totalSum;
@@ -4572,8 +5076,6 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
 
         variance = (Math.abs(((firstSum / 15.0) - (secondSum / 15.0)) / (average)) * 100.0);
 
-        //log.warn("Variance of " + String.format("%.1f", variance) + "%");
-
         outputVariance.setText("Variance: " + String.format("%.1f", variance) + "%");
 
         return (variance < 1.0);
@@ -4589,21 +5091,28 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
         return false;
     }
 
+    public static void setServiceBeamMode(){
+        readyForServiceBeam = true;
+    }
+
+    public static boolean getServiceBeamMode(){
+        return readyForServiceBeam;
+    }
+
     private void getStability() throws Exception {
         String degraderCurr = "E0.E1.BSB01.cfeedback";
+
+        outputLabel.setText("S1E: " + restManager.getVariable(degraderCurr).get("value").getAsString());
 
 //        ArrayDeque beamCurrent = new ArrayDeque();
 //
 //        beamCurrent.addLast(restManager.getVariable(degraderCurr).get("value").getAsDouble());
-
-        //restManager.getVariable(degraderCurr).get("value").getAsDouble();
-
-
-        outputLabel.setText("S1E: " + restManager.getVariable(degraderCurr).get("value").getAsString());
+//
+//        restManager.getVariable(degraderCurr).get("value").getAsDouble();
     }
 
     private void setTitle() {
-        this.setTitle("adaPT Assist - PTS-8.6.3.2");
+        this.setTitle("Service Beam GUI - PTS-8.7.1");
     }
 
     private void csvCreate(File newFile) {
@@ -4643,6 +5152,61 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
                     out.newLine();
                 }
             }
+        } catch (IOException e) {
+            log.error(e);
+        }
+    }
+
+    private static void csvCreateBeamResults(File newFile) {
+        try (BufferedWriter out = new BufferedWriter(new FileWriter(newFile, true))) {
+            log.info("[Beam Record] Creating new beam results CSV file");
+            out.write("Time,");
+            out.write("Beam,");
+            out.write("RF(kV),");
+            out.write("BCREU(nA),");
+            out.write("Control,");
+            out.write("Duration,");
+            out.newLine();
+        } catch (IOException e) {
+            log.error(e);
+        }
+
+        csvWriteBeamOn(newFile);
+    }
+
+    private static void csvWriteBeamOn(File resultsFile) {
+        log.info("[Beam Record] Adding line to beam result CSV file");
+        try (BufferedWriter out = new BufferedWriter(new FileWriter(resultsFile, true))) {
+            out.write(new GregorianCalendar().getTime() + ",");
+            out.write("ON,");
+            out.write(mEsbtsPanel.mActionsPanel.getDeeVoltage() + ",");
+            out.write(String.valueOf(Controller.bcreu.getMaxBeam()));
+            out.write(",");
+            out.write(",");
+            out.newLine();
+        } catch (IOException e) {
+            log.error(e);
+        }
+    }
+
+    private static void csvWriteBeamOff(File resultsFile, int control, long duration) {
+        log.info("[Beam Record] Adding line to beam result CSV file");
+        try (BufferedWriter out = new BufferedWriter(new FileWriter(resultsFile, true))) {
+            out.write(new GregorianCalendar().getTime() + ",");
+            out.write("OFF,");
+            out.write(",");
+            out.write(",");
+            if(control==1){
+                out.write("MANUAL,");
+            } else if (control == 2) {
+                out.write("TIMER,");
+            } else if (control==3) {
+                out.write("SPARK,");
+            } else{
+                out.write("UNKNOWN,");
+            }
+            out.write(DurationFormatUtils.formatDuration(duration, "mm:ss:SSS") + ",");
+            out.newLine();
         } catch (IOException e) {
             log.error(e);
         }
@@ -4702,21 +5266,21 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
                         var = getRestVariable(Status.Arc_write);
                         ArcSP.setText(String.format("%.2f", var.getAsDouble()));
 
-//                        var = getRestVariable(Status.CC_setpoint);
-//                        CCoilSP.setText(String.format("%.2f", var.getAsDouble()));
-
                         var = getRestVariable(Status.MC_setpoint);
                         MCoilSP.setText(String.format("%.3f", var.getAsDouble()));
+
+                        SourTuning.setSelected(controller.sourceTuning());
+
+                        MCTuning.setSelected(controller.mainCoilTuning());
+
+//                        var = getRestVariable(Status.CC_setpoint);
+//                        CCoilSP.setText(String.format("%.2f", var.getAsDouble()));
 
 //                        var = getRestVariable(Status.HC1_setpoint);
 //                        HCoil1SP.setText(String.format("%.2f", var.getAsDouble()));
 //
 //                        var = getRestVariable(Status.HC2_setpoint);
 //                        HCoil2SP.setText(String.format("%.2f", var.getAsDouble()));
-
-                        SourTuning.setSelected(controller.sourceTuning());
-
-                        MCTuning.setSelected(controller.mainCoilTuning());
                     }
 
                 } catch (Exception e) {
@@ -4762,7 +5326,6 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
             //log.debug("Saved results to results.csv");
 //            Gui info = states.get(states.size() - 1);
 //            info.mainPanel.updateUI();
-
         }
     }
 
@@ -4772,6 +5335,9 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
             //here you make heavy task this is running in another thread not in EDT
             //process after some time call publish()
             while (!isCancelled()) {
+                if (!controller.bcreu.isConnected()) {
+                    controller.bcreu.connect();
+                }
                 try {
                     controller.bcreu.refreshValues();
                     Status info = controller.checkBcreu();
@@ -4805,12 +5371,15 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
         @Override
         protected Void doInBackground() throws Exception {
 
-            while (!isCancelled()) {
+            while (!isCancelled() && controller.acu.isConnected()) {
                 try {
                     if (newCurrText[0] == null || newCurrText[1] == null || newCurrText[2] == null || newCurrText[3] == null ) {
                         applyButton.setEnabled(false);
                     }
-                    setSelectedBeamline(controller.getSelectedBeamline());
+//                    if (controller.isSystemManual() && locked){
+//                        startBeamButton.setEnabled(true);
+//                    }
+                    //setSelectedBeamline(controller.getSelectedBeamline());
                     if (!PowerSave.isSelected()) {
                         powerSaveLabel.setText("Power Save Mode: Disabled");
                         powerSaveLabel.setForeground(automatic);
@@ -4834,69 +5403,97 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
                     } else {
                         psInterlock2.setSelected(true);
                     }
+                    if (!controller.isBeamAllocated()){
+                        printBeamline1 = false;
+                        printBeamline4 = false;
+                    }
                     if (controller.isBeamAllocated()) {
                         psInterlock3.setSelected(false);
                         if (controller.beam.beamScheduler.getCurrentBeamAllocation().getBeamSupplyPointId().toString().equalsIgnoreCase("FBTR1")) {
                             allocatedLabelTR1.setForeground(Color.BLACK);
+                            if (!printBeamline1) {
+                                //controller.trackMagnetFeedbackTR1();
+                            }
+                            printBeamline1 = true;
                         } else {
-                            allocatedLabelTR1.setForeground(IbaColors.BT_GRAY);
+                            allocatedLabelTR1.setForeground(IbaColors.LT_GRAY);
+                            printBeamline1 = true;
                         }
                         if (controller.beam.beamScheduler.getCurrentBeamAllocation().getBeamSupplyPointId().toString().equalsIgnoreCase("IBTR2-30") || controller.beam.beamScheduler.getCurrentBeamAllocation().getBeamSupplyPointId().toString().equalsIgnoreCase("IBTR2-90")) {
                             allocatedLabelTR2.setForeground(Color.BLACK);
                         } else {
-                            allocatedLabelTR2.setForeground(IbaColors.BT_GRAY);
+                            allocatedLabelTR2.setForeground(IbaColors.LT_GRAY);
                         }
                         if (controller.beam.beamScheduler.getCurrentBeamAllocation().getBeamSupplyPointId().toString().equalsIgnoreCase("IBTR3-30") || controller.beam.beamScheduler.getCurrentBeamAllocation().getBeamSupplyPointId().toString().equalsIgnoreCase("IBTR3-90")) {
                             allocatedLabelTR3.setForeground(Color.BLACK);
                         } else {
-                            allocatedLabelTR3.setForeground(IbaColors.BT_GRAY);
+                            allocatedLabelTR3.setForeground(IbaColors.LT_GRAY);
                         }
                         if (controller.beam.beamScheduler.getCurrentBeamAllocation().getBeamSupplyPointId().toString().equalsIgnoreCase("GTR4")) {
                             allocatedLabelTR4.setForeground(Color.BLACK);
+                            if (!printBeamline4) {
+                                //controller.trackMagnetFeedbackTR4();
+                            }
+                            printBeamline4 = true;
                         } else {
-                            allocatedLabelTR4.setForeground(IbaColors.BT_GRAY);
+                            allocatedLabelTR4.setForeground(IbaColors.LT_GRAY);
+                            printBeamline4 = false;
                         }
                     } else {
                         psInterlock3.setSelected(true);
-                        allocatedLabelTR1.setForeground(IbaColors.BT_GRAY);
-                        allocatedLabelTR2.setForeground(IbaColors.BT_GRAY);
-                        allocatedLabelTR3.setForeground(IbaColors.BT_GRAY);
-                        allocatedLabelTR4.setForeground(IbaColors.BT_GRAY);
+                        allocatedLabelTR1.setForeground(IbaColors.LT_GRAY);
+                        allocatedLabelTR2.setForeground(IbaColors.LT_GRAY);
+                        allocatedLabelTR3.setForeground(IbaColors.LT_GRAY);
+                        allocatedLabelTR4.setForeground(IbaColors.LT_GRAY);
                     }
                     if (controller.isRequestPending()) {
+                        if (controller.isSystemManual()) {
+                            if (!requestWarning){
+                                log.error("[REQUEST] Pending BCP request, switch BSS to AUTOMATIC mode.");
+                                requestWarning = true;
+                            }
+                            mainPanel.setBorder(BorderFactory.createMatteBorder(
+                                    3, 3, 3, 3, Color.YELLOW));
+                            Thread.sleep(1000);
+                            mainPanel.setBorder(BorderFactory.createEmptyBorder(0,0,0,0));
+                        }else {
+                            mainPanel.setBorder(BorderFactory.createEmptyBorder(0,0,0,0));
+                            requestWarning = false;
+                        }
+
                         psInterlock4.setSelected(false);
                         for (PendingBeamRequest req : controller.beam.beamScheduler.getPendingBeamRequests()) {
                             if (req.getBeamSupplyPointId().equalsIgnoreCase("FBTR1")) {
                                 queuedLabelTR1.setForeground(Color.BLACK);
                             } else {
-                                queuedLabelTR1.setForeground(IbaColors.BT_GRAY);
+                                queuedLabelTR1.setForeground(IbaColors.LT_GRAY);
                             }
                             if (req.getBeamSupplyPointId().equalsIgnoreCase("IBTR2-30") || req.getBeamSupplyPointId().equalsIgnoreCase("IBTR2-90")) {
                                 queuedLabelTR2.setForeground(Color.BLACK);
                             } else {
-                                queuedLabelTR2.setForeground(IbaColors.BT_GRAY);
+                                queuedLabelTR2.setForeground(IbaColors.LT_GRAY);
                             }
                             if (req.getBeamSupplyPointId().equalsIgnoreCase("IBTR3-30") || req.getBeamSupplyPointId().equalsIgnoreCase("IBTR3-90")) {
                                 queuedLabelTR3.setForeground(Color.BLACK);
                             } else {
-                                queuedLabelTR3.setForeground(IbaColors.BT_GRAY);
+                                queuedLabelTR3.setForeground(IbaColors.LT_GRAY);
                             }
                             if (req.getBeamSupplyPointId().equalsIgnoreCase("GTR4")) {
                                 queuedLabelTR4.setForeground(Color.BLACK);
                             } else {
-                                queuedLabelTR4.setForeground(IbaColors.BT_GRAY);
+                                queuedLabelTR4.setForeground(IbaColors.LT_GRAY);
                             }
                         }
                     } else {
                         psInterlock4.setSelected(true);
-                        queuedLabelTR1.setForeground(IbaColors.BT_GRAY);
-                        queuedLabelTR2.setForeground(IbaColors.BT_GRAY);
-                        queuedLabelTR3.setForeground(IbaColors.BT_GRAY);
-                        queuedLabelTR4.setForeground(IbaColors.BT_GRAY);
+                        queuedLabelTR1.setForeground(IbaColors.LT_GRAY);
+                        queuedLabelTR2.setForeground(IbaColors.LT_GRAY);
+                        queuedLabelTR3.setForeground(IbaColors.LT_GRAY);
+                        queuedLabelTR4.setForeground(IbaColors.LT_GRAY);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
-                    log.error("Exception in ConstantWorker");
+                    log.error("Exception in ConstantWorker2");
                 } finally {
                     try {
                         Thread.sleep(200);
@@ -4922,6 +5519,299 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
 //                        powerSaveLabel.setText("Power Save Mode: Disabled");
 //                        powerSaveLabel.setForeground(automatic);
 //                    }
+                    isAutomaticMode = !controller.isSchedulingManual();
+                    isADLogout = controller.beam.TSM3.getTreatmentRoomSession() != TreatmentRoomSession.Treatment;
+                    isBeamline4Selected = controller.getSelectedBeamline() == 4;
+                    isTR3SearchedInServiceMode = controller.isTR3SearchedInServiceMode();
+                    mScanMagActivity = controller.beam.smpsController.getCurrentActivityName();
+                    isXrayTubeRetracted = controller.isTR3XrayTubeExtracted();
+
+
+                    if (controller.isBeamAllocated()) {
+                        mEsbtsPanel.mBeamDeliveryPoint = Controller.feedbackClient.tc.getBeamDeliveryPoint(controller.beam.beamScheduler.getCurrentBeamAllocation().getBeamSupplyPointId());
+                    }
+
+//                    log.warn(controller.beam.BAPP1.getIrradiationStatus());
+//                    log.warn(controller.beam.BAPP4.getIrradiationStatus());
+//                    log.warn(controller.beam.BAPP1.getTreatmentRoomSession());
+//                    log.warn(controller.beam.BAPP1.getTreatmentRoomSession());
+//                    log.warn(controller.beam.TSM2.getTreatmentRoomSession().toString());
+                    //log.warn("TSM3: " + controller.beam.TSM3.getTreatmentRoomSession().toString());
+//                    log.warn(controller.beam.TSM4.getTreatmentRoomSession().toString());
+                    //controller.beam.BAPP4.getTreatmentRoomSession();
+                    mEsbtsPanel.updateSubPanelsStatus(readyForServiceBeam);
+
+                    //mScanningControllerPanel.updateUI();
+                    //mScanningControllerPanel.updatePanel(readyForServiceBeam);
+
+                    //log.warn(controller.beam.bssController.getCurrentActivityName());
+                    //log.warn(controller.beam.bssController.getCurrentActivityStatus());
+
+                    mCurrentActivityName = controller.beam.bssController.getCurrentActivityName();
+                    mCurrentActivityStatus = controller.beam.bssController.getCurrentActivityStatus();
+
+                    if (mCurrentActivityName == BssActivityId.IDLE) {
+                        mEsbtsPanel.mActionsPanel.mSelectBeamlineStatusLabel.setIcon(ResourceManager.getInstance().getImageIcon("bms/bss/controller/ui/inactive"));
+                        mEsbtsPanel.mActionsPanel.mSetRangeStatusLabel.setIcon(ResourceManager.getInstance().getImageIcon("bms/bss/controller/ui/inactive"));
+                        mEsbtsPanel.mActionsPanel.mEnableBeamStatusLabel.setIcon(ResourceManager.getInstance().getImageIcon("bms/bss/controller/ui/inactive"));
+                        mEsbtsPanel.mActionsPanel.mDisableBeamStatusLabel.setIcon(ResourceManager.getInstance().getImageIcon("bms/bss/controller/ui/inactive"));
+                        switch (mCurrentActivityStatus) {
+                            case IDLE:
+                                mEsbtsPanel.mActionsPanel.mIdleStatusLabel.setIcon(ResourceManager.getInstance().getImageIcon("bms/bss/controller/ui/inactive"));
+                                break;
+                            case ONGOING:
+                                mEsbtsPanel.mActionsPanel.mIdleStatusLabel.setIcon(ResourceManager.getInstance().getImageIcon("bms/bss/controller/ui/running"));
+                                break;
+                            case COMPLETED:
+                                mEsbtsPanel.mActionsPanel.mIdleStatusLabel.setIcon(ResourceManager.getInstance().getImageIcon("bms/bss/controller/ui/good"));
+                                break;
+                            case ERROR:
+                                mEsbtsPanel.mActionsPanel.mIdleStatusLabel.setIcon(ResourceManager.getInstance().getImageIcon("bms/bss/controller/ui/bad"));
+                                break;
+                            case CANCELED:
+                                mEsbtsPanel.mActionsPanel.mIdleStatusLabel.setIcon(ResourceManager.getInstance().getImageIcon("bms/bss/controller/ui/bad"));
+                                break;
+                            case DISABLED:
+                                mEsbtsPanel.mActionsPanel.mIdleStatusLabel.setIcon(ResourceManager.getInstance().getImageIcon("bms/bss/controller/ui/inactive"));
+                                break;
+                        }
+                    } else if (mCurrentActivityName == BssActivityId.PREPARE) {
+                        mEsbtsPanel.mActionsPanel.mIdleStatusLabel.setIcon(ResourceManager.getInstance().getImageIcon("bms/bss/controller/ui/inactive"));
+                        mEsbtsPanel.mActionsPanel.mSelectBeamlineStatusLabel.setIcon(ResourceManager.getInstance().getImageIcon("bms/bss/controller/ui/inactive"));
+                        mEsbtsPanel.mActionsPanel.mEnableBeamStatusLabel.setIcon(ResourceManager.getInstance().getImageIcon("bms/bss/controller/ui/inactive"));
+                        mEsbtsPanel.mActionsPanel.mDisableBeamStatusLabel.setIcon(ResourceManager.getInstance().getImageIcon("bms/bss/controller/ui/inactive"));
+                        switch (mCurrentActivityStatus) {
+                            case IDLE:
+                                mEsbtsPanel.mActionsPanel.mSetRangeStatusLabel.setIcon(ResourceManager.getInstance().getImageIcon("bms/bss/controller/ui/inactive"));
+                                break;
+                            case ONGOING:
+                                mEsbtsPanel.mActionsPanel.mSetRangeStatusLabel.setIcon(ResourceManager.getInstance().getImageIcon("bms/bss/controller/ui/running"));
+                                break;
+                            case COMPLETED:
+                                mEsbtsPanel.mActionsPanel.mSetRangeStatusLabel.setIcon(ResourceManager.getInstance().getImageIcon("bms/bss/controller/ui/good"));
+                                break;
+                            case ERROR:
+                                mEsbtsPanel.mActionsPanel.mSetRangeStatusLabel.setIcon(ResourceManager.getInstance().getImageIcon("bms/bss/controller/ui/bad"));
+                                break;
+                            case CANCELED:
+                                mEsbtsPanel.mActionsPanel.mSetRangeStatusLabel.setIcon(ResourceManager.getInstance().getImageIcon("bms/bss/controller/ui/bad"));
+                                break;
+                            case DISABLED:
+                                mEsbtsPanel.mActionsPanel.mSetRangeStatusLabel.setIcon(ResourceManager.getInstance().getImageIcon("bms/bss/controller/ui/bad"));
+                                break;
+                        }
+                    } else if (mCurrentActivityName == BssActivityId.SET_RANGE) {
+                        mEsbtsPanel.mActionsPanel.mIdleStatusLabel.setIcon(ResourceManager.getInstance().getImageIcon("bms/bss/controller/ui/inactive"));
+                        mEsbtsPanel.mActionsPanel.mSelectBeamlineStatusLabel.setIcon(ResourceManager.getInstance().getImageIcon("bms/bss/controller/ui/inactive"));
+                        mEsbtsPanel.mActionsPanel.mEnableBeamStatusLabel.setIcon(ResourceManager.getInstance().getImageIcon("bms/bss/controller/ui/inactive"));
+                        mEsbtsPanel.mActionsPanel.mDisableBeamStatusLabel.setIcon(ResourceManager.getInstance().getImageIcon("bms/bss/controller/ui/inactive"));
+                        switch (mCurrentActivityStatus) {
+                            case IDLE:
+                                mEsbtsPanel.mActionsPanel.mSetRangeStatusLabel.setIcon(ResourceManager.getInstance().getImageIcon("bms/bss/controller/ui/inactive"));
+                                break;
+                            case ONGOING:
+                                mEsbtsPanel.mActionsPanel.mSetRangeStatusLabel.setIcon(ResourceManager.getInstance().getImageIcon("bms/bss/controller/ui/running"));
+                                break;
+                            case COMPLETED:
+                                mEsbtsPanel.mActionsPanel.mSetRangeStatusLabel.setIcon(ResourceManager.getInstance().getImageIcon("bms/bss/controller/ui/good"));
+                                break;
+                            case ERROR:
+                                mEsbtsPanel.mActionsPanel.mSetRangeStatusLabel.setIcon(ResourceManager.getInstance().getImageIcon("bms/bss/controller/ui/bad"));
+                                break;
+                            case CANCELED:
+                                mEsbtsPanel.mActionsPanel.mSetRangeStatusLabel.setIcon(ResourceManager.getInstance().getImageIcon("bms/bss/controller/ui/bad"));
+                                break;
+                            case DISABLED:
+                                mEsbtsPanel.mActionsPanel.mSetRangeStatusLabel.setIcon(ResourceManager.getInstance().getImageIcon("bms/bss/controller/ui/bad"));
+                                break;
+                        }
+                    } else if (mCurrentActivityName == BssActivityId.ENABLE_BEAM) {
+                        mEsbtsPanel.mActionsPanel.mIdleStatusLabel.setIcon(ResourceManager.getInstance().getImageIcon("bms/bss/controller/ui/inactive"));
+                        mEsbtsPanel.mActionsPanel.mSelectBeamlineStatusLabel.setIcon(ResourceManager.getInstance().getImageIcon("bms/bss/controller/ui/inactive"));
+                        mEsbtsPanel.mActionsPanel.mSetRangeStatusLabel.setIcon(ResourceManager.getInstance().getImageIcon("bms/bss/controller/ui/inactive"));
+                        mEsbtsPanel.mActionsPanel.mDisableBeamStatusLabel.setIcon(ResourceManager.getInstance().getImageIcon("bms/bss/controller/ui/inactive"));
+                        switch (mCurrentActivityStatus) {
+                            case IDLE:
+                                mEsbtsPanel.mActionsPanel.mEnableBeamStatusLabel.setIcon(ResourceManager.getInstance().getImageIcon("bms/bss/controller/ui/inactive"));
+                                break;
+                            case ONGOING:
+                                mEsbtsPanel.mActionsPanel.mEnableBeamStatusLabel.setIcon(ResourceManager.getInstance().getImageIcon("bms/bss/controller/ui/running"));
+                                break;
+                            case COMPLETED:
+                                mEsbtsPanel.mActionsPanel.mEnableBeamStatusLabel.setIcon(ResourceManager.getInstance().getImageIcon("bms/bss/controller/ui/good"));
+                                break;
+                            case ERROR:
+                                mEsbtsPanel.mActionsPanel.mEnableBeamStatusLabel.setIcon(ResourceManager.getInstance().getImageIcon("bms/bss/controller/ui/bad"));
+                                break;
+                            case CANCELED:
+                                mEsbtsPanel.mActionsPanel.mEnableBeamStatusLabel.setIcon(ResourceManager.getInstance().getImageIcon("bms/bss/controller/ui/bad"));
+                                break;
+                            case DISABLED:
+                                mEsbtsPanel.mActionsPanel.mEnableBeamStatusLabel.setIcon(ResourceManager.getInstance().getImageIcon("bms/bss/controller/ui/bad"));
+                                break;
+                        }
+                    } else if (mCurrentActivityName == BssActivityId.DISABLE_BEAM) {
+                        mEsbtsPanel.mActionsPanel.mIdleStatusLabel.setIcon(ResourceManager.getInstance().getImageIcon("bms/bss/controller/ui/inactive"));
+                        mEsbtsPanel.mActionsPanel.mSelectBeamlineStatusLabel.setIcon(ResourceManager.getInstance().getImageIcon("bms/bss/controller/ui/inactive"));
+                        mEsbtsPanel.mActionsPanel.mSetRangeStatusLabel.setIcon(ResourceManager.getInstance().getImageIcon("bms/bss/controller/ui/inactive"));
+                        mEsbtsPanel.mActionsPanel.mEnableBeamStatusLabel.setIcon(ResourceManager.getInstance().getImageIcon("bms/bss/controller/ui/inactive"));
+                        switch (mCurrentActivityStatus) {
+                            case IDLE:
+                                mEsbtsPanel.mActionsPanel.mDisableBeamStatusLabel.setIcon(ResourceManager.getInstance().getImageIcon("bms/bss/controller/ui/inactive"));
+                                break;
+                            case ONGOING:
+                                mEsbtsPanel.mActionsPanel.mDisableBeamStatusLabel.setIcon(ResourceManager.getInstance().getImageIcon("bms/bss/controller/ui/good"));
+                                break;
+                            case COMPLETED:
+                                mEsbtsPanel.mActionsPanel.mDisableBeamStatusLabel.setIcon(ResourceManager.getInstance().getImageIcon("bms/bss/controller/ui/good"));
+                                break;
+                            case ERROR:
+                                mEsbtsPanel.mActionsPanel.mDisableBeamStatusLabel.setIcon(ResourceManager.getInstance().getImageIcon("bms/bss/controller/ui/bad"));
+                                break;
+                            case CANCELED:
+                                mEsbtsPanel.mActionsPanel.mDisableBeamStatusLabel.setIcon(ResourceManager.getInstance().getImageIcon("bms/bss/controller/ui/bad"));
+                                break;
+                            case DISABLED:
+                                mEsbtsPanel.mActionsPanel.mDisableBeamStatusLabel.setIcon(ResourceManager.getInstance().getImageIcon("bms/bss/controller/ui/bad"));
+                                break;
+                        }
+                    }
+                    if (isTR3SearchedInServiceMode) {
+                        mEsbtsPanel.mDevicesPanel.mIdleLabel2.setIcon(ResourceManager.getInstance().getImageIcon("icompx/check/OK"));
+                    }else{
+                        mEsbtsPanel.mDevicesPanel.mIdleLabel2.setIcon(ResourceManager.getInstance().getImageIcon("icompx/check/ERROR"));
+                    }
+                    if (isAutomaticMode) {
+                        mEsbtsPanel.mDevicesPanel.mIdleLabel4.setIcon(ResourceManager.getInstance().getImageIcon("icompx/check/OK"));
+                    }else{
+                        mEsbtsPanel.mDevicesPanel.mIdleLabel4.setIcon(ResourceManager.getInstance().getImageIcon("icompx/check/ERROR"));
+                    }
+                    if (isADLogout) {
+                        mEsbtsPanel.mDevicesPanel.mIdleLabel5.setIcon(ResourceManager.getInstance().getImageIcon("icompx/check/OK"));
+                    }else{
+                        mEsbtsPanel.mDevicesPanel.mIdleLabel5.setIcon(ResourceManager.getInstance().getImageIcon("icompx/check/ERROR"));
+                    }
+                    if (isBeamline4Selected) {
+                        mEsbtsPanel.mDevicesPanel.mIdleLabel3.setIcon(ResourceManager.getInstance().getImageIcon("icompx/check/OK"));
+                    }else{
+                        mEsbtsPanel.mDevicesPanel.mIdleLabel3.setIcon(ResourceManager.getInstance().getImageIcon("icompx/check/ERROR"));
+                    }
+                    if (isXrayTubeRetracted){
+                        mEsbtsPanel.mDevicesPanel.mIdleLabel6.setIcon(ResourceManager.getInstance().getImageIcon("icompx/check/OK"));
+                    }else{
+                        mEsbtsPanel.mDevicesPanel.mIdleLabel6.setIcon(ResourceManager.getInstance().getImageIcon("icompx/check/ERROR"));
+                    }
+                    if (isAutomaticMode && isADLogout && isBeamline4Selected && isTR3SearchedInServiceMode && isXrayTubeRetracted) {
+                        //if (controller.beam.beamScheduler.getCurrentBeamAllocation().getBeamSupplyPointId().toString().equalsIgnoreCase("FBTR1")) {
+                            mEsbtsPanel.mDevicesPanel.mIdleLabelOperMode.setText("Main Control Room is ready for service beam");
+                            mEsbtsPanel.mDevicesPanel.mStartServiceBeam.setEnabled(true);
+                            //readyForServiceBeam = true;
+                        } else {
+                            mEsbtsPanel.mDevicesPanel.mIdleLabelOperMode.setText("Main Control Room is in patient treatment mode");
+                            readyForServiceBeam = false;
+                            mEsbtsPanel.mDevicesPanel.mStartServiceBeam.setEnabled(false);
+                        }
+
+
+//                    } else {
+//                        readyForServiceBeam = false;
+//                        mBlankPanel.mDevicesPanel.mStartServiceBeam.setEnabled(false);
+//                        readyForServiceBeam = true;
+//                        mBlankPanel.mDevicesPanel.mStartServiceBeam.setEnabled(true);
+
+                   // }
+                    //log.warn(controller.beam.ISEU1.isChainClosed());
+                    //log.warn(controller.beam.ISEU4.isChainClosed());
+                   // if (!controller.isSystemManual()) {
+                        //mBlankPanel.mDevicesPanel.mIdleLabelOperMode.setText("Main Control Room is in service mode");
+                        //mBlankPanel.mDevicesPanel.mStartServiceBeam.setEnabled(true);
+//                        if (controller.isRequestPending()) {
+//                            for (PendingBeamRequest req : controller.beam.beamScheduler.getPendingBeamRequests()) {
+//                                if (req.getBeamSupplyPointId().equalsIgnoreCase("FBTR1")) {
+//                                    mBlankPanel.mDevicesPanel.mStartServiceBeam.setEnabled(false);
+//                                    mBlankPanel.mDevicesPanel.mAllocateButton.setEnabled(true);
+//                                }
+//                            }
+//                        }
+                        if (readyForServiceBeam) {
+                            //mBlankPanel.mDevicesPanel.mStartServiceBeam.setEnabled(true);
+                            mEsbtsPanel.mSelectBeamlinePanel.mBeamCurrentTextField.setEnabled(true);
+                            mEsbtsPanel.mSelectBeamlinePanel.mSLE1TextField.setEnabled(true);
+                            mEsbtsPanel.mSelectBeamlinePanel.mSLE2TextField.setEnabled(true);
+                            mEsbtsPanel.mSelectBeamlinePanel.mSLE3TextField.setEnabled(true);
+                            beamSchedulerPanel.setEnabled(true);
+                            //beamSchedulerPanel.setBeamRequestEnabled(true);
+                            beamSchedulerPanel.updateAllocatedInfo();
+                            beamSchedulerPanel.updatePendingList();
+
+                            BeamAllocation allocation = Controller.beam.beamScheduler.getCurrentBeamAllocation();
+                            if (allocation != null) {
+                                Boolean allocated = allocation.getBeamSupplyPointId().contains("IBTR3");
+                                // System.out.println(allocation.getBeamSupplyPointId());
+                                beamSchedulerPanel.setBeamRequestEnabled(!allocated);
+                                mEsbtsPanel.mSelectBeamlinePanel.mSMPSStartButton.setEnabled(allocated && mScanMagActivity.equals(SmpsControllerActivityId.IDLE));
+                                mEsbtsPanel.mSelectBeamlinePanel.mSMPSStandbyButton.setEnabled(allocated && mScanMagActivity.equals(SmpsControllerActivityId.PREPARE));
+                                mEsbtsPanel.mSelectBeamlinePanel.mSLE1Button.setEnabled(allocated);
+                                //mEsbtsPanel.mSelectBeamlinePanel.mStartButton.setEnabled(allocated && controller.S2E.getPosition() == Insertable.Position.INSERTED);
+                                mEsbtsPanel.getSetRangePanel().getStartButton().setEnabled(allocated && mCurrentActivityStatus != ActivityStatus.ONGOING);
+                                mEsbtsPanel.updateActionButtonStatus(allocated);
+                                if (allocated){
+                                    if (controller.S2E.getPosition() == Insertable.Position.RETRACTED){
+                                        startBeamButton.setEnabled(true);
+                                        timedRunCB.setEnabled(true);
+                                        postRunAction.setEnabled(true);
+                                        timedRunText.setEnabled(timedRunCB.isSelected());
+
+                                        mEsbtsPanel.mSelectBeamlinePanel.mStartButton.setEnabled(false);
+                                        mEsbtsPanel.mSelectBeamlinePanel.mContinuousBeamCB.setEnabled(false);
+                                    }else {
+                                        startBeamButton.setEnabled(false);
+                                        timedRunCB.setEnabled(false);
+                                        timedRunText.setEnabled(false);
+                                        postRunAction.setEnabled(false);
+                                        mEsbtsPanel.mSelectBeamlinePanel.mStartButton.setEnabled(mCurrentActivityStatus != ActivityStatus.ONGOING);
+                                        mEsbtsPanel.mSelectBeamlinePanel.mContinuousBeamCB.setEnabled(true);
+                                    }
+                                }
+                            } else {
+                                beamSchedulerPanel.setBeamRequestEnabled(true);
+                                mEsbtsPanel.mSelectBeamlinePanel.mStartButton.setEnabled(false);
+                                mEsbtsPanel.mSelectBeamlinePanel.mContinuousBeamCB.setEnabled(false);
+                                mEsbtsPanel.mSelectBeamlinePanel.mSMPSStartButton.setEnabled(false);
+                                mEsbtsPanel.mSelectBeamlinePanel.mSMPSStandbyButton.setEnabled(false);
+                                mEsbtsPanel.mSelectBeamlinePanel.mSLE1Button.setEnabled(false);
+                                mEsbtsPanel.getSetRangePanel().getStartButton().setEnabled(false);
+                                mEsbtsPanel.updateActionButtonStatus(false);
+                                startBeamButton.setEnabled(false);
+                                timedRunCB.setEnabled(false);
+                                timedRunText.setEnabled(false);
+                                postRunAction.setEnabled(false);
+                            }
+                    } else {
+                        mEsbtsPanel.mDevicesPanel.mIdleLabelOperMode.setText("Main Control Room is in patient treatment mode");
+
+                        mEsbtsPanel.mSelectBeamlinePanel.mSLE1TextField.setEnabled(false);
+                        mEsbtsPanel.mSelectBeamlinePanel.mSLE2TextField.setEnabled(false);
+                        mEsbtsPanel.mSelectBeamlinePanel.mSLE3TextField.setEnabled(false);
+                        mEsbtsPanel.mSelectBeamlinePanel.mSMPSStartButton.setEnabled(false);
+                        mEsbtsPanel.mSelectBeamlinePanel.mSMPSStandbyButton.setEnabled(false);
+                        mEsbtsPanel.mSelectBeamlinePanel.mStartButton.setEnabled(false);
+                        mEsbtsPanel.mSelectBeamlinePanel.mContinuousBeamCB.setEnabled(false);
+                        mEsbtsPanel.mSelectBeamlinePanel.mSLE1Button.setEnabled(false);
+                        mEsbtsPanel.getSetRangePanel().getStartButton().setEnabled(false);
+                        mEsbtsPanel.mSelectBeamlinePanel.mBeamCurrentTextField.setEnabled(false);
+                        mEsbtsPanel.mDevicesPanel.mAllocateButton.setEnabled(false);
+                        mEsbtsPanel.updateActionButtonStatus(false);
+                        beamSchedulerPanel.setEnabled(false);
+                        beamSchedulerPanel.setBeamRequestEnabled(false);
+                        beamSchedulerPanel.updateAllocatedInfo();
+                        beamSchedulerPanel.updatePendingList();
+                        startBeamButton.setEnabled(false);
+                        timedRunCB.setEnabled(false);
+                        timedRunText.setEnabled(false);
+                        postRunAction.setEnabled(false);
+
+                    }
 //                    if (PowerSave.isSelected()){
 //                        if (controller.readyForPowerSave()) {
 //                            controller.setESSCurrents();
@@ -4940,264 +5830,344 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
 //                        psInterlock3.setSelected(false);
 //                        if (controller.beam.beamScheduler.getCurrentBeamAllocation().getBeamSupplyPointId().toString().equalsIgnoreCase("FBTR1")){
 //                            allocatedLabelTR1.setForeground(Color.BLACK);
-//                        }else{ allocatedLabelTR1.setForeground(IbaColors.BT_GRAY);}
+//                        }else{ allocatedLabelTR1.setForeground(IbaColors.LT_GRAY);}
 //                        if (controller.beam.beamScheduler.getCurrentBeamAllocation().getBeamSupplyPointId().toString().equalsIgnoreCase("IBTR2-30") || controller.beam.beamScheduler.getCurrentBeamAllocation().getBeamSupplyPointId().toString().equalsIgnoreCase("IBTR2-90")){
 //                            allocatedLabelTR2.setForeground(Color.BLACK);
-//                        }else{ allocatedLabelTR2.setForeground(IbaColors.BT_GRAY);}
+//                        }else{ allocatedLabelTR2.setForeground(IbaColors.LT_GRAY);}
 //                        if (controller.beam.beamScheduler.getCurrentBeamAllocation().getBeamSupplyPointId().toString().equalsIgnoreCase("IBTR3-30") || controller.beam.beamScheduler.getCurrentBeamAllocation().getBeamSupplyPointId().toString().equalsIgnoreCase("IBTR3-90")){
 //                            allocatedLabelTR3.setForeground(Color.BLACK);
-//                        }else{ allocatedLabelTR3.setForeground(IbaColors.BT_GRAY);}
+//                        }else{ allocatedLabelTR3.setForeground(IbaColors.LT_GRAY);}
 //                        if (controller.beam.beamScheduler.getCurrentBeamAllocation().getBeamSupplyPointId().toString().equalsIgnoreCase("GTR4")){
 //                            allocatedLabelTR4.setForeground(Color.BLACK);
-//                        }else{ allocatedLabelTR4.setForeground(IbaColors.BT_GRAY);}
+//                        }else{ allocatedLabelTR4.setForeground(IbaColors.LT_GRAY);}
 //                    }else {psInterlock3.setSelected(true);
-//                        allocatedLabelTR1.setForeground(IbaColors.BT_GRAY);
-//                        allocatedLabelTR2.setForeground(IbaColors.BT_GRAY);
-//                        allocatedLabelTR3.setForeground(IbaColors.BT_GRAY);
-//                        allocatedLabelTR4.setForeground(IbaColors.BT_GRAY);
+//                        allocatedLabelTR1.setForeground(IbaColors.LT_GRAY);
+//                        allocatedLabelTR2.setForeground(IbaColors.LT_GRAY);
+//                        allocatedLabelTR3.setForeground(IbaColors.LT_GRAY);
+//                        allocatedLabelTR4.setForeground(IbaColors.LT_GRAY);
 //                    }
 //                    if (controller.isRequestPending()){
 //                        psInterlock4.setSelected(false);
 //                        for (PendingBeamRequest req : controller.beam.beamScheduler.getPendingBeamRequests()) {
 //                            if (req.getBeamSupplyPointId().equalsIgnoreCase("FBTR1")) {
 //                                queuedLabelTR1.setForeground(Color.BLACK);
-//                            }else{queuedLabelTR1.setForeground(IbaColors.BT_GRAY);}
+//                            }else{queuedLabelTR1.setForeground(IbaColors.LT_GRAY);}
 //                            if (req.getBeamSupplyPointId().equalsIgnoreCase("IBTR2-30") || req.getBeamSupplyPointId().equalsIgnoreCase("IBTR2-90")) {
 //                                queuedLabelTR2.setForeground(Color.BLACK);
-//                            }else{queuedLabelTR2.setForeground(IbaColors.BT_GRAY);}
+//                            }else{queuedLabelTR2.setForeground(IbaColors.LT_GRAY);}
 //                            if (req.getBeamSupplyPointId().equalsIgnoreCase("IBTR3-30") || req.getBeamSupplyPointId().equalsIgnoreCase("IBTR3-90")) {
 //                                queuedLabelTR3.setForeground(Color.BLACK);
-//                            }else{queuedLabelTR3.setForeground(IbaColors.BT_GRAY);}
+//                            }else{queuedLabelTR3.setForeground(IbaColors.LT_GRAY);}
 //                            if (req.getBeamSupplyPointId().equalsIgnoreCase("GTR4")) {
 //                                queuedLabelTR4.setForeground(Color.BLACK);
-//                            }else{queuedLabelTR4.setForeground(IbaColors.BT_GRAY);}
+//                            }else{queuedLabelTR4.setForeground(IbaColors.LT_GRAY);}
 //                        }
 //                    }else {psInterlock4.setSelected(true);
-//                        queuedLabelTR1.setForeground(IbaColors.BT_GRAY);
-//                        queuedLabelTR2.setForeground(IbaColors.BT_GRAY);
-//                        queuedLabelTR3.setForeground(IbaColors.BT_GRAY);
-//                        queuedLabelTR4.setForeground(IbaColors.BT_GRAY);
+//                        queuedLabelTR1.setForeground(IbaColors.LT_GRAY);
+//                        queuedLabelTR2.setForeground(IbaColors.LT_GRAY);
+//                        queuedLabelTR3.setForeground(IbaColors.LT_GRAY);
+//                        queuedLabelTR4.setForeground(IbaColors.LT_GRAY);
 //                    }
-                    if (controller.isTR1Secured() || controller.isTR2Secured() || controller.isTR3Secured() || controller.isTR4Secured()) {
-                        psInterlock5.setSelected(false);
-                        if (controller.isTR1Secured()) {
-                            secureLabelTR1.setForeground(Color.BLACK);
-                        } else {
-                            secureLabelTR1.setForeground(IbaColors.BT_GRAY);
-                        }
-                        if (controller.isTR2Secured()) {
-                            secureLabelTR2.setForeground(Color.BLACK);
-                        } else {
-                            secureLabelTR2.setForeground(IbaColors.BT_GRAY);
-                        }
-                        if (controller.isTR3Secured()) {
-                            secureLabelTR3.setForeground(Color.BLACK);
-                        } else {
-                            secureLabelTR3.setForeground(IbaColors.BT_GRAY);
-                        }
-                        if (controller.isTR4Secured()) {
-                            secureLabelTR4.setForeground(Color.BLACK);
-                        } else {
-                            secureLabelTR4.setForeground(IbaColors.BT_GRAY);
-                        }
-                    } else {
-                        psInterlock5.setSelected(true);
-                        secureLabelTR1.setForeground(IbaColors.BT_GRAY);
-                        secureLabelTR2.setForeground(IbaColors.BT_GRAY);
-                        secureLabelTR3.setForeground(IbaColors.BT_GRAY);
-                        secureLabelTR4.setForeground(IbaColors.BT_GRAY);
-                    }
-                    if (controller.isTR1Searching() || controller.isTR2Searching() || controller.isTR3Searching() || controller.isTR4Searching()) {
-                        psInterlock6.setSelected(false);
-                        if (controller.isTR1Searching()) {
-                            searchingLabelTR1.setForeground(Color.BLACK);
-                        } else {
-                            searchingLabelTR1.setForeground(IbaColors.BT_GRAY);
-                        }
-                        if (controller.isTR2Searching()) {
-                            searchingLabelTR2.setForeground(Color.BLACK);
-                        } else {
-                            searchingLabelTR2.setForeground(IbaColors.BT_GRAY);
-                        }
-                        if (controller.isTR3Searching()) {
-                            searchingLabelTR3.setForeground(Color.BLACK);
-                        } else {
-                            searchingLabelTR3.setForeground(IbaColors.BT_GRAY);
-                        }
-                        if (controller.isTR4Searching()) {
-                            searchingLabelTR4.setForeground(Color.BLACK);
-                        } else {
-                            searchingLabelTR4.setForeground(IbaColors.BT_GRAY);
-                        }
-                    } else {
-                        psInterlock6.setSelected(true);
-                        searchingLabelTR1.setForeground(IbaColors.BT_GRAY);
-                        searchingLabelTR2.setForeground(IbaColors.BT_GRAY);
-                        searchingLabelTR3.setForeground(IbaColors.BT_GRAY);
-                        searchingLabelTR4.setForeground(IbaColors.BT_GRAY);
-                    }
-                    if (controller.isSystemManual()) {
-                        operModeLabel.setText("Operating Mode: Manual");
-                        operModeLabel.setForeground(manual);
-                        operModeLabel2.setText("Operating Mode: Manual");
-                        operModeLabel2.setForeground(manual);
+//                    if (controller.isTR1Secured() || controller.isTR2Secured() || controller.isTR3Secured() || controller.isTR4Secured()) {
+//                        psInterlock5.setSelected(false);
+//                        if (controller.isTR1Secured()) {
+//                            secureLabelTR1.setForeground(Color.BLACK);
+//                        } else {
+//                            secureLabelTR1.setForeground(IbaColors.LT_GRAY);
+//                        }
+//                        if (controller.isTR2Secured()) {
+//                            secureLabelTR2.setForeground(Color.BLACK);
+//                        } else {
+//                            secureLabelTR2.setForeground(IbaColors.LT_GRAY);
+//                        }
+//                        if (controller.isTR3Secured()) {
+//                            secureLabelTR3.setForeground(Color.BLACK);
+//                        } else {
+//                            secureLabelTR3.setForeground(IbaColors.LT_GRAY);
+//                        }
+//                        if (controller.isTR4Secured()) {
+//                            secureLabelTR4.setForeground(Color.BLACK);
+//                        } else {
+//                            secureLabelTR4.setForeground(IbaColors.LT_GRAY);
+//                        }
+//                    } else {
+//                        psInterlock5.setSelected(true);
+//                        secureLabelTR1.setForeground(IbaColors.LT_GRAY);
+//                        secureLabelTR2.setForeground(IbaColors.LT_GRAY);
+//                        secureLabelTR3.setForeground(IbaColors.LT_GRAY);
+//                        secureLabelTR4.setForeground(IbaColors.LT_GRAY);
+//                    }
+//                    if (controller.isTR1Searching() || controller.isTR2Searching() || controller.isTR3Searching() || controller.isTR4Searching()) {
+//                        if (!idle) {
+//                            if (!searchWarning){
+//                                log.error("[SEARCH] TR search is active, IDLE BCP and switch BSS to AUTOMATIC mode.");
+//                                searchWarning = true;
+//                            }
+//                            mainPanel.setBorder(BorderFactory.createMatteBorder(
+//                                    3, 3, 3, 3, Color.YELLOW));
+//                            Thread.sleep(1000);
+//                            mainPanel.setBorder(BorderFactory.createEmptyBorder(0,0,0,0));
+//                        }else {
+//                            mainPanel.setBorder(BorderFactory.createEmptyBorder(0,0,0,0));
+//                            searchWarning = false;
+//                        }
+//                        psInterlock6.setSelected(false);
+//                        if (controller.isTR1Searching()) {
+//                            searchingLabelTR1.setForeground(Color.BLACK);
+//                        } else {
+//                            searchingLabelTR1.setForeground(IbaColors.LT_GRAY);
+//                        }
+//                        if (controller.isTR2Searching()) {
+//                            searchingLabelTR2.setForeground(Color.BLACK);
+//                        } else {
+//                            searchingLabelTR2.setForeground(IbaColors.LT_GRAY);
+//                        }
+//                        if (controller.isTR3Searching()) {
+//                            searchingLabelTR3.setForeground(Color.BLACK);
+//                        } else {
+//                            searchingLabelTR3.setForeground(IbaColors.LT_GRAY);
+//                        }
+//                        if (controller.isTR4Searching()) {
+//                            searchingLabelTR4.setForeground(Color.BLACK);
+//                        } else {
+//                            searchingLabelTR4.setForeground(IbaColors.LT_GRAY);
+//                        }
+//                    } else {
+//                        psInterlock6.setSelected(true);
+//                        searchingLabelTR1.setForeground(IbaColors.LT_GRAY);
+//                        searchingLabelTR2.setForeground(IbaColors.LT_GRAY);
+//                        searchingLabelTR3.setForeground(IbaColors.LT_GRAY);
+//                        searchingLabelTR4.setForeground(IbaColors.LT_GRAY);
+//                    }
+//                    if (controller.isSystemManual()) {
+//                        operModeLabel.setText("Operating Mode: Manual");
+//                        operModeLabel.setForeground(manual);
+//                        operModeLabel2.setText("Operating Mode: Manual");
+//                        operModeLabel2.setForeground(manual);
+//                        operModeLabel3.setText("Operating Mode: Manual");
+//                        operModeLabel3.setForeground(manual);
+//                        alignMeButton.setEnabled(true);
+//                        cancelButton.setEnabled(true);
+//                        computeButton.setEnabled(true);
+//                        saveMeButton.setEnabled(true);
+//                        psInterlock1.setSelected(false);
 //                        SourTuning.setEnabled(true);
 //                        MCTuning.setEnabled(true);
-                        alignMeButton.setEnabled(true);
-                        //applyButton.setEnabled(true);
-                        cancelButton.setEnabled(true);
-                        computeButton.setEnabled(true);
+//                        //applyButton.setEnabled(true);
 //                        cancelTuneButton.setEnabled(true);
 //                        mainCoilButton.setEnabled(true);
-                        cancelButton2.setEnabled(true);
-                        saveMeButton.setEnabled(true);
-                        burnInButton.setEnabled(true);
-//                        Dee1plus.setEnabled(true);
-//                        Dee1minus.setEnabled(true);
-//                        Dee2plus.setEnabled(true);
-//                        Dee2minus.setEnabled(true);
-//                        VDeeSP.setEditable(true);
-//                        VDeeSP2.setEditable(true);
+//                        cancelButton2.setEnabled(true);
+//                        burnInStartButton.setEnabled(true);
+////                        Dee1plus.setEnabled(true);
+////                        Dee1minus.setEnabled(true);
+////                        Dee2plus.setEnabled(true);
+////                        Dee2minus.setEnabled(true);
+////                        VDeeSP.setEditable(true);
+////                        VDeeSP2.setEditable(true);
 //                        FilSP.setEditable(true);
 //                        Filplus.setEnabled(true);
 //                        Filminus.setEnabled(true);
 //                        ArcSP.setEditable(true);
 //                        Arcplus.setEnabled(true);
 //                        Arcminus.setEnabled(true);
-//                        CCoilSP.setEditable(true);
-//                        CCoilplus.setEnabled(true);
-//                        CCoilminus.setEnabled(true);
-//                        MCoilSP.setEditable(true);
-//                        MCoilplus.setEnabled(true);
-//                        MCoilminus.setEnabled(true);
-//                        HCoil1SP.setEditable(true);
-//                        HCoil1plus.setEnabled(true);
-//                        HCoil1minus.setEnabled(true);
-//                        HCoil2SP.setEditable(true);
-//                        HCoil2plus.setEnabled(true);
-//                        HCoil2minus.setEnabled(true);
+////                        CCoilSP.setEditable(true);
+////                        CCoilplus.setEnabled(true);
+////                        CCoilminus.setEnabled(true);
+////                        MCoilSP.setEditable(true);
+////                        MCoilplus.setEnabled(true);
+////                        MCoilminus.setEnabled(true);
+////                        HCoil1SP.setEditable(true);
+////                        HCoil1plus.setEnabled(true);
+////                        HCoil1minus.setEnabled(true);
+////                        HCoil2SP.setEditable(true);
+////                        HCoil2plus.setEnabled(true);
+////                        HCoil2minus.setEnabled(true);
 //                        rfLUTButton.setEnabled(true);
-                        psInterlock1.setSelected(false);
-                    }
-//                    if (updated){
-//                        ImageIcon icon = new ImageIcon("checkmark.png");
-//                        Dimension dimension = new Dimension(10,10);
-//                        JLabel thumb = new JLabel();
-//                        thumb.setIcon(icon);
-//                        thumb.setLayout(new GridBagLayout());
-//                        thumb.setPreferredSize(dimension);
-//                        GridBagConstraints c = new GridBagConstraints();
-//                        c.insets = new Insets(0,75,50,0);
-//                        //c.gridx = 1;
-//                       // c.anchor = GridBagConstraints.SOUTH;
-//                        tuningInstructionPanel.add(thumb, c);
-//                        tuningInstructionPanel.repaint();
-//                        //tuningInstructionPanel.updateUI();
-//
 //                    }
-                    if (controller.isSystemManual() && updated) {
-                        cancelTuneButton.setEnabled(true);
-                        mainCoilButton.setEnabled(true);
-                        rfLUTButton.setEnabled(true);
-//                        MCoilSP.setEditable(true);
+////                    if (updated){
+////                        ImageIcon icon = new ImageIcon("checkmark.png");
+////                        Dimension dimension = new Dimension(10,10);
+////                        JLabel thumb = new JLabel();
+////                        thumb.setIcon(icon);
+////                        thumb.setLayout(new GridBagLayout());
+////                        thumb.setPreferredSize(dimension);
+////                        GridBagConstraints c = new GridBagConstraints();
+////                        c.insets = new Insets(0,75,50,0);
+////                        //c.gridx = 1;
+////                       // c.anchor = GridBagConstraints.SOUTH;
+////                        tuningInstructionPanel.add(thumb, c);
+////                        tuningInstructionPanel.repaint();
+////                        //tuningInstructionPanel.updateUI();
+////
+////                    }
+//                    if (controller.isSystemManual() && updated && idle) {
+//                        cancelTuneButton.setEnabled(true);
+//                        mainCoilButton.setEnabled(true);
+//                        rfLUTButton.setEnabled(true);
+//                        FilSP.setEditable(true);
+//                        Filplus.setEnabled(true);
+//                        Filminus.setEnabled(true);
+//                        ArcSP.setEditable(true);
+//                        Arcplus.setEnabled(true);
+//                        Arcminus.setEnabled(true);
+//                        SourTuning.setEnabled(true);
+//                        MCTuning.setEnabled(true);
+////                        MCoilSP.setEditable(true);
+////                        MCoilplus.setEnabled(true);
+////                        MCoilminus.setEnabled(true);
+//                    }
+//                    if (controller.isSystemManual() && updated){
+//                        cancelButton2.setEnabled(true);
+//                    }
+//                    if (controller.isSystemManual() && updated && !MCTuning.isSelected()) {
 //                        MCoilplus.setEnabled(true);
 //                        MCoilminus.setEnabled(true);
-                        FilSP.setEditable(true);
-                        Filplus.setEnabled(true);
-                        Filminus.setEnabled(true);
-                        ArcSP.setEditable(true);
-                        Arcplus.setEnabled(true);
-                        Arcminus.setEnabled(true);
-                        SourTuning.setEnabled(true);
-                        MCTuning.setEnabled(true);
+//                    }
+//                    if ((controller.isSystemManual() && !updated) || (controller.isSystemManual() && !idle)){
+//                        mainCoilButton.setEnabled(false);
+//                        rfLUTButton.setEnabled(false);
+//                    }
+//                    if (controller.isSystemManual() && !updated) {
+//                        cancelButton2.setEnabled(false);
+//                        mainCoilButton.setEnabled(false);
+//                        rfLUTButton.setEnabled(false);
+//                        MCoilSP.setEditable(false);
+//                        MCoilplus.setEnabled(false);
+//                        MCoilminus.setEnabled(false);
+//                        FilSP.setEditable(false);
+//                        Filplus.setEnabled(false);
+//                        Filminus.setEnabled(false);
+//                        ArcSP.setEditable(false);
+//                        Arcplus.setEnabled(false);
+//                        Arcminus.setEnabled(false);
+//                        SourTuning.setEnabled(false);
+//                        MCTuning.setEnabled(false);
+//                    }
+//                    if (!controller.isSystemManual()) {
+//                        updated = false;
+//                        operModeLabel.setText("Operating Mode: Automatic");
+//                        operModeLabel.setForeground(automatic);
+//                        operModeLabel2.setText("Operating Mode: Automatic");
+//                        operModeLabel2.setForeground(automatic);
+//                        operModeLabel3.setText("Operating Mode: Automatic");
+//                        operModeLabel3.setForeground(automatic);
+//                        SourTuning.setEnabled(false);
+//                        MCTuning.setEnabled(false);
+//                        alignMeButton.setEnabled(false);
+//                        applyButton.setEnabled(false);
+//                        cancelButton.setEnabled(false);
+//                        computeButton.setEnabled(false);
+//                        cancelTuneButton.setEnabled(false);
+//                        mainCoilButton.setEnabled(false);
+//                        cancelButton2.setEnabled(false);
+//                        saveMeButton.setEnabled(false);
+//                        burnInStartButton.setEnabled(false);
+//                        FilSP.setEditable(false);
+//                        Filplus.setEnabled(false);
+//                        Filminus.setEnabled(false);
+//                        ArcSP.setEditable(false);
+//                        Arcplus.setEnabled(false);
+//                        Arcminus.setEnabled(false);
+//                        MCoilSP.setEditable(false);
+//                        MCoilplus.setEnabled(false);
+//                        MCoilminus.setEnabled(false);
+//                        rfLUTButton.setEnabled(false);
+//                        psInterlock1.setSelected(true);
+////                        Dee1plus.setEnabled(false);
+////                        Dee1minus.setEnabled(false);
+////                        Dee2plus.setEnabled(false);
+////                        Dee2minus.setEnabled(false);
+////                        VDeeSP.setEditable(false);
+////                        VDeeSP2.setEditable(false);
+////                        CCoilSP.setEditable(false);
+////                        CCoilplus.setEnabled(false);
+////                        CCoilminus.setEnabled(false);
+////                        HCoil1SP.setEditable(false);
+////                        HCoil1plus.setEnabled(false);
+////                        HCoil1minus.setEnabled(false);
+////                        HCoil2SP.setEditable(false);
+////                        HCoil2plus.setEnabled(false);
+////                        HCoil2minus.setEnabled(false);
+//                    }
+//                    if (controller.isSystemManual() && counter != 1) {
+//                        refreshButton.setEnabled(true);
+//                        applyButton.setEnabled(true);
+//                        counter = 1;
+//                    }
+//                    if (!controller.isSystemManual() && counter != 2) {
+//                        refreshButton.setEnabled(false);
+//                        applyButton.setEnabled(false);
+//                        counter = 2;
+//                    }
+//                    if (!controller.acu.isConnected()) {
+//                        controller.acu.connect();
+//                    }
+
+                    if (restManager.getVariable("S0.C0.GEI01.AcuOkTre").get("value").getAsBoolean()){
+                        rfSparkDetected.setIcon(ResourceManager.getInstance().getImageIcon("icompx/check/OK"));
+                    }else {
+                        rfSparkDetected.setIcon(ResourceManager.getInstance().getImageIcon("icompx/check/ERROR"));
+                        if (TimerPanel.getTimer().isRunning()){
+                            if (mEsbtsPanel.mSelectBeamlinePanel.mContinuousBeamCB.isSelected()){
+                                Controller.beam.bcreu.pauseRegulation();
+                            }else{
+                                Controller.beam.bcreu.setContinuousPulse(false);
+                            }
+
+                            if (beamResults.isFile()) {
+                                csvWriteBeamOff(beamResults, 3, TimerPanel.getClockTime());
+                            } else {
+                                log.error("[Beam Record] Could not find Beam Results file. Path: " + beamResults.getAbsolutePath());
+                            }
+
+                            TimerPanel.getTimer().stop();
+                            startBeamButton.setText("Start Beam");
+
+                            if (postRunAction.getSelectedItem().toString().equalsIgnoreCase("RF")){
+                                Controller.beam.llrf.setDeeVoltage2(41.00d);
+                            }else{
+                                try {
+                                    Controller.beam.bssController.startDisableBeamActivity(Controller.beam.beamScheduler.getCurrentBeamAllocation().getBeamSupplyPointId());
+                                    Thread.sleep(1000);
+                                    if (Controller.S2E.getPosition() == Insertable.Position.MOVING || Controller.S2E.getPosition() == Insertable.Position.INSERTED) {
+                                        //do nothing
+                                    } else {
+                                        Controller.ecubtcu.bsInsert("S2E");
+                                    }
+                                } catch (Exception g) {
+                                    g.printStackTrace();
+                                }
+                            }
+                        }
                     }
-                    if (controller.isSystemManual() && updated && !MCTuning.isSelected()) {
-                        MCoilplus.setEnabled(true);
-                        MCoilminus.setEnabled(true);
-                    }
-                    if (controller.isSystemManual() && !updated) {
-                        cancelButton2.setEnabled(false);
-                        mainCoilButton.setEnabled(false);
-                        rfLUTButton.setEnabled(false);
-                        MCoilSP.setEditable(false);
-                        MCoilplus.setEnabled(false);
-                        MCoilminus.setEnabled(false);
-                        FilSP.setEditable(false);
-                        Filplus.setEnabled(false);
-                        Filminus.setEnabled(false);
-                        ArcSP.setEditable(false);
-                        Arcplus.setEnabled(false);
-                        Arcminus.setEnabled(false);
-                        SourTuning.setEnabled(false);
-                        MCTuning.setEnabled(false);
-                    }
-                    if (!controller.isSystemManual()) {
-                        updated = false;
-                        operModeLabel.setText("Operating Mode: Automatic");
-                        operModeLabel.setForeground(automatic);
-                        operModeLabel2.setText("Operating Mode: Automatic");
-                        operModeLabel2.setForeground(automatic);
-                        SourTuning.setEnabled(false);
-                        MCTuning.setEnabled(false);
-                        alignMeButton.setEnabled(false);
-                        applyButton.setEnabled(false);
-                        cancelButton.setEnabled(false);
-                        computeButton.setEnabled(false);
-                        cancelTuneButton.setEnabled(false);
-                        mainCoilButton.setEnabled(false);
-                        cancelButton2.setEnabled(false);
-                        saveMeButton.setEnabled(false);
-                        burnInButton.setEnabled(false);
-//                        Dee1plus.setEnabled(false);
-//                        Dee1minus.setEnabled(false);
-//                        Dee2plus.setEnabled(false);
-//                        Dee2minus.setEnabled(false);
-//                        VDeeSP.setEditable(false);
-//                        VDeeSP2.setEditable(false);
-                        FilSP.setEditable(false);
-                        Filplus.setEnabled(false);
-                        Filminus.setEnabled(false);
-                        ArcSP.setEditable(false);
-                        Arcplus.setEnabled(false);
-                        Arcminus.setEnabled(false);
-//                        CCoilSP.setEditable(false);
-//                        CCoilplus.setEnabled(false);
-//                        CCoilminus.setEnabled(false);
-                        MCoilSP.setEditable(false);
-                        MCoilplus.setEnabled(false);
-                        MCoilminus.setEnabled(false);
-//                        HCoil1SP.setEditable(false);
-//                        HCoil1plus.setEnabled(false);
-//                        HCoil1minus.setEnabled(false);
-//                        HCoil2SP.setEditable(false);
-//                        HCoil2plus.setEnabled(false);
-//                        HCoil2minus.setEnabled(false);
-                        rfLUTButton.setEnabled(false);
-                        psInterlock1.setSelected(true);
-                    }
-                    if (controller.isSystemManual() && counter != 1) {
-                        refreshButton.setEnabled(true);
-                        applyButton.setEnabled(true);
-                        counter = 1;
-                    }
-                    if (!controller.isSystemManual() && counter != 2) {
-                        refreshButton.setEnabled(false);
-                        applyButton.setEnabled(false);
-                        counter = 2;
-                    }
-                    if (!controller.acu.isConnected()) {
-                        controller.acu.connect();
-                    }
+
                     if (!controller.feedbackClient.isConnected()) {
                         controller.feedbackClient.connect();
                     }
                     if (!controller.ecubtcu.isConnected()) {
                         controller.ecubtcu.connect();
                     }
-                    if (!controller.acu.isConnected() || !controller.feedbackClient.isConnected()) {
-                        mBcreuProxy.cancel(false);
+                    if (!controller.feedbackClient.isConnected()) {
+                        if (mBcreuProxy.getState().equals(StateValue.STARTED)) {
+                            mBcreuProxy.cancel(true);
+                        }
+//                        if (mRefreshWorker.getState().equals(StateValue.STARTED)) {
+//                            mRefreshWorker.cancel(true);
+//                        }
+//                        if (controller.ecubtcu.isConnected()) {
+//                            controller.ecubtcu.disconnect();
+//                        }
+//                        if (controller.acu.isConnected()) {
+//                            controller.acu.disconnect();
+//                        }
+//                        if (mTask2.getState().equals(StateValue.STARTED)) {
+//                            mTask2.cancel(true);
+//                        }
+//                        if (mTask.getState().equals(StateValue.STARTED)) {
+//                            mTask.cancel(true);
+//                        }
                         this.cancel(false);
-                        log.error("Connection Error: Please restart iAlign.");
+                        log.error("Connection Error: Please restart Service Beam GUI");
                         return null;
                     }
                     Status info = controller.checkStatus();
@@ -5221,69 +6191,71 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
             //this is executed in the EDT
             // Only care about the latest values
             Status info = states.get(states.size() - 1);
-            for (int i = 0; i < (Status.LLRFTUNING_OFFSET + Status.LLRF_read.length); i++) {
-                if (i < Status.BLE_names.length) {
-                    statusText[i].setText(info.getString(i));
-                    statusText[i].setBackground(info.getColor(i));
-                } else if ((i >= Status.MAGNET_OFFSET) && (i < (Status.MAGNET_OFFSET + Status.Magnet_names.length))) {
-                    oldCurrText[i - Status.MAGNET_OFFSET].setText(info.getString(i));
-                    oldCurrText[i - Status.MAGNET_OFFSET].setBackground(info.getColor(i));
-                    oldCurrText2[i - Status.MAGNET_OFFSET].setText(info.getString(i));
-                    oldCurrText2[i - Status.MAGNET_OFFSET].setBackground(info.getColor(i));
-                } else if ((i >= Status.CYCLO_OFFSET) && (i < Status.CYCLO_OFFSET + Status.Cyclo_names.length)) {
-                    cycloText[i - Status.CYCLO_OFFSET].setText(info.getString(i));
-                    cycloText[i - Status.CYCLO_OFFSET].setBackground(info.getColor(i));
-                } else if ((i >= Status.CYCLOTUNING_OFFSET) && (i < Status.CYCLOTUNING_OFFSET + Status.CycloTuning_names.length)) {
-                    MCTuningText[i - Status.CYCLOTUNING_OFFSET].setText(info.getString(i));
-                    MCTuningText[i - Status.CYCLOTUNING_OFFSET].setBackground(info.getColor(i));
-                } else if ((i >= Status.LLRFTUNING_OFFSET) && (i < Status.LLRFTUNING_OFFSET + Status.LLRF_read.length)) {
-                    String rounded = "";
-                    rounded = String.format("%.2f", (Double.valueOf(info.getString(i))));
+            for (int i = 0; i < (Status.BLE_names.length); i++) {
+
+                statusText[i].setText(info.getString(i));
+                statusText[i].setBackground(info.getColor(i));
+            }
+//                } else if ((i >= Status.MAGNET_OFFSET) && (i < (Status.MAGNET_OFFSET + Status.Magnet_names.length))) {
+//                    oldCurrText[i - Status.MAGNET_OFFSET].setText(info.getString(i));
+//                    oldCurrText[i - Status.MAGNET_OFFSET].setBackground(info.getColor(i));
+//                    oldCurrText2[i - Status.MAGNET_OFFSET].setText(info.getString(i));
+//                    oldCurrText2[i - Status.MAGNET_OFFSET].setBackground(info.getColor(i));
+//                } else if ((i >= Status.CYCLO_OFFSET) && (i < Status.CYCLO_OFFSET + Status.Cyclo_names.length)) {
+//                    cycloText[i - Status.CYCLO_OFFSET].setText(info.getString(i));
+//                    cycloText[i - Status.CYCLO_OFFSET].setBackground(info.getColor(i));
+//                } else if ((i >= Status.CYCLOTUNING_OFFSET) && (i < Status.CYCLOTUNING_OFFSET + Status.CycloTuning_names.length)) {
+//                    MCTuningText[i - Status.CYCLOTUNING_OFFSET].setText(info.getString(i));
+//                    MCTuningText[i - Status.CYCLOTUNING_OFFSET].setBackground(info.getColor(i));
+//                } else if ((i >= Status.LLRFTUNING_OFFSET) && (i < Status.LLRFTUNING_OFFSET + Status.LLRF_read.length)) {
+//                    String rounded = "";
+//                    rounded = String.format("%.2f", (Double.valueOf(info.getString(i))));
 //                    if (i == Status.LLRFTUNING_OFFSET) {
 //                        VDeeFB.setText(rounded);
 //                    }
-                    if (i == Status.LLRFTUNING_OFFSET + 1) {
-                        FilFB.setText(rounded);
-                    }
-                    if (i == Status.LLRFTUNING_OFFSET + 2) {
-                        ArcFB.setText(rounded);
-                    }
-                    if (i == Status.LLRFTUNING_OFFSET + 3) {
-                        ArcVolt.setText(rounded);
-                    }
+//                    if (i == Status.LLRFTUNING_OFFSET + 1) {
+//                        FilFB.setText(rounded);
+//                    }
+//                    if (i == Status.LLRFTUNING_OFFSET + 2) {
+//                        ArcFB.setText(rounded);
+//                    }
+//                    if (i == Status.LLRFTUNING_OFFSET + 3) {
+//                        ArcVolt.setText(rounded);
+//                    }
 //                    if (i == Status.LLRFTUNING_OFFSET + 4) {
 //                        CCoilFB.setText(rounded);
 //                    }
-                    if (i == Status.LLRFTUNING_OFFSET + 5) {
-                        MCoilFB.setText(String.format("%.3f", (Double.valueOf(info.getString(i)))));
-                    }
+//                    if (i == Status.LLRFTUNING_OFFSET + 5) {
+//                        MCoilFB.setText(String.format("%.3f", (Double.valueOf(info.getString(i)))));
+//                    }
 //                    if (i == Status.LLRFTUNING_OFFSET + 6){
 //                        HCoil1FB.setText(rounded);
 //                    }
 //                    if (i == Status.LLRFTUNING_OFFSET + 7){
 //                        HCoil2FB.setText(rounded);
 //                    }
+//
+//                }
+//            }
+//            if (controller.isSystemManual() && readCurrent) {
+//                val = controller.bcreu.getIcCyclo();
+            //var = restManager.getVariable(Status.Arc_voltage);
 
-                }
-            }
-            if (controller.isSystemManual() && readCurrent) {
-                val = controller.bcreu.getIcCyclo();
-                //var = restManager.getVariable(Status.Arc_voltage);
+            //double val2 = (Double) Controller.acu.getTagValue(Status.Arc_voltage);
 
-                //double val2 = (Double) Controller.acu.getTagValue(Status.Arc_voltage);
-
-                //double val2 = var.getAsDouble();
-                if (val > 1.0) {
-                    beamChart.update(val);
-                    log.warn("ICCyclo: " + val);
-                    //log.warn("Arc Voltage: " + val2);
-                }
-            }
-            if (mPrepDialog != null) {
-                if (mPrepDialog.isVisible()) {
-                    mPrepDialog.setCheckBoxes(info.getPrep());
-                }
-            }
+            //double val2 = var.getAsDouble();
+//                if (val > 1.0) {
+//                    beamChart.update(val);
+//                    //log.warn("ICCyclo: " + val);
+//                    //log.warn("Arc Voltage: " + val2);
+//                }
+//            }
+//            if (mPrepDialog != null) {
+//                if (mPrepDialog.isVisible()) {
+//                    mPrepDialog.setCheckBoxes(info.getPrep());
+//                }
+//            }
+//        }
         }
     }
 
@@ -5332,13 +6304,14 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
         @Override
         protected Void doInBackground() throws Exception {
             if (!controller.acu.isConnected()) {
-                controller.acu.connect();
+                //controller.acu.connect();
+                //controller.bcreu.disconnect();
             }
             //           if (!controller.feedbackClient.isConnected()) {
             //               controller.feedbackClient.connect();
             //           }
             if (!controller.ecubtcu.isConnected()) {
-                controller.ecubtcu.connect();
+               // controller.ecubtcu.connect();
             }
 
 //            if (!controller.llrf.isConnected()) {
@@ -5347,7 +6320,7 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
 
             // AMO trying to get bcreu feedback to restart after cancel is pressed
             if (!controller.bcreu.isConnected()) {
-                controller.bcreu.connect();
+               // controller.bcreu.connect();
             }
 
             // Display if user-action is needed
@@ -5425,7 +6398,7 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
             if (controller.refreshAll()) {
                 refresh();
 
-                log.warn("Refresh complete.");
+                log.warn("[REFRESH] complete.");
                 if (!refreshButton.isEnabled()) {
                     refreshButton.setEnabled(true);
                 }
@@ -5433,7 +6406,7 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
                     applyButton.setEnabled(true);
                 }
             } else {
-                log.error("Unable to acquire new BPM measurements.");
+                log.error("[REFRESH] Unable to acquire new BPM measurements.");
                 if (!refreshButton.isEnabled()) {
                     refreshButton.setEnabled(true);
                 }
@@ -5472,94 +6445,217 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
      * -Filament set to 125A
      * -Filament ON
      **/
-    public class TimerPanel extends JPanel {
+    public static class TimerPanel extends JPanel {
 
-        private Timer timer;
+        public static Timer timer;
         private long startTime = -1;
+        public long now;
+        public static long clockTime;
 
         private long oneMin = 60000;
         private long fiveMin = oneMin * 5;
 
+        private long step0 = 0;
         private long step1 = fiveMin;
         private long step2 = step1 + fiveMin;
-        private long step3 = step2 + oneMin;
-        private long step4 = step3 + oneMin;
-        private long step5 = step4 + oneMin;
-        private long step6 = step5 + oneMin;
-        private long step7 = step6 + oneMin;
-        private long step8 = step7 + oneMin;
-        private long step9 = step8 + oneMin;
-        private long step10 = step9 + oneMin;
-        private long step11 = step10 + oneMin;
-        private long step12 = step11 + oneMin;
-        private long step13 = step12 + oneMin;
-        private long step14 = step13 + oneMin;
-        private long step15 = step14 + oneMin;
-        private long step16 = step15 + oneMin;
-        private long step17 = step16 + oneMin;
-        private long step18 = step17 + oneMin;
-        private long step19 = step18 + oneMin;
-        private long step20 = step19 + oneMin;
+        private long step3 = step2 + (oneMin*4);
+        private long step4 = step3 + (oneMin*3);
+        private long step5 = step4 + (oneMin*3);
+        private long step6 = step5 + (oneMin*3);
+        private long step7 = step6 + (oneMin*2);
+        private long step8 = step7 + (oneMin*2);
+        private long step9 = step8 + (oneMin*2);
+        private long step10 = step9 + (oneMin*2);
+        private long step11 = step10 + (oneMin*2);
 
-        private long duration = step20 + (2 * oneMin);
+        private long step[];
 
-        private int flag1, flag2, flag3, flag4, flag5, flag6, flag7, flag8, flag9, flag10,
-                flag11, flag12, flag13, flag14, flag15, flag16, flag17, flag18, flag19, flag20 = 0;
+        private long stepArc;
+        private long stepTuning = stepArc;
+
+        private long totalDuration = stepTuning + 1000;
+
+        private int flag[];
 
         private JLabel label;
         private JLabel statusLabel;
         private JTextArea textArea;
         private String progressString;
 
+        private JTextField setpointTitle;
+        private JTextField setpointTitle2;
+        private JTextField setpoint[];
+        private JTextField setpointArc;
+        private JTextField setpointTuning;
+
+        private JTextField durationTitle;
+        private JTextField durationTitle2;
+        private JTextField duration[];
+        private JTextField durationArc;
+        private JTextField durationTuning;
+
+        private TitledBorderNoEdge title;
+        private TitledBorder title2;
+
+        private DurationFormatUtils dfu = new DurationFormatUtils();
+
 
         public TimerPanel() {
+
+            String pattern = "MM-dd";
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+            String date = simpleDateFormat.format(new Date());
+            beamResults = new File("./BeamResults/ServiceBeam_" + date + ".csv");
+
+//            step = new long[13];
+//            step[0] = 0;
+//            step[1] = fiveMin;
+//            step[2] = step[1] + fiveMin;
+//            step[3] = step[2] + (oneMin*4);
+//            step[4] = step[3] + (oneMin*3);
+//            step[5] = step[4] + (oneMin*3);
+//            step[6] = step[5] + (oneMin*3);
+//            step[7] = step[6] + (oneMin*3);
+//            step[8] = step[7] + (oneMin*2);
+//            step[9] = step[8] + (oneMin*2);
+//            step[10] = step[9] + (oneMin*2);
+//            step[11] = step[10] + (oneMin*2);
+//            step[12] = step[11] + (oneMin);
+//            stepTuning = step[12];
+//            totalDuration = step[12];
+//
+//            flag = new int[13];
+//            for (int i = 1; i <= 12; i++){
+//                flag[i] = 0;
+//            }
+
             setLayout(new GridBagLayout());
             GridBagConstraints gbc = new GridBagConstraints();
-            gbc.gridx = 0;
-            gbc.gridy = 1;
+            gbc.gridx = 1;
+            gbc.gridy = 0;
+//            gbc.gridwidth = 2;
+//            gbc.insets = new Insets(0, 0, 0, 0);
+//            gbc.anchor = GridBagConstraints.CENTER;
+//            statusLabel = new JLabel("  Status: Not Running   ");
+//            statusLabel.setFont(new Font("Dialog", Font.BOLD, 24));
+//           // add(statusLabel, gbc);
+//
+//            operModeLabel3.setFont(new Font("Dialog", Font.BOLD, 16));
+//            operModeLabel3.setText("Operating Mode: Manual");
+//            operModeLabel3.setHorizontalAlignment(JLabel.CENTER);
+//
+//            gbc.gridy = 2;
+//           // add(operModeLabel3, gbc);
+//
+//            gbc.gridx = 2;
+//            gbc.gridy = 6;
+//            gbc.gridheight = 2;
+//            gbc.insets = new Insets(0, 0, 0, 0);
+            add(new JPanel(), gbc);
+            gbc.gridy++;
+            add(new JPanel(), gbc);
+            gbc.gridy++;
+            add(new JPanel(), gbc);
+            gbc.gridy++;
+            add(new JPanel(), gbc);
+            gbc.gridy++;
+            add(new JPanel(), gbc);
+            gbc.gridy++;
+            Font bigTitle = new Font(Font.DIALOG, Font.BOLD, 18);
+            rfSparkDetected.setFont(bigTitle);
+            rfSparkDetected.setIcon(ResourceManager.getInstance().getImageIcon("icompx/icons/disabled"));
+            gbc.anchor = GridBagConstraints.CENTER;
+            //rfSparkDetected.setHorizontalAlignment(JLabel.LEFT);
+            add(rfSparkDetected, gbc);
+
+            add(new JPanel(), gbc);
+            gbc.gridy++;
+            add(new JPanel(), gbc);
+            gbc.gridy++;
+//            add(new JPanel(), gbc);
+//            gbc.gridy++;
+//            add(new JPanel(), gbc);
+//            gbc.gridy++;
+            add(new JPanel(), gbc);
+            gbc.gridy++;
+            add(new JPanel(), gbc);
+            gbc.gridy++;
+            add(new JPanel(), gbc);
+            gbc.gridy++;
+            add(new JPanel(), gbc);
+            gbc.gridy++;
+            add(new JPanel(), gbc);
+            gbc.gridy++;
+            add(new JPanel(), gbc);
+            gbc.gridy++;
+
+            gbc.anchor = GridBagConstraints.CENTER;
+            label = new JLabel("00:00");
+            label.setText(dfu.formatDuration(0, "mm:ss:SSS"));
+            label.setFont(new Font("Dialog", Font.BOLD, 48));
+            add(label, gbc);
+
+            //gbc.gridx = 2;
+            gbc.gridy++;
+            gbc.gridheight = 1;
             gbc.weightx = 1; // full width
             gbc.weighty = 1;
             gbc.ipady = IPADY_DEFAULT;
-            gbc.insets = new Insets(15, 0, 0, 30);
-            gbc.anchor = GridBagConstraints.NORTHEAST;
-            burnInButton = new JButton("Start Burn-in");
-            add(burnInButton, gbc);
-
-
-            gbc.gridy = 1;
-            gbc.gridx = 1;
-            gbc.insets = new Insets(0, 30, 0, 0);
-            gbc.anchor = GridBagConstraints.NORTHWEST;
-            label = new JLabel("...");
-            label.setFont(new Font("Dialog", Font.BOLD, 24));
-            add(label, gbc);
-
-
-            gbc.gridy = 0;
-            gbc.gridx = 0;
-            gbc.gridwidth = 2;
-            gbc.insets = new Insets(100, 0, 0, 0);
+            //gbc.insets = new Insets(0, 0, 0, 0);
             gbc.anchor = GridBagConstraints.CENTER;
-            statusLabel = new JLabel("Status: ");
-            statusLabel.setFont(new Font("Dialog", Font.BOLD, 24));
-            add(statusLabel, gbc);
+            startBeamButton = new JButton("Start Beam");
+            startBeamButton.setToolTipText("Start/Pause the beam output.");
+            startBeamButton.setEnabled(false);
+            add(startBeamButton, gbc);
+
+            //gbc.gridx =0;
+            timedRunCB = new JCheckBox("Timed Run");
+            timedRunCB.setToolTipText("Un-check for open-ended beam runs (requires manually pausing/stopping beam)");
+            timedRunCB.setFont(new Font("Dialog", Font.BOLD, 16));
+            timedRunCB.setEnabled(false);
+            timedRunCB.setSelected(false);
 
 
-            gbc.gridwidth = 1;
-            gbc.gridx = 2;
-            gbc.gridheight = 2;
-            gbc.weightx = 0.3;
-            gbc.weighty = 1;
-            gbc.insets = new Insets(0, 0, 0, 150);
-            gbc.anchor = GridBagConstraints.LINE_END;
+//            gbc.gridy++;
+//            add(new JLabel(), gbc);
 
-            textArea = new JTextArea(progressString);
-            textArea.setEditable(false);
-            progressString = "";
-            textArea.setBackground(IbaColors.BT_GRAY);
-            textArea.setFont(new Font("Dialog", Font.BOLD, 14));
-            add(textArea, gbc);
+            gbc.gridy++;
+            gbc.ipady = 0;
+            gbc.anchor = GridBagConstraints.SOUTH;
+            add(timedRunCB, gbc);
 
+            timedRunText = new JTextField("0.0");
+            Dimension dimension = new Dimension(100, 40);
+            timedRunText.setFont(new Font("Dialog", Font.BOLD, 16));
+            timedRunText.setBackground(IbaColors.BT_GRAY);
+            timedRunText.setHorizontalAlignment(SwingConstants.CENTER);
+            timedRunText.setEnabled(false);
+            timedRunText.setPreferredSize(dimension);
+            title2 = new TitledBorder("sec");
+            title2.setTitleJustification(TitledBorder.RIGHT);
+            title2.setBorder(BorderFactory.createMatteBorder(1,1,1,1, Color.BLACK));
+            timedRunText.setBorder(title2);
+
+
+            gbc.gridy++;
+            gbc.anchor = GridBagConstraints.CENTER;
+            add(timedRunText, gbc);
+
+            String[] actionStrings = { "RF", "Beamstop" };
+            postRunAction = new JComboBox(actionStrings);
+            postRunAction.setToolTipText("Defines the post-run action: \n Set RF to a non-beam producing voltage, or insert a beamstop to prevent dark current from entering the TR. ");
+
+            ((JLabel)postRunAction.getRenderer()).setHorizontalAlignment(JLabel.CENTER);
+
+            postRunAction.setEnabled(false);
+            postRunAction.setFont(new Font("Dialog", Font.BOLD, 14));
+            postRunAction.setBackground(IbaColors.BT_GRAY);
+            dimension = new Dimension(100, 30);
+            postRunAction.setPreferredSize(dimension);
+
+            gbc.gridy++;
+            gbc.anchor = GridBagConstraints.NORTH;
+            add(postRunAction, gbc);
 
             timer = new Timer(10, new ActionListener() {
                 @Override
@@ -5567,269 +6663,316 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
                     if (startTime < 0) {
                         startTime = System.currentTimeMillis();
                     }
-                    long now = System.currentTimeMillis();
-                    long clockTime = now - startTime;
+                    now = System.currentTimeMillis();
+                    clockTime = now - startTime;
 
-                    mainPanel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 
-                    if (clockTime >= step1 && clockTime < duration && flag1 == 0) {
-                        progressString += "Filament ON to 125A @: " + LocalTime.now().toString() + "\n";
-                        textArea.setText(progressString);
-                        flag1 += 1;
-                        controller.burnInSource(1);
-                    }
+                    label.setText(dfu.formatDuration(clockTime, "mm:ss:SSS"));
 
-                    if (clockTime >= step2 && clockTime < duration && flag2 == 0) {
-                        progressString += "Filament to 130A @: " + LocalTime.now().toString() + "\n";
-                        textArea.setText(progressString);
-                        flag2 += 1;
-                        controller.burnInSource(2);
-                    }
-
-                    if (clockTime >= step3 && clockTime < duration && flag3 == 0) {
-                        progressString += "Filament to 135A @: " + LocalTime.now().toString() + "\n";
-                        textArea.setText(progressString);
-                        flag3 += 1;
-                        controller.burnInSource(3);
-                    }
-
-                    if (clockTime >= step4 && clockTime < duration && flag4 == 0) {
-                        progressString += "Filament to 140A @: " + LocalTime.now().toString() + "\n";
-                        textArea.setText(progressString);
-                        flag4 += 1;
-                        controller.burnInSource(4);
-                    }
-
-                    if (clockTime >= step5 && clockTime < duration && flag5 == 0) {
-                        progressString += "Filament to 145A @: " + LocalTime.now().toString() + "\n";
-                        textArea.setText(progressString);
-                        flag5 += 1;
-                        controller.burnInSource(5);
-                    }
-
-                    if (clockTime >= step6 && clockTime < duration && flag6 == 0) {
-                        progressString += "Filament to 150A @: " + LocalTime.now().toString() + "\n";
-                        textArea.setText(progressString);
-                        flag6 += 1;
-                        controller.burnInSource(6);
-                    }
-
-                    if (clockTime >= step7 && clockTime < duration && flag7 == 0) {
-                        progressString += "Filament to 155A @: " + LocalTime.now().toString() + "\n";
-                        textArea.setText(progressString);
-                        flag7 += 1;
-                        controller.burnInSource(7);
-                    }
-
-                    if (clockTime >= step8 && clockTime < duration && flag8 == 0) {
-                        progressString += "Filament to 160A @: " + LocalTime.now().toString() + "\n";
-                        textArea.setText(progressString);
-                        flag8 += 1;
-                        controller.burnInSource(8);
-                    }
-
-                    if (clockTime >= step9 && clockTime < duration && flag9 == 0) {
-                        progressString += "Filament to 165A @: " + LocalTime.now().toString() + "\n";
-                        textArea.setText(progressString);
-                        flag9 += 1;
-                        controller.burnInSource(9);
-                    }
-
-                    if (clockTime >= step10 && clockTime < duration && flag10 == 0) {
-                        progressString += "Filament to 170A @: " + LocalTime.now().toString() + "\n";
-                        textArea.setText(progressString);
-                        flag10 += 1;
-                        controller.burnInSource(10);
-                    }
-
-                    if (clockTime >= step11 && clockTime < duration && flag11 == 0) {
-                        progressString += "Filament to 175A @: " + LocalTime.now().toString() + "\n";
-                        textArea.setText(progressString);
-                        flag11 += 1;
-                        controller.burnInSource(11);
-                    }
-
-                    if (clockTime >= step12 && clockTime < duration && flag12 == 0) {
-                        progressString += "Filament to 180A @: " + LocalTime.now().toString() + "\n";
-                        textArea.setText(progressString);
-                        flag12 += 1;
-                        controller.burnInSource(12);
-                    }
-
-                    if (clockTime >= step13 && clockTime < duration && flag13 == 0) {
-                        progressString += "Filament to 185A @: " + LocalTime.now().toString() + "\n";
-                        textArea.setText(progressString);
-                        flag13 += 1;
-                        controller.burnInSource(13);
-                    }
-
-                    if (clockTime >= step14 && clockTime < duration && flag14 == 0) {
-                        progressString += "Filament to 190A @: " + LocalTime.now().toString() + "\n";
-                        textArea.setText(progressString);
-                        flag14 += 1;
-                        controller.burnInSource(14);
-                    }
-
-                    if (clockTime >= step15 && clockTime < duration && flag15 == 0) {
-                        progressString += "Filament to 195A @: " + LocalTime.now().toString() + "\n";
-                        textArea.setText(progressString);
-                        flag15 += 1;
-                        controller.burnInSource(15);
-                    }
-
-                    if (clockTime >= step16 && clockTime < duration && flag16 == 0) {
-                        progressString += "Filament to 190A @: " + LocalTime.now().toString() + "\n";
-                        textArea.setText(progressString);
-                        flag16 += 1;
-                        controller.burnInSource(16);
-                    }
-
-                    if (clockTime >= step17 && clockTime < duration && flag17 == 0) {
-                        progressString += "Filament to 185A @: " + LocalTime.now().toString() + "\n";
-                        textArea.setText(progressString);
-                        flag17 += 1;
-                        controller.burnInSource(17);
-                    }
-
-                    if (clockTime >= step18 && clockTime < duration && flag18 == 0) {
-                        progressString += "Filament to 180A @: " + LocalTime.now().toString() + "\n";
-                        textArea.setText(progressString);
-                        flag18 += 1;
-                        controller.burnInSource(18);
-                    }
-
-                    if (clockTime >= step19 && clockTime < duration && flag19 == 0) {
-                        progressString += "Arc ON to 85mA @: " + LocalTime.now().toString() + "\n";
-                        textArea.setText(progressString);
-                        flag19 += 1;
-                        controller.burnInSource(19);
-                    }
-
-                    if (clockTime >= step20 && clockTime < duration && flag20 == 0) {
-                        progressString += "Source tuning enabled @: " + LocalTime.now().toString() + "\n";
-                        textArea.setText(progressString);
-                        flag20 += 1;
-                        controller.burnInSource(20);
-                    }
-
-                    if (clockTime >= duration) {
-                        clockTime = duration;
+                    if (Controller.S2E.getPosition() != Insertable.Position.RETRACTED){
                         timer.stop();
-
-                        flag1 = 0;  //reset flags poorly
-                        flag2 = 0;
-                        flag3 = 0;
-                        flag4 = 0;
-                        flag5 = 0;
-                        flag6 = 0;
-                        flag7 = 0;
-                        flag8 = 0;
-                        flag9 = 0;
-                        flag10 = 0;
-                        flag11 = 0;
-                        flag12 = 0;
-                        flag13 = 0;
-                        flag14 = 0;
-                        flag15 = 0;
-                        flag16 = 0;
-                        flag17 = 0;
-                        flag18 = 0;
-                        flag19 = 0;
-                        flag20 = 0;
-
-                        log.warn("Automatic Source Burn-in is complete");
-                        burnInButton.setText("Start Burn-in");
-                        statusLabel.setText("Status: Burn-in complete");
-                        progressString += "Burn-in completed @: " + LocalTime.now().toString() + "\n";
-                        textArea.setText(progressString);
-                        mainPanel.setCursor(Cursor.getDefaultCursor());
                     }
-                    SimpleDateFormat df = new SimpleDateFormat("mm:ss:SSS");
-                    label.setFont(new Font("Dialog", Font.BOLD, 44));
-                    label.setText(df.format(duration - clockTime));
+
+                    if (timedRunCB.isSelected()){
+                        if (clockTime >= Double.parseDouble(timedRunText.getText())*1000){
+                            if (mEsbtsPanel.mSelectBeamlinePanel.mContinuousBeamCB.isSelected()){
+                                Controller.beam.bcreu.pauseRegulation();
+                            }else{
+                                Controller.beam.bcreu.setContinuousPulse(false);
+                            }
+                            if (postRunAction.getSelectedItem().toString().equalsIgnoreCase("RF")){
+                                Controller.beam.llrf.setDeeVoltage2(41.00d);
+                            }else{
+                                try {
+                                    Controller.beam.bssController.startDisableBeamActivity(Controller.beam.beamScheduler.getCurrentBeamAllocation().getBeamSupplyPointId());
+                                    Thread.sleep(1000);
+                                    if (Controller.S2E.getPosition() == Insertable.Position.MOVING || Controller.S2E.getPosition() == Insertable.Position.INSERTED) {
+                                        //do nothing
+                                    } else {
+                                        Controller.ecubtcu.bsInsert("S2E");
+                                    }
+                                } catch (Exception f) {
+                                    f.printStackTrace();
+                                }
+                            }
+                            timer.stop();
+                            clockTime = (long) Double.parseDouble(timedRunText.getText())*1000;
+                            label.setText(dfu.formatDuration(clockTime, "mm:ss:SSS"));
+                            startBeamButton.setText("Start Beam");
+                            if (beamResults.isFile()) {
+                                csvWriteBeamOff(beamResults, 2, TimerPanel.getClockTime());
+                            } else {
+                                log.error("[Beam Record] Could not find Beam Results file. Path: " + beamResults.getAbsolutePath());
+                            }
+                        }
+                    }
+
+                  //  mainPanel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+
                 }
             });
             timer.setInitialDelay(0);
-//            addMouseListener(new MouseAdapter() {
-//                @Override
-//                public void mouseClicked(MouseEvent e) {
-//                    if (!timer.isRunning()) {
-//                        startTime = -1;
-//                        timer.start();
-//                    }
-//                }
-//            });
 
-
-            burnInButton.addActionListener(new ActionListener() {
+            startBeamButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     if (!timer.isRunning()) {
                         startTime = -1;
-                        if (controller.isSystemManual()) {
+                        if (!Controller.isSystemManual()) {
+                            if (mEsbtsPanel.mSelectBeamlinePanel.mContinuousBeamCB.isSelected()) {
+                                Controller.beam.llrf.setMaxVoltage(56.00d);
+                                try {
+                                    if (mEsbtsPanel.mActionsPanel.deeVoltage==0) {
+                                        mEsbtsPanel.mActionsPanel.deeVoltage = getRestVariable("B0.R1.LLA01.VDee1feedbackrv").getAsDouble();
+                                        mEsbtsPanel.mActionsPanel.deeVoltage = Math.floor(mEsbtsPanel.mActionsPanel.deeVoltage);
+                                    }
+                                } catch (Exception h) {
+                                    h.printStackTrace();
+                                }
+                                System.out.println(mEsbtsPanel.mActionsPanel.deeVoltage);
+                                try {
+                                    Controller.beam.bssController.startEnableBeamActivity(Controller.beam.beamScheduler.getCurrentBeamAllocation().getBeamSupplyPointId());
+                                    Thread.sleep(500);
+                                    if (Controller.S2E.getPosition() == Insertable.Position.MOVING || Controller.S2E.getPosition() == Insertable.Position.RETRACTED) {
+                                        //do nothing
+                                    } else {
+                                        Controller.ecubtcu.bsRetract("S2E");
+                                    }
+                                } catch (Exception g) {
+                                    g.printStackTrace();
+                                }
+//                if (deeVoltage > 41) {
+//                    Controller.beam.llrf.setDeeVoltage2(deeVoltage);
+//                }
+                            }else {
+                                try {
+                                    Controller.beam.bssController.startEnableBeamActivity(Controller.beam.beamScheduler.getCurrentBeamAllocation().getBeamSupplyPointId());
+                                    Thread.sleep(500);
+                                    if (Controller.S2E.getPosition() == Insertable.Position.MOVING || Controller.S2E.getPosition() == Insertable.Position.RETRACTED) {
+                                        //do nothing
+                                    } else {
+                                        Controller.ecubtcu.bsRetract("S2E");
+                                    }
+                                } catch (Exception f) {
+                                    f.printStackTrace();
+                                }
+                            }
+                            if (mEsbtsPanel.mActionsPanel.deeVoltage > 0) {
+                                Controller.beam.llrf.setDeeVoltage2(mEsbtsPanel.mActionsPanel.deeVoltage);
+                            }
+                            if (mEsbtsPanel.mSelectBeamlinePanel.mContinuousBeamCB.isSelected()){
+                                Controller.beam.bcreu.startRegulation(true);
+                                Controller.beam.bcreu.startBeamPulses();
+                            }else{
+                                Controller.beam.bcreu.setContinuousPulse(true);
+                            }
+                            //Controller.beam.bcreu.startBeamPulses();
+                            //Controller.beam.bcreu.setContinuousPulse(true);
                             timer.start();
-                            log.warn("Started Automatic Source Burn-in");
-                            burnInButton.setText("Cancel Burn-in");
-                            statusLabel.setText("Status: Burn-in started");
-                            progressString = "Source off while vacuum stabilizes @: " + LocalTime.now().toString() + "\n";
-                            textArea.setText(progressString);
-                            controller.burnInSource(0);
                         } else {
-                            log.error("System is in automatic mode, please switch to manual mode to burn-in source.");
+                            log.error("System is in manual mode, please switch to automatic mode to start beam.");
+                        }
+                        startBeamButton.setText("Pause Beam");
+
+                        if (beamResults.isFile()) {
+                            csvWriteBeamOn(beamResults);
+                        } else {
+                            csvCreateBeamResults(beamResults);
                         }
 
                     } else if (timer.isRunning()) {
+                        if (mEsbtsPanel.mSelectBeamlinePanel.mContinuousBeamCB.isSelected()){
+                            Controller.beam.bcreu.pauseRegulation();
+                        }else{
+                            Controller.beam.bcreu.setContinuousPulse(false);
+                        }
+
                         timer.stop();
-                        flag1 = 0; //reset flags poorly
-                        flag2 = 0;
-                        flag3 = 0;
-                        flag4 = 0;
-                        flag5 = 0;
-                        flag6 = 0;
-                        flag7 = 0;
-                        flag8 = 0;
-                        flag9 = 0;
-                        flag10 = 0;
-                        flag11 = 0;
-                        flag12 = 0;
-                        flag13 = 0;
-                        flag14 = 0;
-                        flag15 = 0;
-                        flag16 = 0;
-                        flag17 = 0;
-                        flag18 = 0;
-                        flag19 = 0;
-                        flag20 = 0;
-                        mainPanel.setCursor(Cursor.getDefaultCursor());
-                        log.warn("Cancelled Automatic Source Burn-in");
-                        burnInButton.setText("Start Burn-in");
-                        statusLabel.setText("Status: Burn-in cancelled");
-                        progressString += "Burn-in cancelled @: " + LocalTime.now().toString() + "\n";
-                        textArea.setText(progressString);
+                        startBeamButton.setText("Start Beam");
+
+                        if (beamResults.isFile()) {
+                            csvWriteBeamOff(beamResults, 1, TimerPanel.getClockTime());
+                        } else {
+                            log.error("[Beam Record] Could not find Beam Results file. Path: " + beamResults.getAbsolutePath());
+                        }
+
+                        if (postRunAction.getSelectedItem().toString().equalsIgnoreCase("RF")){
+                            Controller.beam.llrf.setDeeVoltage2(41.00d);
+                        }else{
+                            try {
+                                Controller.beam.bssController.startDisableBeamActivity(Controller.beam.beamScheduler.getCurrentBeamAllocation().getBeamSupplyPointId());
+                                Thread.sleep(1000);
+                                if (Controller.S2E.getPosition() == Insertable.Position.MOVING || Controller.S2E.getPosition() == Insertable.Position.INSERTED) {
+                                    //do nothing
+                                } else {
+                                    Controller.ecubtcu.bsInsert("S2E");
+                                }
+                            } catch (Exception g) {
+                                g.printStackTrace();
+                            }
+                        }
+
                     }
                     if (startTime < 0) {
                         startTime = System.currentTimeMillis();
                     }
                     long now = System.currentTimeMillis();
                     long clockTime = now - startTime;
-
-
-                    if (clockTime >= duration) {
-                        clockTime = duration;
-                        timer.stop();
-                        burnInButton.setText("Start Burn-in");
-                    }
-                    SimpleDateFormat df = new SimpleDateFormat("mm:ss:SSS");
-                    label.setFont(new Font("Dialog", Font.BOLD, 42));
-                    label.setText(df.format(duration - clockTime));
+                    label.setFont(new Font("Dialog", Font.BOLD, 48));
+                    label.setText(dfu.formatDuration(clockTime, "mm:ss:SSS"));
                 }
             });
 
-        }
+            timedRunCB.addActionListener(new ActionListener() {
+                 @Override
+                 public void actionPerformed(ActionEvent e) {
+                 timedRunText.setEnabled(timedRunCB.isSelected());
+                }
+            });
 
+
+
+//            burnInLockButton.addActionListener(new ActionListener() {
+//                @Override
+//                public void actionPerformed(ActionEvent e) {
+//                    if (locked) {
+//                        locked = false;
+//                        burnInStartButton.setEnabled(false);
+//
+//                        for (int i = 0; i <= 11; i++) {
+//                            if (i == 0){
+//                                duration[i].setEditable(true);
+//                                duration[i].setBackground(Color.WHITE);
+//
+//                                title = new TitledBorderNoEdge("Step" + String.valueOf(i+1));
+//                                title.setBorder(border);
+//                                title.setTitleJustification(TitledBorder.RIGHT);
+//                                title.setTitlePosition(TitledBorder.BELOW_TOP);
+//                                title.setTitleFont(new Font("Dialog", Font.BOLD, 10));
+//                                setpoint[i].setBorder(BorderFactory.createMatteBorder(2,2,1,1, Color.BLACK));
+//                                duration[i].setBorder(title);
+//                            }else if (i==11){
+//                                setpoint[i].setEditable(true);
+//                                setpoint[i].setBackground(Color.WHITE);
+//                                duration[i].setEditable(true);
+//                                duration[i].setBackground(Color.WHITE);
+//
+//                                title = new TitledBorderNoEdge("Step" + String.valueOf(i+1));
+//                                title.setBorder(BorderFactory.createMatteBorder(2,1,2,2, Color.BLACK));
+//                                title.setTitleJustification(TitledBorder.RIGHT);
+//                                title.setTitlePosition(TitledBorder.BELOW_TOP);
+//                                title.setTitleFont(new Font("Dialog", Font.BOLD, 10));
+//                                setpoint[i].setBorder(BorderFactory.createMatteBorder(2,2,2,1, Color.BLACK));
+//                                duration[i].setBorder(title);
+//                            } else {
+//                                setpoint[i].setEditable(true);
+//                                setpoint[i].setBackground(Color.WHITE);
+//                                duration[i].setEditable(true);
+//                                duration[i].setBackground(Color.WHITE);
+//
+//                                title = new TitledBorderNoEdge("Step" + String.valueOf(i+1));
+//                                title.setBorder(border);
+//                                title.setTitleJustification(TitledBorder.RIGHT);
+//                                title.setTitlePosition(TitledBorder.BELOW_TOP);
+//                                title.setTitleFont(new Font("Dialog", Font.BOLD, 10));
+//                                setpoint[i].setBorder(BorderFactory.createMatteBorder(2,2,1,1, Color.BLACK));
+//                                duration[i].setBorder(title);
+//                            }
+//                        }
+//
+//                        burnInLockButton.setText("Lock");
+//                    } else {
+//                        locked = true;
+//
+//                        for (int i = 0; i <= 10; i++) {
+//                            if (i==0){
+//                                setpoint[i].setEditable(false);
+//                                setpoint[i].setBackground(IbaColors.BT_GRAY);
+//                                setpoint[i].setBorder(BorderFactory.createMatteBorder(2,2,1,1, Color.BLACK));
+//                            }else {
+//                                setpoint[i].setEditable(false);
+//                                setpoint[i].setBackground(IbaColors.BT_GRAY);
+//                                if (Float.valueOf(setpoint[i].getText()) > maxFilSP) {
+//                                    controller.burnInStep[i] = maxFilSP;
+//                                    setpoint[i].setText(String.valueOf(controller.burnInStep[i]));
+//                                } else if (Float.valueOf(setpoint[i].getText()) < minFilSP) {
+//                                    controller.burnInStep[i] = minFilSP;
+//                                    setpoint[i].setText(String.valueOf(controller.burnInStep[i]));
+//                                } else {
+//                                    controller.burnInStep[i] =
+//                                            Math.round(Float.valueOf(setpoint[i].getText()));
+//                                    setpoint[i].setText(String.valueOf(controller.burnInStep[i]));
+//                                }
+//                            }
+//                        }
+//
+//
+//                        setpoint[11].setEditable(false);
+//                        setpoint[11].setBackground(IbaColors.BT_GRAY);
+//                        if (Float.valueOf(setpoint[11].getText()) > maxArcSP) {
+//                            controller.burnInStep[11] = maxArcSP;
+//                            setpoint[11].setText(String.valueOf(controller.burnInStep[11]));
+//                        } else if (Float.valueOf(setpoint[11].getText()) < minArcSP) {
+//                            controller.burnInStep[11] = minArcSP;
+//                            setpoint[11].setText(String.valueOf(controller.burnInStep[11]));
+//                        } else {
+//                            controller.burnInStep[11] =
+//                                    Math.round(Float.valueOf(setpoint[11].getText()));
+//                            setpoint[11].setText(String.valueOf(controller.burnInStep[11]));
+//                        }
+//
+//
+//                        for (int i = 0; i <= 11; i++) {
+//                            duration[i].setEditable(false);
+//                            duration[i].setBackground(IbaColors.BT_GRAY);
+//                            if (Float.valueOf(duration[i].getText()) > maxDuration) {
+//                                step[i + 1] = step[i] + (maxDuration * oneMin);
+//                                duration[i].setText(String.valueOf((step[i + 1] / oneMin) - (step[i] / oneMin)));
+//                                if (i==11){
+//                                    durationTuning.setText("ON");
+//                                }
+//                            } else if (Float.valueOf(duration[i].getText()) <= minDuration) {
+//                                if (i != 0) {
+//                                    setpoint[i].setBackground(Color.gray);
+//                                }
+//                                if (i==11){
+//                                    durationTuning.setText("OFF");
+//                                }
+//                                step[i + 1] = step[i] + minDuration;
+//                                duration[i].setText(String.valueOf((step[i + 1] / oneMin) - (step[i] / oneMin)));
+//                                duration[i].setBackground(Color.gray);
+//                            } else {
+//                                step[i + 1] = step[i] +
+//                                        Math.round(Float.valueOf(duration[i].getText())) * oneMin;
+//                                duration[i].setText(String.valueOf((step[i + 1] / oneMin) - (step[i] / oneMin)));
+//                                if (i==11){
+//                                    durationTuning.setText("ON");
+//                                }
+//                            }
+//
+//                            totalDuration = step[12];
+//                            dfu = new DurationFormatUtils();
+//                            label.setText(dfu.formatDuration(totalDuration, "mm:ss:SSS"));
+//                            if (totalDuration >= oneMin * 100) {
+//                                label.setText(dfu.formatDuration(totalDuration, "mmm:ss:SSS"));
+//                            }
+//                            burnInLockButton.setText("Unlock");
+//                        }
+//                    }
+//                }
+//            });
+        }
         @Override
         public Dimension getPreferredSize() {
             return new Dimension(400, 400);
+        }
+
+        public static long getClockTime(){
+            return clockTime;
+        }
+
+        public static Timer getTimer(){
+            return timer;
         }
     }
 
@@ -5869,15 +7012,15 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
             numberAxis = (NumberAxis) plot.getRangeAxis();
             numberAxis.setLowerBound(0);
             numberAxis.setUpperBound(3.0D);
-            NumberTickUnit rangeTick = new NumberTickUnit(0.3D);
+            NumberTickUnit rangeTick = new NumberTickUnit(1.0D);
             numberAxis.setTickUnit(rangeTick);
             numberAxis.setTickLabelFont(new Font("Dialog", Font.PLAIN, 12));
             numberAxis.setTickLabelPaint(Color.black);
             axis2 = new NumberAxis("");
             axis2.setAutoRange(true);
             axis2.setLowerBound(0);
-            axis2.setUpperBound(10.0D);
-            rangeTick = new NumberTickUnit(1.0D);
+            axis2.setUpperBound(11.0D);
+            rangeTick = new NumberTickUnit(3.0D);
             axis2.setTickUnit(rangeTick);
             axis2.setTickLabelFont(new Font("Dialog", Font.PLAIN, 12));
             axis2.setTickLabelPaint(Color.blue);
@@ -5899,15 +7042,60 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
             ta.setMaxWidth(0.48);
             plot.addAnnotation(ta);
 
-            final StandardXYItemRenderer renderer = new StandardXYItemRenderer();
+            //DecimalFormat format = new DecimalFormat("###,###");
+
+            //StandardCategoryItemLabelGenerator labelGenerator = new StandardCategoryItemLabelGenerator("{2}", format);
+//            XYItemLabelGenerator labelGenerator1 = new XYItemLabelGenerator() {
+//                @Override
+//                public String generateLabel(XYDataset dataset, int series, int item) {
+//                    return null;
+//                }
+//            };
+
+            NumberFormat format = NumberFormat.getNumberInstance();
+            format.setMaximumFractionDigits(0);
+            XYItemLabelGenerator generator = new StandardXYItemLabelGenerator(StandardXYItemLabelGenerator.DEFAULT_ITEM_LABEL_FORMAT, format, format);
+
+            //final StandardXYItemRenderer renderer = new StandardXYItemRenderer();
+            renderer.setBaseShapesVisible(false);
+            renderer.setBaseShapesFilled(true);
+            renderer.setSeriesStroke(0, new BasicStroke(1.5f));
+            renderer.setSeriesItemLabelsVisible(0, false);
+            renderer.setBaseItemLabelGenerator(generator);
+            renderer.setBaseItemLabelFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 9));
             renderer.setSeriesPaint(0, Color.black);
             renderer.setPlotImages(true);
             plot.setRenderer(0, renderer);
 
-            final StandardXYItemRenderer renderer2 = new StandardXYItemRenderer();
+            //final StandardXYItemRenderer renderer2 = new StandardXYItemRenderer();
+            renderer2.setBaseShapesVisible(false);
+            renderer2.setBaseShapesFilled(true);
+            renderer2.setSeriesStroke(0, new BasicStroke(1.5f));
+            renderer2.setSeriesItemLabelsVisible(0, false);
+            renderer2.setBaseItemLabelGenerator(generator);
+            renderer2.setBaseItemLabelFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 9));
+            renderer2.setBaseItemLabelPaint(Color.blue);
             renderer2.setSeriesPaint(0, Color.blue);
             renderer2.setPlotImages(true);
             plot.setRenderer(1, renderer2);
+
+            //StandardCategoryItemLabelGenerator labelGenerator = new StandardCategoryItemLabelGenerator("{2}", format);
+            //StandardCategorySeriesLabelGenerator labelGenerator = new StandardCategorySeriesLabelGenerator();
+//            final StandardXYItemRenderer rendererer = (StandardXYItemRenderer) plot.getRenderer();
+//            rendererer.setBaseShapesVisible(true);
+//            rendererer.setBaseShapesFilled(true);
+//            rendererer.setSeriesStroke(0, new BasicStroke(1.5f));
+//            rendererer.setSeriesItemLabelsVisible(0, true);
+//            //rendererer.setBaseItemLabelGenerator(labelGenerator);
+//            rendererer.setBaseItemLabelFont(new java.awt.Font("Arial", java.awt.Font.PLAIN, 9));
+//            Shape circle = new Ellipse2D.Double(-2, -2, 4, 4);
+//            rendererer.setSeriesShape(0, circle);
+//            //plot.getRenderer().setSeriesPaint(0, Color.decode("#0066CC"));
+//
+//            rendererer.setSeriesPaint(0, Color.black);
+//            rendererer.setPlotImages(true);
+//            plot.setRenderer(0, rendererer);
+
 
             chartPanel = new ChartPanel(chart);
 
@@ -5931,7 +7119,8 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
 
             this.add(chartPanel, gbc);
 
-            list = new LinkedList<>();
+            list1 = new LinkedList<>();
+            list2 = new LinkedList<>();
         }
 
         public void update(double value) {
@@ -5954,15 +7143,86 @@ public class Gui extends JFrame implements ActionListener, ItemListener {
                                 dataset.appendData(newData);
                                 dataset2.advanceTime();
                                 dataset2.appendData(newData2);
-//                                list.addLast(newData2[0]);
-//                                if (list.size() > 14){
-//                                    list.removeFirst();
-//                                }
-                                numberAxis.setLowerBound(value - 1.5D);
-                                numberAxis.setUpperBound(value + 1.5D);
 
-                                axis2.setLowerBound(newData2[0] - 5.0D);
-                                axis2.setUpperBound(newData2[0] + 5.0D);
+                                renderer.setBaseShapesVisible(true);
+                                renderer.setSeriesItemLabelsVisible(0, true);
+                                renderer2.setBaseShapesVisible(true);
+                                renderer2.setSeriesItemLabelsVisible(0, true);
+
+
+                                list1.addLast(newData2[0]);
+                                if (list1.size() > 15){
+                                    list1.removeFirst();
+                                }
+
+
+                                if (value > 1) {
+                                    list2.addLast((float) value);
+                                    if (list2.size() > 15) {
+                                        list2.removeFirst();
+                                    }
+                                }
+
+//                                numberAxis.setLowerBound(value - 1.5D);
+//                                numberAxis.setUpperBound(value + 1.5D);
+
+//                                axis2.setLowerBound(newData2[0] - 5.0D);
+//                                axis2.setUpperBound(newData2[0] + 5.0D);
+
+
+                                int min = Math.round(newData2[0]);
+                                int max = Math.round(newData2[0]);
+
+
+
+                                for (int i=0; i<list1.size(); i++)
+                                {
+                                    if (list1.get(i) > max)
+                                    {
+                                        max = Math.round(list1.get(i));
+                                    }
+                                    if (list1.get(i) < min)
+                                    {
+                                        min = Math.round(list1.get(i));
+                                    }
+                                }
+
+                                int range = max - min;
+
+                                axis2.setLowerBound(min - (range/2));
+                                axis2.setUpperBound(max + (range/2));
+                                NumberTickUnit rangeTick = new NumberTickUnit(((max+5)-(min-5))/4);
+                                axis2.setTickUnit(rangeTick);
+
+
+
+                                int min2 = (int)value;
+                                int max2 = (int)value;
+
+
+                                for (int i=0; i<list2.size(); i++)
+                                {
+                                    if (list2.get(i) > max2)
+                                    {
+                                        max2 = Math.round(list2.get(i));
+                                    }
+                                    if (list2.get(i) < min2)
+                                    {
+                                        min2 = Math.round(list2.get(i));
+                                    }
+                                }
+
+                                min2 = (int)Math.rint(min2);
+                                max2 = (int)Math.rint(max2);
+                                int tick = (int)Math.rint(((max2+5)-(min2-5))/4);
+                                int range2 = max - min;
+
+                                numberAxis.setLowerBound(min2 - (range2/2));
+                                numberAxis.setUpperBound(max2 + (range2/2));
+                                rangeTick = new NumberTickUnit((double)tick);
+                                numberAxis.setTickUnit(rangeTick);
+
+
 
                                 chart.fireChartChanged();
                             } catch (Exception e) {

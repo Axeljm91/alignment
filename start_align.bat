@@ -1,1 +1,0 @@
-java -cp beam-ialign-8.x-SNAPSHOT-deploy.jar com.iba.ialign.Main comm.notif.port=10998 > ialign.log

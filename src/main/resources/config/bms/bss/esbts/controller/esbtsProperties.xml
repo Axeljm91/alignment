@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+   
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+   <bean id="esBtsPropertyFiles" class="java.util.ArrayList">
+      <constructor-arg>
+         <list>
+            <value>classpath:config/bms/bms/devices/impl/properties/cu-properties.xml</value>
+            <value>classpath:config/bms/bms/devices/impl/properties/insertabledevice-properties.xml</value>
+            <value>classpath:config/bms/bms/devices/impl/properties/retractabledevice-properties.xml</value>
+            <value>classpath:config/bms/bss/devices/api/properties/bpm-properties.xml</value>
+            <value>classpath:config/bms/bss/devices/api/properties/degrader-properties.xml</value>
+            <value>classpath:config/bms/bss/devices/api/properties/ecubtcu-properties.xml</value>
+            <value>classpath:config/bms/bss/devices/api/properties/group3-properties.xml</value>
+            <value>classpath:config/bms/bss/devices/api/properties/ionsource-properties.xml</value>
+            <value>classpath:config/bms/bss/devices/api/properties/magnet-properties.xml</value>
+            <value>classpath:config/bms/bss/devices/api/properties/modularpowersupply-properties.xml</value>
+            <value>classpath:config/bms/bss/devices/api/properties/slits-properties.xml</value>
+            <value>classpath:config/bms/bss/devices/api/properties/valve-properties.xml</value>
+            <value>classpath:config/bms/bss/devices/api/properties/range-properties.xml</value>
+            <value>classpath:config/bms/bms/devices/impl/properties/plc-properties.xml</value>
+         </list>
+      </constructor-arg>
+   </bean>
+
+</beans>

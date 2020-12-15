@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+   <!-- Map of optical solutions ids to inactive range control devices names arrays.
+        If there is no inactive devices for an optical solution, that optical solution may be absent from the map. -->
+   <bean id="inactiveRangeControlDevicesPerOpticalSolutions" class="java.util.HashMap">
+      <constructor-arg>
+         <map value-type="java.lang.String[]">
+            <entry key="DS_US_Default" value="q1n1,q2n1,q1n2,q2n2,q1n4,q2n4" /> <!-- PBS quads are inactive for DS/US -->
+            <entry key="US_Reduced_Current_1" value="q1n1,q2n1,q1n2,q2n2,q1n4,q2n4" /> <!-- PBS quads are inactive for DS/US -->
+            <entry key="US_Reduced_Current_2" value="q1n1,q2n1,q1n2,q2n2,q1n4,q2n4" /> <!-- PBS quads are inactive for DS/US -->
+         </map>
+      </constructor-arg>
+   </bean>
+
+</beans>

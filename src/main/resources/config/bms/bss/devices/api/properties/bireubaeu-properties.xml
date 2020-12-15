@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ ///////////////////////////////////////////////////////////////////
+  ~ Copyright (c) by Ion Beam Applications S.A.
+  ~ All rights reserved
+  ~ Rue du cyclotron, 3
+  ~ B-1348 Louvain-la-Neuve
+  ~ Tel : +32.10.47.58.11
+  ~ ///////////////////////////////////////////////////////////////////
+  -->
+
+<!--Dictionary of ICOMP properties common to the BIREU and the BAEU -->
+
+<propertyDefinitions>
+   <component>
+      <name>BIREU-BAEU</name>
+      <propertyDefinition>
+         <name>FunctionalBlock1Active</name>
+         <type>BOOLEAN</type>
+         <description>Indicates whether the functional block 1 (Max current check) is active.</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>FunctionalBlock2Active</name>
+         <type>BOOLEAN</type>
+         <description>Indicates whether the functional block2 is active (BCM check for Bireu, Neutron detection for Baeu) is active.</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>NoBeamIntegrationTime1</name>
+         <type>LONG</type>
+         <description>The integration time of the functional block 1.</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>NoBeamIntegrationTime2</name>
+         <type>LONG</type>
+         <description>The integration time of the functional block 2.</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>NoBeamThreshold1</name>
+         <type>DOUBLE</type>
+         <description>The current threshold (max) of the functional block 1.</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>NoBeamThreshold2</name>
+         <type>DOUBLE</type>
+         <description>The current threshold (max) of the functional block 1.</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>SampleCounter1</name>
+         <type>LONG</type>
+         <description>Sample counter 1.</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>SampleCounter2</name>
+         <type>LONG</type>
+         <description>Sample counter 2.</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>ServiceStarted</name>
+         <type>BOOLEAN</type>
+         <description>Flag indicating if the service is started.</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>ConfigParametersCheckOk</name>
+         <type>BOOLEAN</type>
+         <description>Flag indicating if the Bireu/Baeu is properly configured.</description>
+      </propertyDefinition>
+   </component>
+</propertyDefinitions>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+   xmlns:util="http://www.springframework.org/schema/util"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+      http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+
+   <!-- Treatment Session Mode for BMS Standalone (set to Physics mode) -->
+
+   <bean id="tsmProxy" parent="abstractProxy" class="com.iba.pts.treatmentroomsession.TreatmentSessionModeProxy">
+      <property name="name" value="TSMProxy" />
+      <property name="componentName" value="TSM" />
+   </bean>
+
+   <!-- Treatment Session Mode notification sender for BMS Standalone -->
+
+   <bean id="tsmNotifReceiver" class="com.iba.icomp.comm.notif.NotifChannelReceiver">
+      <property name="name" value="TSMNotificationsReceiver" />
+      <property name="channel" value="TSMNotifications-IBTR3/" />
+      <property name="container" value="BMS-TCR-SERVICE-SCREENS-IBTR3" />
+      <property name="channelStream">
+         <bean class="com.iba.icomp.core.io.SocketChannelStream">
+            <constructor-arg value="10.1.100.13" />
+            <constructor-arg value="18385" />
+         </bean>
+      </property>
+      <property name="eventConverter" ref="eventConverter" />
+      <property name="eventBus" ref="eventBus" />
+      <property name="filter" value="BMS-TCR-SERVICE-SCREENS-IBTR3" />
+   </bean>
+
+   <bean id="tsmCmdSender" class="com.iba.icomp.comm.notif.NotifChannelSender">
+      <property name="name" value="TSMCommandsSender" />
+      <property name="channel" value="TSMCommands-IBTR3" />
+      <property name="container" value="BMS-TCR-SERVICE-SCREENS-IBTR3" />
+      <property name="channelStream">
+         <bean class="com.iba.icomp.core.io.SocketChannelStream">
+            <constructor-arg value="10.1.100.13" />
+            <constructor-arg value="18385" />
+         </bean>
+      </property>
+      <property name="eventConverter" ref="eventConverter" />
+      <property name="filter" value="BMS-TCR-SERVICE-SCREENS-IBTR3" />
+   </bean>
+
+   <!-- Routing maps -->
+   <bean id="tsmProxyEndPoint" class="com.iba.icompx.core.component.EndPointProxy">
+      <property name="component" ref="tsmProxy"/>
+      <property name="outputChannel" ref="tsmCmdSender"/>
+      <property name="inputChannel" ref="tsmNotifReceiver"/>
+      <property name="intermediary" ref="applicationQueue"/>
+   </bean>
+
+</beans>

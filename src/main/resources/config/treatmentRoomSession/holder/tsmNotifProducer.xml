@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+   xmlns:util="http://www.springframework.org/schema/util"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+      http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+
+   <!-- Treatment Session Mode for BMS Standalone (set to Physics mode) -->
+
+   <bean id="tsmComponent" parent="abstractComponent" class="com.iba.pts.treatmentroomsession.TreatmentSessionModeComponent">
+      <property name="name" value="${prop:pts.tsm.origin}" />
+   </bean>
+
+   <!-- Treatment Session Mode notification sender for BMS Standalone -->
+
+   <bean id="tsmCmdReceiver" class="com.iba.icomp.comm.notif.NotifChannelReceiver">
+      <property name="name" value="TSMCommandsReceiver" />
+      <property name="channel" value="${prop:pts.tsm.channel.cmd}" />
+      <property name="container" value="${prop:container.name}" />
+      <property name="channelStream">
+         <bean class="com.iba.icomp.core.io.SocketChannelStream">
+            <constructor-arg value="${prop:comm.notif.address}" />
+            <constructor-arg value="${prop:comm.notif.port}" />
+         </bean>
+      </property>
+      <property name="eventConverter" ref="eventConverter" />
+      <property name="eventBus" ref="eventBus" />
+      <property name="filter" value="${prop:container.name}" />
+   </bean>
+
+   <bean id="tsmNotifSender" class="com.iba.icomp.comm.notif.NotifChannelSender">
+      <property name="name" value="TSMNotificationsSender" />
+      <property name="channel" value="${prop:pts.tsm.channel.notif}" />
+      <property name="container" value="${prop:container.name}" />
+      <property name="channelStream">
+         <bean class="com.iba.icomp.core.io.SocketChannelStream">
+            <constructor-arg value="${prop:comm.notif.address}" />
+            <constructor-arg value="${prop:comm.notif.port}" />
+         </bean>
+      </property>
+      <property name="eventConverter" ref="eventConverter" />
+      <property name="filter" value="${prop:container.name}" />
+   </bean>
+
+   <!-- Routing maps -->
+   <bean id="tsmEndPoint" class="com.iba.icompx.core.component.EndPoint">
+      <property name="component" ref="tsmComponent"/>
+      <property name="outputChannel" ref="tsmNotifSender"/>
+      <property name="inputChannel" ref="tsmCmdReceiver"/>
+      <property name="intermediary" ref="applicationQueue"/>
+   </bean>
+
+</beans>

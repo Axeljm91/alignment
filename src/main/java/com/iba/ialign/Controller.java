@@ -11,12 +11,21 @@ package com.iba.ialign;
 
 //AMO
 
+import com.iba.icomp.core.property.PropertyDefinition;
+import com.iba.icomp.core.property.PropertyDefinitionDictionary;
+import com.iba.pts.bms.bss.esbts.BeamlineSection;
+import com.iba.pts.bms.bss.esbts.solution.RangeConverter;
+import com.iba.pts.bms.common.IrradiationStatus;
+
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeListener;
+
 import com.iba.blak.device.impl.*;
 import com.iba.icomp.core.property.PropertyChangeProvider;
 import com.iba.pts.bms.bss.bps.devices.impl.DegraderBeamStopProxy;
 
+import com.iba.pts.bms.bss.controller.api.BssActivityId;
 import com.iba.pts.bms.bss.controller.api.BssController.OperatingMode;
 //AMO
 
@@ -30,6 +39,7 @@ import com.iba.blakOverwrite.DegraderLegacyBeamProfileMonitor;
 
 //import com.iba.blak.device.impl.LegacyBeamProfileMonitorImpl;
 import com.iba.blakOverwrite.LegacyBeamProfileMonitorImpl;
+import com.iba.tcs.beam.bss.devices.api.Magnet;
 
 //import com.iba.blak.ecubtcu.BlakEcubtcu;
 //import com.iba.blak.ecubtcu.BlakEcubtcuImpl;
@@ -43,23 +53,29 @@ import com.iba.blakOverwrite.blakEcubtcuClient;
 import com.iba.blakOverwrite.blakNotifFeedbackClient;
 import com.iba.blakOverwrite.Beam;
 
+//import com.iba.pts.pms.poss.devices.api.PmsDevice;
+//import com.iba.pts.pms.poss.devices.impl.retractable.RenovatedXrayProxy;
 import com.opcOpenInterface.Rest;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.sikuli.basics.Settings;
 import org.sikuli.script.Screen;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
 import javax.swing.*;
+import javax.swing.Timer;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeSupport;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.Field;
-import java.net.ConnectException;
-import java.util.concurrent.TimeoutException;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.List;
 
 
 /* This object manages the interface b/w the hardware and the rest of the software
@@ -67,174 +83,234 @@ import java.util.concurrent.TimeoutException;
  */
 
 public class Controller implements PropertyChangeListener, PropertyChangeProvider {
-	/**
-	 * The logger. See http://logging.apache.org/log4j/1.2/index.html for more information.
-	 */
-	private static org.apache.log4j.Logger log=Logger.getLogger(new Throwable().getStackTrace()[0].getClassName());
+    /**
+     * The logger. See http://logging.apache.org/log4j/1.2/index.html for more information.
+     */
+    private static org.apache.log4j.Logger log = Logger.getLogger(new Throwable().getStackTrace()[0].getClassName());
 
-    private static DegraderLegacyBeamProfileMonitor    P1E;
-    private static LegacyBeamProfileMonitorImpl        P2E;
-    static public ContinuousDegrader                   DEGRADER;
-    static public DegraderBeamStopProxy                BEAMSTOP;
-    static public BeamCurrentMonitor                   BCM1E;
-    public static BeamStop                             S1E;
-    public static BeamStop                             S2E;
-    private static Slit                                SL1E, SL2E;
+    private static DegraderLegacyBeamProfileMonitor P1E;
+    private static LegacyBeamProfileMonitorImpl P2E;
+    static public ContinuousDegrader DEGRADER;
+    static public DegraderBeamStopProxy BEAMSTOP;
+    static public BeamCurrentMonitor BCM1E;
+    public static BeamStop S1E;
+    public static BeamStop S2E;
+    private static Slit SL1E, SL2E, SL3E;
+
+
     // ESS
-    private static EcubtcuQuadrupole                   Q1E, Q2E, Q3E, Q47E, Q56E, Q8E, Q9E, Q10E;
-    private static EcubtcuDipole                       B1234E;
+    private static EcubtcuQuadrupole Q1E, Q2E, Q3E, Q47E, Q56E, Q8E, Q9E, Q10E;
+    private static EcubtcuDipole B1234E;
     // TR1
-    private static EcubtcuQuadrupole                   Q1B1, Q2B1, Q3B1, Q1F1, Q2F1, Q3F1, Q1N1, Q2N1;
-    private static EcubtcuDipole                       B12B1;
+    private static EcubtcuQuadrupole Q1B1, Q2B1, Q3B1, Q1F1, Q2F1, Q3F1, Q1N1, Q2N1;
+    private static EcubtcuDipole B12B1;
     // SS1
-    private static EcubtcuQuadrupole                   Q1S1, Q2S1, Q3S1, Q4S1, Q5S1;
+    private static EcubtcuQuadrupole Q1S1, Q2S1, Q3S1, Q4S1, Q5S1;
     // TR2
-    private static EcubtcuQuadrupole                   Q1B2, Q2B2, Q3B2, Q1F2, Q2F2, Q3F2, Q1N2, Q2N2, Q1I2, Q2I2, Q3I2, Q4I2, Q5I2;
-    private static EcubtcuDipole                       B12B2, B1I2, B2I2;
+    private static EcubtcuQuadrupole Q1B2, Q2B2, Q3B2, Q1F2, Q2F2, Q3F2, Q1N2, Q2N2, Q1I2, Q2I2, Q3I2, Q4I2, Q5I2;
+    private static EcubtcuDipole B12B2, B1I2, B2I2;
     // SS2
-    private static EcubtcuQuadrupole                   Q1S2, Q2S2, Q3S2, Q4S2, Q5S2;
+    private static EcubtcuQuadrupole Q1S2, Q2S2, Q3S2, Q4S2, Q5S2;
     // TR3
-    private static EcubtcuQuadrupole                   Q1B3, Q2B3, Q3B3, Q1F3, Q2F3, Q3F3, Q1I3, Q2I3, Q3I3, Q4I3, Q5I3;
-    private static EcubtcuDipole                       B12B3, B1I3, B2I3;
+    private static EcubtcuQuadrupole Q1B3, Q2B3, Q3B3, Q1F3, Q2F3, Q3F3, Q1I3, Q2I3, Q3I3, Q4I3, Q5I3;
+    private static EcubtcuDipole B12B3, B1I3, B2I3;
     // SS3
-    private static EcubtcuQuadrupole                   Q1S3, Q2S3, Q3S3, Q4S3, Q5S3;
+    private static EcubtcuQuadrupole Q1S3, Q2S3, Q3S3, Q4S3, Q5S3;
     // TR4
-    private static EcubtcuQuadrupole                   Q1B4, Q2B4, Q3B4, Q1G4, Q2G4, Q3G4, Q4G4, Q5G4, Q1N4, Q2N4;
-    private static EcubtcuDipole                       B12B4, B1G4, B2G4;
+    private static EcubtcuQuadrupole Q1B4, Q2B4, Q3B4, Q1G4, Q2G4, Q3G4, Q4G4, Q5G4, Q1N4, Q2N4;
+    private static EcubtcuDipole B12B4, B1G4, B2G4;
+    private static EcubtcuSteering TRB34E, T1F1, T2F1, T1S1, T2S1, T3S1, T1S2, T2S2, T3S2, T1S3, T2S3, T3S3, TRB2B4, T1B4, T1G4, T2G4;
 
-//    private EcubtcuQuadrupole[]                 BP1Quads   = new EcubtcuQuadrupole[] {Q1B1, Q2B1, Q3B1, Q1F1, Q2F1, Q3F1, Q1N1, Q2N1};
-//    private EcubtcuDipole[]                     BP1Dipoles = new EcubtcuDipole[] {B12B1};
-//    private EcubtcuQuadrupole[]                 BP2Quads   = new EcubtcuQuadrupole[] {Q1S1, Q2S1, Q3S1, Q4S1, Q5S1, Q1B2, Q2B2, Q3B2, Q1F2, Q2F2, Q3F2, Q1N2, Q2N2};
-//    private EcubtcuDipole[]                     BP2Dipoles = new EcubtcuDipole[] {B12B2};
-//    private EcubtcuQuadrupole[]                 BP3Quads   = new EcubtcuQuadrupole[] {Q1S1, Q2S1, Q3S1, Q4S1, Q5S1, Q1B2, Q2B2, Q3B2, Q1I2, Q2I2, Q3I2, Q4I2, Q5I2, Q1N2, Q2N2};
-//    private EcubtcuDipole[]                     BP3Dipoles = new EcubtcuDipole[] {B12B2, B1I2, B2I2};
-//    private EcubtcuQuadrupole[]                 BP4Quads   = new EcubtcuQuadrupole[] {Q1S1, Q2S1, Q3S1, Q4S1, Q5S1, Q1S2, Q2S2, Q3S2, Q4S2, Q5S2, Q1B3, Q2B3, Q3B3, Q1F3, Q2F3, Q3F3};
-//    private EcubtcuDipole[]                     BP4Dipoles = new EcubtcuDipole[] {B12B3};
-//    private EcubtcuQuadrupole[]                 BP5Quads   = new EcubtcuQuadrupole[] {Q1S1, Q2S1, Q3S1, Q4S1, Q5S1, Q1S2, Q2S2, Q3S2, Q4S2, Q5S2, Q1B3, Q2B3, Q3B3, Q1I3, Q2I3, Q3I3, Q4I3, Q5I3};
-//    private EcubtcuDipole[]                     BP5Dipoles = new EcubtcuDipole[] {B12B3, B1I3, B2I3};
-//    private EcubtcuQuadrupole[]                 BP6Quads   = new EcubtcuQuadrupole[] {Q1S1, Q2S1, Q3S1, Q4S1, Q5S1, Q1S2, Q2S2, Q3S2, Q4S2, Q5S2, Q1S3, Q2S3, Q3S3, Q4S3, Q5S3, Q1B4, Q2B4, Q3B4, Q1G4, Q2G4, Q3G4, Q4G4, Q5G4, Q1N4, Q2N4};
-//    private EcubtcuDipole[]                     BP6Dipoles = new EcubtcuDipole[] {B12B4, B1G4, B2G4};
+    private EcubtcuQuadrupole[] ESSQuads = new EcubtcuQuadrupole[]{};
+    private EcubtcuDipole[] ESSDipoles = new EcubtcuDipole[]{};
+    private EcubtcuQuadrupole[] BP1Quads = new EcubtcuQuadrupole[]{};
+    private EcubtcuDipole[] BP1Dipoles = new EcubtcuDipole[]{};
+    private EcubtcuQuadrupole[] BP2Quads = new EcubtcuQuadrupole[]{};
+    private EcubtcuDipole[] BP2Dipoles = new EcubtcuDipole[]{};
+    private EcubtcuQuadrupole[] BP3Quads = new EcubtcuQuadrupole[]{};
+    private EcubtcuDipole[] BP3Dipoles = new EcubtcuDipole[]{};
+    private EcubtcuQuadrupole[] BP4Quads = new EcubtcuQuadrupole[]{};
+    private EcubtcuDipole[] BP4Dipoles = new EcubtcuDipole[]{};
+    private EcubtcuQuadrupole[] BP5Quads = new EcubtcuQuadrupole[]{};
+    private EcubtcuDipole[] BP5Dipoles = new EcubtcuDipole[]{};
+    private EcubtcuQuadrupole[] BP6Quads = new EcubtcuQuadrupole[]{};
+    private EcubtcuDipole[] BP6Dipoles = new EcubtcuDipole[]{};
 
-	private double G11X, G11Y, G12X, G12Y, G21X, G21Y, G22X, G22Y;
-    private double[]    mTargets, mTolerances, mSigmaTarget, mSigmaTolerance, mSafeCurrents;
-    private double[]    mPositions    = new double[4];
-    private double[]    mSigmas       = new double[4];
-    private double[]    mCurrents     = new double[4];
-    private Status      mStatus;
-	private SiteManager siteManager;
-	private TagManager  tagManager;
-	private String mNotifServerAddress ;
+    private EcubtcuQuadrupole[] TR1Quads = new EcubtcuQuadrupole[]{};
+    private EcubtcuDipole[] TR1Dipoles = new EcubtcuDipole[]{};
+    private EcubtcuSteering[] TR1Steering = new EcubtcuSteering[]{};
+    private EcubtcuQuadrupole[] TR4Quads = new EcubtcuQuadrupole[]{};
+    private EcubtcuDipole[] TR4Dipoles = new EcubtcuDipole[]{};
+    private EcubtcuSteering[] TR4Steering = new EcubtcuSteering[]{};
+
+    private Map<String, BeamlineSection> mBeamlineSections = new HashMap<>();
+    private List<BeamlineSection> mSections;
+    private BeamlineSection ess = new BeamlineSection(new ArrayList<>(), new ArrayList<>());
+    private BeamlineSection fbtr1 = new BeamlineSection(new ArrayList<>(), new ArrayList<>());
+
+    private final Map<String, RangeConverter> mRangeConverter = new HashMap<>();
+    private Set<Magnet> mOffMagnets;
+
+    private double G11X, G11Y, G12X, G12Y, G21X, G21Y, G22X, G22Y;
+    private double[] mTargets, mTolerances, mSigmaTarget, mSigmaTolerance, mSafeCurrents;
+    private double[] mPositions = new double[4];
+    private double[] mSigmas = new double[4];
+    private double[] mCurrents = new double[4];
+    private Status mStatus;
+    private SiteManager siteManager;
+    private TagManager tagManager;
+    private String mNotifServerAddress;
     private Rest restManager;
 
     static public Field field[];
-	
-	private boolean isCommandNotifPort = false;
-	private int mNotifPort = 16540;
-	
-	private String mEcubtcuAddress;
 
-    private boolean mFilamentWarningDisplayed  = false;
+    private boolean isCommandNotifPort = false;
+    private int mNotifPort = 16540;
+
+    private String mEcubtcuAddress;
+
+    private boolean mFilamentWarningDisplayed = false;
     private boolean mDeflectorWarningDisplayed = false;
-    private boolean mDeflectorErrorDisplayed   = false;
+    private boolean mDeflectorErrorDisplayed = false;
 
-    static public Device                llrf;
+    static public Device llrf;
 
-    static public Device                acu;
-    static public BcreuHttpDevice       bcreu;
-    static public BeamLine              beamLine    = new BeamLine();
-    static public blakEcubtcuClient     ecubtcu;
+    private File resultsFileTR1 = new File("");
+    private File resultsFileTR4 = new File("");
+    private Timer TR1timer = new Timer(200, null);
+    private Timer TR4timer = new Timer(200, null);
+    private Timer oneHunMils = new Timer(100, null);
+
+
+    static public Device acu;
+    static public Device blpscu;
+    static public BcreuHttpDevice bcreu;
+    static public BeamLine beamLine = new BeamLine();
+    static public blakEcubtcuClient ecubtcu;
     //static public LegacyBeam            legacyBeam  = new LegacyBeam();
-    static public Beam                  beam        = new Beam();
+    static public Beam beam = new Beam();
     static public blakNotifFeedbackClient feedbackClient = new blakNotifFeedbackClient();
 
     public static final int BLOCK_BS = 0;
     public static final int BLOCK_BPM = 1;
     public static final int BLOCK_PT = 2;
- //   static private BlakRtClient     rtClient;
+    //   static private BlakRtClient     rtClient;
 
-    static public int               siteID;
+    static public int siteID;
 
     static private FeedbackConnectionListener connectListener = new FeedbackConnectionListener();
-	
-	private String siteName, siteCode;
 
-	private static int mScreen;
-	private static double mMaxApply, mDeflectorVoltage;
-	//private Screen screen = new Screen(mScreen);
+    private String siteName, siteCode;
 
-	private Color color1;
-	private Color color2;
-	private Color color3;
-	private Color color4;
+    private static int mScreen;
+    private static double mMaxApply, mDeflectorVoltage;
+    //private Screen screen = new Screen(mScreen);
+
+    private Color color1;
+    private Color color2;
+    private Color color3;
+    private Color color4;
 
     public static boolean aligned = false;
 
-	//private Region measurement = new Region(25,75,800,75);
+    public int burnInStep[] = {0, 125, 135, 145, 155, 165, 175, 185, 190, 195, 190, 85};
+    //public int burnInStepArc = 85; // burnInStep[11]
 
-	public Controller() {
-	}
+    //private Region measurement = new Region(25,75,800,75);
+
+    public Controller() {
+    }
 
     public static void stopAlignment() {
-	    aligned = true;
+        aligned = true;
     }
 
     public static double getMaxApply() {
-	    return mMaxApply;
+        return mMaxApply;
     }
 
     public static Double[] setDeflectorVoltage(Double[] mins) {
-	    mins[0] = mDeflectorVoltage - 0.1;
-	    mins[1] = mDeflectorVoltage - 0.5;
+        mins[0] = mDeflectorVoltage - 0.2;
+        mins[1] = mDeflectorVoltage - 0.5;
 
-	    return mins;
+        return mins;
     }
 
-    public void setNotifPort(int nPort)
-	{
-		mNotifPort = nPort;
-		isCommandNotifPort = true;
-	}
+    public static void selectBP(int bp) {
+        //if (getSelectedBeamline() != bp) {
 
-	public void initialize(){
-		this.siteManager = SiteManager.getSiteManager();
-		this.tagManager = TagManager.getTagManager();
-		log.debug("Loading the tags");
+        //}
+    }
+
+    public void setNotifPort(int nPort) {
+        mNotifPort = nPort;
+        isCommandNotifPort = true;
+    }
+
+    public void initialize() {
+        this.siteManager = SiteManager.getSiteManager();
+        this.tagManager = TagManager.getTagManager();
+        log.debug("Loading the tags");
 //	    tagManager.buildTagsFromStream(ClassLoader.getSystemResourceAsStream("xml/tags.xml"));
-		
-		try
-	      {
-			Resource res = new ClassPathResource("xml/tags.xml");
-			tagManager.buildTagsFromStream(res.getInputStream());
-	      }
-	      catch (IOException e)
-	      {
-	         log.info("Read file error: " + e.getMessage());
-	         return;
-	      }
-		
-		log.debug("Loading the sites");
-		
-		Site firstSite;
 
+        String pattern = "MM-dd";
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+        String date = simpleDateFormat.format(new Date());
+        resultsFileTR1 = new File("./MagnetDump/BeamlineFeedback-FBTR1-" + date + ".csv");
+        resultsFileTR4 = new File("./MagnetDump/BeamlineFeedback-GTR4-" + date + ".csv");
 
-				
+        TR1timer = new Timer(200, new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                csvWriteFeedbacksTR1(resultsFileTR1);
+            }
+        });
+        TR1timer.setRepeats(true);
+
+        TR4timer = new Timer(200, new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                csvWriteFeedbacksTR4(resultsFileTR4);
+            }
+        });
+        TR4timer.setRepeats(true);
+
+        try {
+            Resource res = new ClassPathResource("xml/tags.xml");
+            tagManager.buildTagsFromStream(res.getInputStream());
+        } catch (IOException e) {
+            log.info("Read file error: " + e.getMessage());
+            return;
+        }
+
+        try {
+            propertySourcesPlaceholderConfigurer();
+            log.info("Site-config jar read in successfully.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
+        }
+
+        log.debug("Loading the sites");
+
+        Site firstSite;
+
 //		FileInputStream siteConfig = new FileInputStream("./siteconfig.xml");
-		try
-	      {
+        try {
 //			FileInputStream siteConfig = new FileInputStream("./siteconfig-local.xml");
-			FileInputStream siteConfig = new FileInputStream("./siteconfig.xml");
-		//	Resource res = new ClassPathResource("sites/siteconfig.xml");
-		//	siteManager.buildSitesFromStream(res.getInputStream());
-			siteManager.buildSitesFromStream(siteConfig);
-			if (siteManager.getSites().size() > 1) {
+            FileInputStream siteConfig = new FileInputStream("./siteconfig.xml");
+            //	Resource res = new ClassPathResource("sites/siteconfig.xml");
+            //	siteManager.buildSitesFromStream(res.getInputStream());
+            siteManager.buildSitesFromStream(siteConfig);
+            if (siteManager.getSites().size() > 1) {
                 log.info("there are more than 1 site in the siteConfig.xml, the default site would be the first site in the file.");
             }
-			
-			firstSite = siteManager.getFirstSite();
-            
-            siteName    = firstSite.getName();
-            siteID      = firstSite.getID();
-            siteCode    = firstSite.getCode();
+
+            firstSite = siteManager.getFirstSite();
+
+            siteName = firstSite.getName();
+            siteID = firstSite.getID();
+            siteCode = firstSite.getCode();
             G11X = firstSite.getG11x();
             G12X = firstSite.getG12x();
             G21X = firstSite.getG21x();
@@ -243,80 +319,70 @@ public class Controller implements PropertyChangeListener, PropertyChangeProvide
             G12Y = firstSite.getG12y();
             G21Y = firstSite.getG21y();
             G22Y = firstSite.getG22y();
-            mNotifServerAddress = firstSite.getNotifServerAddress() ;
-            if(!isCommandNotifPort)
-            {
-            	mNotifPort =firstSite.getNotifPort() ;
-            	log.info("get notif port from siteConfig.xml which is " + mNotifPort);
+            mNotifServerAddress = firstSite.getNotifServerAddress();
+            if (!isCommandNotifPort) {
+                mNotifPort = firstSite.getNotifPort();
+                log.info("get notif port from siteConfig.xml which is " + mNotifPort);
+            } else {
+                log.info("get notif port from command line which is " + mNotifPort);
             }
-            else
-            {
-            	log.info("get notif port from command line which is " + mNotifPort);
-            }
-            
-            mEcubtcuAddress   = firstSite.getEcubtcuAddress();
-            mTargets          = firstSite.getBpmTargets();
-            mTolerances       = firstSite.getBpmTolerances();
-            mSigmaTarget      = firstSite.getSigmaTargets();
-            mSigmaTolerance   = firstSite.getSigmaTolerances();
-            mScreen           = firstSite.getScreen();
-            mSafeCurrents     = firstSite.getSafeCurrents();
-            mMaxApply         = firstSite.getMaxCurrentChange();
+
+            mEcubtcuAddress = firstSite.getEcubtcuAddress();
+            mTargets = firstSite.getBpmTargets();
+            mTolerances = firstSite.getBpmTolerances();
+            mSigmaTarget = firstSite.getSigmaTargets();
+            mSigmaTolerance = firstSite.getSigmaTolerances();
+            mScreen = firstSite.getScreen();
+            mSafeCurrents = firstSite.getSafeCurrents();
+            mMaxApply = firstSite.getMaxCurrentChange();
             mDeflectorVoltage = firstSite.getDeflectorVoltage();
 
-	      }
-		catch (FileNotFoundException e)
-		{
-			log.info("Cannot find the file siteConfig.xml." );
-			return ;
-		}
-		
-		log.debug("Loading beamline from " + firstSite.getBeamLine());
-		
-		
-		
-		
-		  
-		
-		try
-		{
-			beamLine.loadFromFile(firstSite.getBeamLine());
-			
+        } catch (FileNotFoundException e) {
+            log.info("Cannot find the file siteConfig.xml.");
+            return;
+        }
+
+        log.debug("Loading beamline from " + firstSite.getBeamLine());
+
+
+        try {
+            beamLine.loadFromFile(firstSite.getBeamLine());
+
             ecubtcu = new blakEcubtcuClient();
-            ecubtcu.setEcubtcuAddress(mEcubtcuAddress);            
+            ecubtcu.setEcubtcuAddress(mEcubtcuAddress);
             //            Resource ecubtcuResource = new ClassPathResource("x/ecubtcu" + siteCode + ".x");
             Resource ecubtcuResource = new ClassPathResource("x/ecubtcu.x");
             ((blakEcubtcuClient) ecubtcu).setRpcProgrameFile(ecubtcuResource);
-            
+
             feedbackClient.setNotifServerAddress(mNotifServerAddress);
             feedbackClient.setNotifServerPort(mNotifPort);
             setFeedbackClient();
-		}
-		catch (FileNotFoundException e)
-        {
-           log.error("File not found : " + firstSite.getBeamLine());
+        } catch (FileNotFoundException e) {
+            log.error("File not found : " + firstSite.getBeamLine());
+        } catch (IOException e) {
+            log.error("Error reading " + firstSite.getBeamLine() + " file.");
+        } catch (Exception e) {
+            log.error("set rpc program file error");
+            e.printStackTrace();
         }
-        catch (IOException e)
-        {
-           log.error("Error reading " + firstSite.getBeamLine() + " file.");
-        }
-		catch (Exception e)
-		{
-			log.error("set rpc program file error");
-		}
 
 
-		//llrf = siteManager.getSite(siteName).getDevice("llrf");
+        //llrf = siteManager.getSite(siteName).getDevice("llrf");
 
         acu = siteManager.getSite(siteName).getDevice("acu230");
+        //blpscu = siteManager.getSite(siteName).getDevice("blpscu");
 
         bcreu = (BcreuHttpDevice) siteManager.getSite(siteName).getDevice("bcreu-http");
 
-        if(!acu.isConnected()) 
-        	acu.connect();
+//        if(!acu.isConnected()) {
+//            acu.connect();
+//        }
+
+        //if(!blpscu.isConnected()) {
+        //    blpscu.connect();
+        //}
 
         bcreu.connect();
-
 
 
         try {
@@ -329,6 +395,7 @@ public class Controller implements PropertyChangeListener, PropertyChangeProvide
             S2E = (BeamStop) beamLine.getElement("S2E");
             SL1E = (Slit) beamLine.getElement("SL1E");
             SL2E = (Slit) beamLine.getElement("SL2E");
+            SL3E = (Slit) beamLine.getElement("SL3E");
 
             // ESS magnets
             Q1E = (EcubtcuQuadrupole) beamLine.getElement("Q1E");
@@ -342,6 +409,9 @@ public class Controller implements PropertyChangeListener, PropertyChangeProvide
 
             B1234E = (EcubtcuDipole) beamLine.getElement("B1234E");
 
+            ESSDipoles = new EcubtcuDipole[]{B1234E};
+            ESSQuads = new EcubtcuQuadrupole[]{Q1E, Q2E, Q3E, Q47E, Q56E, Q8E, Q9E, Q10E};
+
             // TR 1 magnets
             Q1B1 = (EcubtcuQuadrupole) beamLine.getElement("Q1B1");
             Q2B1 = (EcubtcuQuadrupole) beamLine.getElement("Q2B1");
@@ -353,6 +423,9 @@ public class Controller implements PropertyChangeListener, PropertyChangeProvide
             Q2N1 = (EcubtcuQuadrupole) beamLine.getElement("Q2N1");
 
             B12B1 = (EcubtcuDipole) beamLine.getElement("B12B1");
+
+            BP1Quads = new EcubtcuQuadrupole[]{Q1B1, Q2B1, Q3B1, Q1F1, Q2F1, Q3F1, Q1N1, Q2N1};
+            BP1Dipoles = new EcubtcuDipole[]{B12B1};
 
             // SS 1 magnets
             Q1S1 = (EcubtcuQuadrupole) beamLine.getElement("Q1S1");
@@ -380,6 +453,11 @@ public class Controller implements PropertyChangeListener, PropertyChangeProvide
             B1I2 = (EcubtcuDipole) beamLine.getElement("B1I2");
             B2I2 = (EcubtcuDipole) beamLine.getElement("B2I2");
 
+            BP2Quads = new EcubtcuQuadrupole[]{Q1S1, Q2S1, Q3S1, Q4S1, Q5S1, Q1B2, Q2B2, Q3B2, Q1F2, Q2F2, Q3F2, Q1N2, Q2N2};
+            BP2Dipoles = new EcubtcuDipole[]{B12B2};
+            BP3Quads = new EcubtcuQuadrupole[]{Q1S1, Q2S1, Q3S1, Q4S1, Q5S1, Q1B2, Q2B2, Q3B2, Q1I2, Q2I2, Q3I2, Q4I2, Q5I2, Q1N2, Q2N2};
+            BP3Dipoles = new EcubtcuDipole[]{B12B2, B1I2, B2I2};
+
             // SS 2 magnets
             Q1S2 = (EcubtcuQuadrupole) beamLine.getElement("Q1S2");
             Q2S2 = (EcubtcuQuadrupole) beamLine.getElement("Q2S2");
@@ -404,6 +482,11 @@ public class Controller implements PropertyChangeListener, PropertyChangeProvide
             B1I3 = (EcubtcuDipole) beamLine.getElement("B1I3");
             B2I3 = (EcubtcuDipole) beamLine.getElement("B2I3");
 
+            BP4Quads = new EcubtcuQuadrupole[]{Q1S1, Q2S1, Q3S1, Q4S1, Q5S1, Q1S2, Q2S2, Q3S2, Q4S2, Q5S2, Q1B3, Q2B3, Q3B3, Q1F3, Q2F3, Q3F3};
+            BP4Dipoles = new EcubtcuDipole[]{B12B3};
+            BP5Quads = new EcubtcuQuadrupole[]{Q1S1, Q2S1, Q3S1, Q4S1, Q5S1, Q1S2, Q2S2, Q3S2, Q4S2, Q5S2, Q1B3, Q2B3, Q3B3, Q1I3, Q2I3, Q3I3, Q4I3, Q5I3};
+            BP5Dipoles = new EcubtcuDipole[]{B12B3, B1I3, B2I3};
+
             // SS 3 magnets
             Q1S3 = (EcubtcuQuadrupole) beamLine.getElement("Q1S3");
             Q2S3 = (EcubtcuQuadrupole) beamLine.getElement("Q2S3");
@@ -424,14 +507,48 @@ public class Controller implements PropertyChangeListener, PropertyChangeProvide
             Q2N4 = (EcubtcuQuadrupole) beamLine.getElement("Q2N4");
 
             B12B4 = (EcubtcuDipole) beamLine.getElement("B12B4");
-            B1G4  = (EcubtcuDipole) beamLine.getElement("B1G4");
-            B2G4  = (EcubtcuDipole) beamLine.getElement("B2G4");
+            B1G4 = (EcubtcuDipole) beamLine.getElement("B1G4");
+            B2G4 = (EcubtcuDipole) beamLine.getElement("B2G4");
+
+            BP6Quads = new EcubtcuQuadrupole[]{Q1S1, Q2S1, Q3S1, Q4S1, Q5S1, Q1S2, Q2S2, Q3S2, Q4S2, Q5S2, Q1S3, Q2S3, Q3S3, Q4S3, Q5S3, Q1B4, Q2B4, Q3B4, Q1G4, Q2G4, Q3G4, Q4G4, Q5G4, Q1N4, Q2N4};
+            BP6Dipoles = new EcubtcuDipole[]{B12B4, B1G4, B2G4};
+
+            // Trim/steering magnets TR1/TR4 full
+            TRB34E = (EcubtcuSteering) beamLine.getElement("TRB34E");
+            T1F1 = (EcubtcuSteering) beamLine.getElement("T1F1");
+            T2F1 = (EcubtcuSteering) beamLine.getElement("T2F1");
+            T1S1 = (EcubtcuSteering) beamLine.getElement("T1S1");
+            T2S1 = (EcubtcuSteering) beamLine.getElement("T2S1");
+            T3S1 = (EcubtcuSteering) beamLine.getElement("T3S1");
+            T1S2 = (EcubtcuSteering) beamLine.getElement("T1S2");
+            T2S2 = (EcubtcuSteering) beamLine.getElement("T2S2");
+            T3S2 = (EcubtcuSteering) beamLine.getElement("T3S2");
+            T1S3 = (EcubtcuSteering) beamLine.getElement("T1S3");
+            T2S3 = (EcubtcuSteering) beamLine.getElement("T2S3");
+            T3S3 = (EcubtcuSteering) beamLine.getElement("T3S3");
+            TRB2B4 = (EcubtcuSteering) beamLine.getElement("TRB2B4");
+            T1B4 = (EcubtcuSteering) beamLine.getElement("T1B4");
+            T1G4 = (EcubtcuSteering) beamLine.getElement("T1G4");
+            T2G4 = (EcubtcuSteering) beamLine.getElement("T2G4");
+
+            TR1Steering = new EcubtcuSteering[]{TRB34E, T1F1, T2F1};
+            TR1Quads = (EcubtcuQuadrupole[]) ArrayUtils.addAll(ESSQuads, BP1Quads);
+            TR1Dipoles = (EcubtcuDipole[]) ArrayUtils.addAll(ESSDipoles, BP1Dipoles);
+
+            TR4Steering = new EcubtcuSteering[]{TRB34E, T1S1, T2S1, T3S1, T1S2, T2S2, T3S2, T1S3, T2S3, T3S3, TRB2B4, T1B4, T1G4, T2G4};
+            TR4Quads = (EcubtcuQuadrupole[]) ArrayUtils.addAll(ESSQuads, BP6Quads);
+            TR4Dipoles = (EcubtcuDipole[]) ArrayUtils.addAll(ESSDipoles, BP6Dipoles);
 
 
+            mBeamlineSections.put("ESS", ess);
+            mBeamlineSections.put("FBTR1", fbtr1);
 
-//            for (int i = 19; i< 27; i++) {
-//                log.error(field[i].getName());
-//            }
+
+            // mSections.add(ess);
+            // mSections.add(fbtr1);
+
+            // Beamline mBeamlineBP1 = new Beamline("FBTR1", 1, 1, mRangeConverter, mSections, mOffMagnets);
+
 
         } catch (BeamLineElementNotFoundException e) {
             log.error("Not all necessary elements are defined: " + e);
@@ -439,11 +556,33 @@ public class Controller implements PropertyChangeListener, PropertyChangeProvide
 
         field = Controller.class.getDeclaredFields();
 
+        //updateBurnInSteps();
+
         restManager = new Rest();
 
-		log.info("Aye aye, Sir. I'll align your beam !");
+        log.info("Aye aye, Sir. I'll align your beam !");
         mStatus = new Status();
-	}
+    }
+
+    private void updateBurnInSteps() {
+        //burnInStep = new int[19];
+//	    for (int i = 1; i <= 18; i++ ){
+//	        burnInStep[i] = 0;
+//        }
+
+//        burnInStep[0]  = 0;
+//        burnInStep[1]  = 125;
+//        burnInStep[2]  = 135;
+//        burnInStep[3]  = 145;
+//        burnInStep[4]  = 155;
+//        burnInStep[5]  = 165;
+//        burnInStep[6]  = 175;
+//        burnInStep[7]  = 185;
+//        burnInStep[8]  = 190;
+//        burnInStep[9]  = 195;
+//        burnInStep[10] = 190;
+//        burnInStep[11] = 85;
+    }
 
     public Status checkBcreu() {
         String str = bcreu.getBcreuConnection();
@@ -454,15 +593,20 @@ public class Controller implements PropertyChangeListener, PropertyChangeProvide
         if (bool) {
             str = bcreu.getPulseSource();
             //str = bcreu.getPulseSource(beam.isSinglePulseMode());
-            mStatus.set(Status.PULSESOURCE, str, str.equalsIgnoreCase("Internal: Continuous"));
+            if (Gui.mEsbtsPanel.mSelectBeamlinePanel.mContinuousBeamCB.isSelected()) {
+                mStatus.set(Status.PULSESOURCE, str, str.equalsIgnoreCase("TR3"));
+            }else{
+                mStatus.set(Status.PULSESOURCE, str, str.equalsIgnoreCase("Internal: Continuous") || str.equalsIgnoreCase("Internal: Single"));
+            }
         } else {
             str = bcreu.getPulseSource(beam.isSinglePulseMode());
             //str = bcreu.getPulseSource();
             mStatus.set(Status.PULSESOURCE, str, str.equalsIgnoreCase("Internal: Continuous"));
         }
         mStatus.set(Status.BCREU_STATE, bcreu.getRunningState(), bcreu.getRunningStateColor(false));
-        mStatus.set(Status.MAX_BEAM, bcreu.getMaxBeam(), 9.6d);
-        mStatus.set(Status.IC_CYCLO, bcreu.getIcCyclo(), 4.3d);
+        mStatus.set(Status.MAX_BEAM, bcreu.getMaxBeam(), Double.parseDouble(Gui.getEsbtsPanel().mSelectBeamlinePanel.mBeamCurrentTextField.getText()) - 0.3d, Double.parseDouble(Gui.getEsbtsPanel().mSelectBeamlinePanel.mBeamCurrentTextField.getText()) + 0.3d);
+        mStatus.set(Status.IC_CYCLO, bcreu.getIcCyclo(), (Double.parseDouble(Gui.getEsbtsPanel().mSelectBeamlinePanel.mBeamCurrentTextField.getText())*0.4d) - 0.5d, Double.parseDouble(Gui.getEsbtsPanel().mSelectBeamlinePanel.mBeamCurrentTextField.getText()) + 0.5d);
+
 
         return mStatus;
     }
@@ -498,40 +642,48 @@ public class Controller implements PropertyChangeListener, PropertyChangeProvide
     /* Should connect to ECUBTCU prior to calling check() */
     public Status checkStatus() {
 //        if (!feedbackClient.isInitialized()) {
- //           feedbackClient.retreiveMcrFeedbacks();
-  //      }
-    	
-    	feedbackClient.retreiveMcrFeedbacks();
-    	
+        //           feedbackClient.retreiveMcrFeedbacks();
+        //      }
+
+        //feedbackClient.retreiveMcrFeedbacks();
+
         // BeamLine Elements
-        mStatus.set(Status.P1E_STATUS, P1E);
+        //mStatus.set(Status.P1E_STATUS, P1E);
         mStatus.set(Status.S2E_STATUS, S2E.getPosition());
-        mStatus.set(Status.SL1E_STATUS, SL1E.getPosisionFeedback(), 49.0d);
-        mStatus.set(Status.SL2E_STATUS, SL2E.getPosisionFeedback(), 49.0d);
-        mStatus.set(Status.P2E_STATUS, P2E);
-        Double dval = Math.abs(Q1E.getCurrentFeedback()) + Math.abs(Q2E.getCurrentFeedback()) + Math.abs(Q3E.getCurrentFeedback());
-        Boolean bval = dval > 1;
-        mStatus.set(Status.ESS_MAGNETS, bval ? "ON" : "OFF", !bval);
+        mStatus.set(Status.SL1E_STATUS, SL1E.getPosisionSetpoint(), Double.parseDouble(Gui.getEsbtsPanel().mSelectBeamlinePanel.mSLE1TextField.getText()) - 1.0d, Double.parseDouble(Gui.getEsbtsPanel().mSelectBeamlinePanel.mSLE1TextField.getText()) + 1.0d);
+        mStatus.set(Status.SL2E_STATUS, SL2E.getPosisionSetpoint(), Double.parseDouble(Gui.getEsbtsPanel().mSelectBeamlinePanel.mSLE2TextField.getText()) - 1.0d, Double.parseDouble(Gui.getEsbtsPanel().mSelectBeamlinePanel.mSLE2TextField.getText()) + 1.0d);
+        mStatus.set(Status.SL3E_STATUS, SL3E.getPosisionSetpoint(), Double.parseDouble(Gui.getEsbtsPanel().mSelectBeamlinePanel.mSLE3TextField.getText()) - 1.0d, Double.parseDouble(Gui.getEsbtsPanel().mSelectBeamlinePanel.mSLE3TextField.getText()) + 1.0d);
+        try {
+            Boolean bval = restManager.getVariable(Status.SMPS_ON).get("value").getAsBoolean();
+            mStatus.set(Status.SCAN_MAGNETS, bval ? "Standby" : "ON", !bval);
+            //log.warn(restManager.getVariable(Status.SMPS_ON).get("value").getAsBoolean());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        //mStatus.set(Status.P2E_STATUS, P2E);
+        //Double dval = Math.abs(Q1E.getCurrentFeedback()) + Math.abs(Q2E.getCurrentFeedback()) + Math.abs(Q3E.getCurrentFeedback());
+        //Boolean bval = dval > 1;
+        //mStatus.set(Status.ESS_MAGNETS, bval ? "ON" : "OFF", !bval);
 
 
-        mCurrents = getCurrents();
+        //mCurrents = getCurrents();
         // Magnets
-        for (int i = 0; i < Status.Magnet_names.length; i++) {
-            mStatus.set(i + Status.MAGNET_OFFSET, mCurrents[i], (Boolean) acu.getTagValue(Status.Magnet_reg[i]));
-        }
-
-        for (int i = 0; i < Status.Cyclo_read.length; i++) {
-            mStatus.set(i + Status.CYCLO_OFFSET, (Double) acu.getTagValue(Status.Cyclo_read[i]));
-        }
-
-        //MC tuning tab
-        for (int i = 0; i < Status.CycloTuning_read.length; i++) {
-            mStatus.set(i + Status.CYCLOTUNING_OFFSET, (Double) acu.getTagValue(Status.CycloTuning_read[i]));
-        }
-
-        for (int i = 0; i < Status.LLRF_read.length; i++) {
-            mStatus.set(i + Status.LLRFTUNING_OFFSET, (Double) acu.getTagValue(Status.LLRF_read[i]));
-        }
+//        for (int i = 0; i < Status.Magnet_names.length; i++) {
+//            mStatus.set(i + Status.MAGNET_OFFSET, mCurrents[i], (Boolean) acu.getTagValue(Status.Magnet_reg[i]));
+//        }
+//
+//        for (int i = 0; i < Status.Cyclo_read.length; i++) {
+//            mStatus.set(i + Status.CYCLO_OFFSET, (Double) acu.getTagValue(Status.Cyclo_read[i]));
+//        }
+//
+//        //MC tuning tab
+//        for (int i = 0; i < Status.CycloTuning_read.length; i++) {
+//            mStatus.set(i + Status.CYCLOTUNING_OFFSET, (Double) acu.getTagValue(Status.CycloTuning_read[i]));
+//        }
+//
+//        for (int i = 0; i < Status.LLRF_read.length; i++) {
+//            mStatus.set(i + Status.LLRFTUNING_OFFSET, (Double) acu.getTagValue(Status.LLRF_read[i]));
+//        }
 
         // For filament resistance calculation -AMO
         //mStatus.set(Status.CYCLO_OFFSET+1, ((Double)acu.getTagValue((Status.Cyclo_read[4]))/((Double)acu.getTagValue(Status.Cyclo_read[2]))));
@@ -560,24 +712,29 @@ public class Controller implements PropertyChangeListener, PropertyChangeProvide
                 ecubtcu.connect();
                 Thread.sleep(100);
             }
- //           ecubtcu.iseuRequestSetEndOfTreatmentMode();
-            if (P2E.getPosition() != Insertable.Position.RETRACTED){
-            	ecubtcu.bpmRetract("P2E");
-            }
+            //           ecubtcu.iseuRequestSetEndOfTreatmentMode();
+//            if (P2E.getPosition() != Insertable.Position.RETRACTED) {
+//                ecubtcu.bpmRetract("P2E");
+//            }
+
+//            if (bcreu.isConnected()){
+//                bcreu.disconnect();
+//            }
 
             // Added for 30 degree beamlines, set-range will fail
             // without explicit in command on S2E since there is no TR BS at 30
             ecubtcu.bsInsert("S2E");
-            beam.bpsController.startIdleActivity();
-            beam.bpsController.proxyPublish();
+
+//            beam.bpsController.startIdleActivity();
+//            beam.bpsController.proxyPublish();
 
 
         } catch (EcubtcuCommandException e) {
             log.error(e);
         } catch (EcubtcuNotConnectedException e) {
             log.error(e);
-        //} catch (EcubtcuException e) {
-           // log.error(e);
+            //} catch (EcubtcuException e) {
+            // log.error(e);
         } catch (InterruptedException e) {
             log.error(e);
         }
@@ -585,9 +742,8 @@ public class Controller implements PropertyChangeListener, PropertyChangeProvide
     }
 
 
-	public void prepareForAlignment(){
-        try
-        {
+    public void prepareForAlignment() {
+        try {
             if (!ecubtcu.isConnected()) {
                 ecubtcu.connect();
                 Thread.sleep(100);
@@ -597,35 +753,39 @@ public class Controller implements PropertyChangeListener, PropertyChangeProvide
                 Thread.sleep(100);
             }
             if (!mStatus.getBool(Status.P1E_STATUS)) {
-                if (mStatus.getString(Status.P1E_STATUS).equalsIgnoreCase("UNKNOWN")){
+                if (mStatus.getString(Status.P1E_STATUS).equalsIgnoreCase("UNKNOWN")) {
 //                    P1E.getDegrader().goHome();
-                	ecubtcu.degraderGoHome();
-                } 
-                else 
-                {
+                    ecubtcu.degraderGoHome();
+                } else {
                     //                   P1E.insert();
-                	ecubtcu.degraderGoSpecialBlock(BLOCK_BPM);
+                    ecubtcu.degraderGoSpecialBlock(BLOCK_BPM);
                 }
             }
             if (!mStatus.getBool(Status.SL1E_STATUS)) {
 //                SL1E.setPosition(40.0d);
-            	ecubtcu.slitsGoMm("SL1E", 50.0);
+                ecubtcu.slitsGoMm("SL1E", 50.0);
             }
             if (!mStatus.getBool(Status.SL2E_STATUS)) {
 //                SL2E.setPosition(40.0d);
-            	ecubtcu.slitsGoMm("SL2E", 50.0);
+                ecubtcu.slitsGoMm("SL2E", 50.0);
             }
-            if (!mStatus.getBool(Status.P2E_STATUS)) {
+            //if (!mStatus.getBool(Status.P2E_STATUS)) {
 //                P2E.insert();
-            	ecubtcu.bpmInsert("P2E");
-            	
-            }
+            //	ecubtcu.bpmInsert("P2E");
+
+            //}
             // for this part, need to clear with site how to prepare beam. please refer to the code in BCP.
-            if (!beam.bcreu.isLookupValid()) 
-            {
+            if (!beam.bcreu.isLookupValid()) {
                 log.info("Performing BCREU/ISEU lookup");
                 beam.bpsController.startPrepareActivity(-1, 10.0);
                 beam.bpsController.proxyPublish();
+                //beam.bcreu.startBeamPulses();
+                //had to add for PTS-8.6.5+ for prs-103037
+                while (bcreu.getRunningState() != "Regulating") {
+                    Thread.sleep(500);
+                }
+                beam.bcreu.setContinuousPulse(true);
+                beam.bcreu.proxyPublish();
 
 /*               beam.requestMaxBeamCurrent(-1, 10.0);
                  log.info("prepare bcreu/isue lookup with 10mA for mcr.");
@@ -658,10 +818,10 @@ public class Controller implements PropertyChangeListener, PropertyChangeProvide
             }
 */
 
-           if (!mStatus.getBool(Status.S2E_STATUS)) {
+            if (!mStatus.getBool(Status.S2E_STATUS)) {
                 //S2E.retract();
                 //ecubtcu.bsInsert("S2E");
-                   ecubtcu.bsRetract("S2E");
+                ecubtcu.bsRetract("S2E");
 
 //                   log.warn("Retracting S2E");
 //
@@ -689,12 +849,11 @@ public class Controller implements PropertyChangeListener, PropertyChangeProvide
         } finally {
 
         }
-	}
+    }
 
 
-    public void prepareForTune(){
-        try
-        {
+    public void prepareForTune() {
+        try {
             if (!ecubtcu.isConnected()) {
                 ecubtcu.connect();
                 Thread.sleep(100);
@@ -706,14 +865,18 @@ public class Controller implements PropertyChangeListener, PropertyChangeProvide
 
             ecubtcu.degraderGoSpecialBlock(BLOCK_BS);
 
+            log.info("[TUNE] Moving degrader to beamstop.");
+
             while (DEGRADER.getStatus() != Degrader.STATUS_AT_BS) {
                 Thread.sleep(100);
             }
 
+            log.info("[TUNE] Degrader has reached beamstop position.");
+
             //Set max voltage to satisfy LLRF proxy req
             if (beam.llrf.getMaxVoltage() != 56) {
                 beam.llrf.setMaxVoltage(56);
-                log.warn("LLRF max voltage set to " + beam.llrf.getMaxVoltage() + "kV");
+                log.warn("[TUNE] LLRF max voltage set to " + beam.llrf.getMaxVoltage() + "kV");
             }
 
             //log.warn(beam.llrf.isRfOn());
@@ -722,13 +885,13 @@ public class Controller implements PropertyChangeListener, PropertyChangeProvide
             //Set VDee2 voltage
             if (beam.llrf.getDeeVoltage2() < 55.8) {
                 beam.llrf.setDeeVoltage2(56.00);
-                log.warn("VDee2 set to 56.00kV");
+                log.warn("[TUNE] VDee2 set to 56.00kV");
                 beam.llrf.proxyPublish();
             }
 
             //Read back VDee2 voltage
-            if (beam.llrf.getDeeVoltage2() > 55.8){
-                log.warn("VDee2 is at " + beam.llrf.getDeeVoltage2() + "kV");
+            if (beam.llrf.getDeeVoltage2() > 55.8) {
+                log.warn("[TUNE] VDee2 is at " + beam.llrf.getDeeVoltage2() + "kV");
             }
 
             //Measure beam current on S1E
@@ -742,10 +905,66 @@ public class Controller implements PropertyChangeListener, PropertyChangeProvide
         }
     }
 
+    public void S1EvsICC(double beamCurrent) {
+        try {
+            if (!ecubtcu.isConnected()) {
+                ecubtcu.connect();
+                Thread.sleep(100);
+            }
+            if (!bcreu.isConnected()) {
+                bcreu.connect();
+                Thread.sleep(100);
+            }
+
+            ecubtcu.degraderGoSpecialBlock(BLOCK_BS);
+
+            log.info("[S1EvsICC] Moving degrader to beamstop.");
+
+            while (DEGRADER.getStatus() != Degrader.STATUS_AT_BS) {
+                Thread.sleep(100);
+            }
+
+            log.info("[S1EvsICC] Degrader has reached beamstop position.");
+
+            beam.bpsController.startPrepareActivity(-1, beamCurrent);
+
+            log.info("[S1EvsICC] Preparing BCREU for " + beamCurrent + "nA, TRNB: -1");
+
+            //Set max voltage to satisfy LLRF proxy req
+//            if (beam.llrf.getMaxVoltage() != 56) {
+//                beam.llrf.setMaxVoltage(56);
+//                log.warn("[S1EvsICC] LLRF max voltage set to " + beam.llrf.getMaxVoltage() + "kV");
+//            }
+
+            //log.warn(beam.llrf.isRfOn());
+            //log.warn(beam.llrf.isRfStandby());
+
+            //Set VDee2 voltage
+//            if (beam.llrf.getDeeVoltage2() < 55.8) {
+//                beam.llrf.setDeeVoltage2(56.00);
+//                log.warn("[TUNE] VDee2 set to 56.00kV");
+//                beam.llrf.proxyPublish();
+//            }
+
+            //Read back VDee2 voltage
+//            if (beam.llrf.getDeeVoltage2() > 55.8){
+//                log.warn("[TUNE] VDee2 is at " + beam.llrf.getDeeVoltage2() + "kV");
+//            }
+
+            //Measure beam current on S1E
+
+        } catch (EcubtcuCommandException e) {
+            log.error(e);
+        } catch (EcubtcuNotConnectedException e) {
+            log.error(e);
+        } catch (InterruptedException e) {
+            log.error(e);
+        }
+    }
 
 
-
-    /** arraySubtract performs an element-by-element subtraction of two arrays of the same size.
+    /**
+     * arraySubtract performs an element-by-element subtraction of two arrays of the same size.
      *
      * @param a Minuend
      * @param b Subtrahend
@@ -764,47 +983,48 @@ public class Controller implements PropertyChangeListener, PropertyChangeProvide
         }
     }
 
-    public double[] getPositions(){
+    public double[] getPositions() {
         return mPositions;
     }
 
-    public double[] getSigmas(){
+    public double[] getSigmas() {
         return mSigmas;
     }
 
-    public double[] getTargets(){
+    public double[] getTargets() {
         return mTargets;
     }
 
-    public double[] getTolerances(){
+    public double[] getTolerances() {
         return mTolerances;
     }
 
-    public double[] getSigmaTargets(){
+    public double[] getSigmaTargets() {
         return mSigmaTarget;
     }
 
-    public double[] getSigmaTolerances(){
+    public double[] getSigmaTolerances() {
         return mSigmaTolerance;
     }
 
-    public double[] getSafeCurrents(){
+    public double[] getSafeCurrents() {
         return mSafeCurrents;
     }
 
-    public double[] getAdjustedPositions(){
+    public double[] getAdjustedPositions() {
         return arraySubtract(mPositions, mTargets);
     }
 
     //Legacy with BPM inversion
-    public double[] getOperands(){
+    public double[] getOperands() {
         double[] adjMeans = getAdjustedPositions();
 
+
         double[] operands = new double[4];
-        operands[0] = (adjMeans[1] - G21X*(adjMeans[3] - (G12X*adjMeans[1]/G11X))/((-G12X*G21X/G11X)+G22X))/G11X;
-        operands[1] = ((adjMeans[0] - G21Y*(adjMeans[2] - (G12Y*adjMeans[0]/G11Y))/((-G12Y*G21Y/G11Y)+G22Y))/G11Y);
-        operands[2] = ((adjMeans[3] - (G12X*adjMeans[1]/G11X))/((-G12X*G21X/G11X)+G22X));
-        operands[3] = (adjMeans[2] - (G12Y*adjMeans[0]/G11Y))/((-G12Y*G21Y/G11Y)+G22Y);
+        operands[0] = (adjMeans[1] - G21X * (adjMeans[3] - (G12X * adjMeans[1] / G11X)) / ((-G12X * G21X / G11X) + G22X)) / G11X;
+        operands[1] = ((adjMeans[0] - G21Y * (adjMeans[2] - (G12Y * adjMeans[0] / G11Y)) / ((-G12Y * G21Y / G11Y) + G22Y)) / G11Y);
+        operands[2] = ((adjMeans[3] - (G12X * adjMeans[1] / G11X)) / ((-G12X * G21X / G11X) + G22X));
+        operands[3] = (adjMeans[2] - (G12Y * adjMeans[0] / G11Y)) / ((-G12Y * G21Y / G11Y) + G22Y);
 
         return operands;
     }
@@ -824,7 +1044,7 @@ public class Controller implements PropertyChangeListener, PropertyChangeProvide
 //    }
 
 
-    public double[] computeCurrents(){
+    public double[] computeCurrents() {
         double[] operands = getOperands();
 
         log.debug("Diff in T1X = " + operands[0]);
@@ -842,8 +1062,8 @@ public class Controller implements PropertyChangeListener, PropertyChangeProvide
 
         return newCurrents;
     }
-	
-	public boolean setPositions(double[] positions){
+
+    public boolean setPositions(double[] positions) {
         boolean isNaN = false;
         for (double dval : positions) {
             isNaN |= Double.isNaN(dval);
@@ -854,9 +1074,9 @@ public class Controller implements PropertyChangeListener, PropertyChangeProvide
             return true;
         }
         return false;
-	}
+    }
 
-    public boolean isSystemManual() {
+    public static boolean isSystemManual() {
         return (beam.bssController.getOperatingMode() == OperatingMode.MANUAL);
     }
 
@@ -916,15 +1136,19 @@ public class Controller implements PropertyChangeListener, PropertyChangeProvide
         return false;
     }
 
-	public boolean refreshAll(){
+    public boolean refreshAll() {
         try {
-//        if (!feedbackClient.isConnected()) {
-//            feedbackClient.connect();
+//        if (!acu.isConnected()) {
+//            acu.connect();
 //        }
 
-        if (!ecubtcu.isConnected()) {
-        	ecubtcu.connect();
-        }
+            if (!ecubtcu.isConnected()) {
+                ecubtcu.connect();
+            }
+
+            if (!bcreu.isConnected()) {
+                bcreu.connect();
+            }
 
 
 //        if (checkForSpark()) {
@@ -954,9 +1178,53 @@ public class Controller implements PropertyChangeListener, PropertyChangeProvide
 //         }
 
 
-        //P1E.startContinuousAcquisition();
-        //P2E.startContinuousAcquisition();
-
+//            try {
+//                boolean var2;
+//                try {
+//                    P1E.acquireProfile();
+//                    Thread.sleep(1000L);
+//                    double[] temp = new double[4];
+//                    double[] tempSigma = new double[4];
+//                    temp[0] = P1E.getHorizontalCentroid();
+//                    temp[1] = P1E.getVerticalCentroid();
+//                    tempSigma[0] = P1E.getHorizontalSigma();
+//                    tempSigma[1] = P1E.getVerticalSigma();
+//                    P2E.acquireProfile();
+//                    Thread.sleep(1000L);
+//                    temp[2] = P2E.getHorizontalCentroid();
+//                    temp[3] = P2E.getVerticalCentroid();
+//                    tempSigma[2] = P2E.getHorizontalSigma();
+//                    tempSigma[3] = P2E.getVerticalSigma();
+//                    if (!this.setPositions(temp)) {
+//                        boolean var23 = false;
+//                        return var23;
+//                    }
+//
+//                    this.mSigmas = tempSigma;
+//                    int j = 1;
+//                    log.info("Acquisition in " + j + ": p1eX=" + this.mPositions[0] + ";p1eY=" + this.mPositions[1] + ";p2eX=" + this.mPositions[2] + ";p2eY=" + this.mPositions[3]);
+//                } catch (InterruptedException var18) {
+//                    log.error(var18);
+//                    var2 = false;
+//                    return var2;
+//                } catch (EcubtcuException var19) {
+//                    log.error(var19);
+//                    var2 = false;
+//                    return var2;
+//                } catch (Exception var20) {
+//                    log.error(var20);
+//                    var2 = false;
+//                    return var2;
+//                }
+//            } finally {
+//                try {
+//                    P1E.stopProfileAcquisition();
+//                    P2E.stopProfileAcquisition();
+//                } catch (EcubtcuException var17) {
+//                    log.error("ECUBTCU Communication Error: Could not stop profile acquisition.");
+//                }
+//
+//            }
 
             Thread BPM1 = new Thread(new Runnable() {
                 @Override
@@ -966,9 +1234,17 @@ public class Controller implements PropertyChangeListener, PropertyChangeProvide
                     } catch (Exception f) {
                         log.error("Error acquiring BPM profile");
                         f.printStackTrace();
+                        refreshAll();
                     }
                 }
             });
+
+//            SwingUtilities.invokeLater(new Runnable() {
+//                @Override
+//                public void run() {
+//                    BPM1.start();
+//                }
+//            });
             BPM1.start();
 
             Thread BPM2 = new Thread(new Runnable() {
@@ -976,35 +1252,46 @@ public class Controller implements PropertyChangeListener, PropertyChangeProvide
                 public void run() {
                     try {
                         P2E.acquireProfile();
-
                     } catch (Exception f) {
                         log.error("Error acquiring BPM profile");
                         f.printStackTrace();
+                        refreshAll();
                     }
                 }
             });
-            BPM2.start();
 
+//            SwingUtilities.invokeLater(new Runnable() {
+//                @Override
+//                public void run() {
+//                    BPM2.start();
+//                }
+//            });
+
+            //BPM2.start();
 
             //P1E.acquireProfile();
             //P2E.acquireProfile();
             //Thread.sleep(500);
-            while (BPM1.isAlive())
-            {
+            while (BPM1.isAlive()) {
                 Thread.sleep(100);
             }
+            //BPM2.start();
             Thread.sleep(500);
+
+//            P1E.startContinuousAcquisition();
+//            P2E.startContinuousAcquisition();
+
             double temp[] = new double[4];
             double tempSigma[] = new double[4];
             temp[0] = P1E.getHorizontalCentroid();
             temp[1] = P1E.getVerticalCentroid();
             tempSigma[0] = P1E.getHorizontalSigma();
             tempSigma[1] = P1E.getVerticalSigma();
-            
+
+            BPM2.start();
 
             //P2E.acquireProfile();
-            while (BPM2.isAlive())
-            {
+            while (BPM2.isAlive()) {
                 Thread.sleep(100);
             }
             Thread.sleep(500);
@@ -1012,6 +1299,8 @@ public class Controller implements PropertyChangeListener, PropertyChangeProvide
             temp[3] = P2E.getVerticalCentroid();
             tempSigma[2] = P2E.getHorizontalSigma();
             tempSigma[3] = P2E.getVerticalSigma();
+
+            //Thread.sleep(500);
             // If couldn't setPositions (due to NaN values), then return false.
             if (!setPositions(temp)) {
                 return false;
@@ -1025,12 +1314,12 @@ public class Controller implements PropertyChangeListener, PropertyChangeProvide
         } catch (InterruptedException e) {
             log.error(e);
             return false;
-        } 
-       // catch (AcquisitionTimeoutException e) 
-     //   {
-     //       log.error(e);
-    //        return false;
-    //    } 
+        }
+//        catch (AcquisitionTimeoutException e)
+//        {
+//            log.error(e);
+//            return false;
+//        }
 //        catch (EcubtcuException e) {
 //            log.error(e);
 //            return false;
@@ -1049,22 +1338,22 @@ public class Controller implements PropertyChangeListener, PropertyChangeProvide
         }
 
         return true;
-	}
+    }
 
-	public void useKeyCommand(int command){
+    public void useKeyCommand(int command) {
         acu.setTagValue(mStatus.Key_command, command);
         log.info("Acu key command #" + command + " sent.");
     }
 
-    public boolean sourceTuning(){
+    public boolean sourceTuning() {
         if (!acu.isConnected()) {
             acu.connect();
         }
         return (boolean) acu.getTagValue(Status.sour_tuning);
     }
 
-    public boolean mainCoilTuning(){
-        return (boolean)acu.getTagValue(Status.mc_tuning);
+    public boolean mainCoilTuning() {
+        return (boolean) acu.getTagValue(Status.mc_tuning);
     }
 
     public void idleBCP() {
@@ -1076,35 +1365,50 @@ public class Controller implements PropertyChangeListener, PropertyChangeProvide
     }
 
     public void prep10nA() {
-            log.warn("Performing BCREU/ISEU lookup");
-            beam.bpsController.startPrepareActivity(-1, 10.0);
-            beam.bpsController.proxyPublish();
+        log.warn("Performing BCREU/ISEU lookup");
+        beam.bpsController.startPrepareActivity(-1, 10.0);
+        beam.bpsController.proxyPublish();
     }
 
-    public int getSelectedBeamline(){
+    public boolean isTR3SearchedInServiceMode(){
+        try {
+            return restManager.getVariable("S3.T3.TRA01.ServiceMode").get("value").getAsBoolean();
+        }catch (Exception e) {
+            e.printStackTrace();
+            log.error("Error getting TR search status");
+        }
+        return false;
+    }
+
+    public boolean isTR3XrayTubeExtracted(){
+        try {
+            return restManager.getVariable("S3.T3.XRC01.NozzleXrExtracted").get("value").getAsBoolean();
+        }catch (Exception e) {
+            e.printStackTrace();
+            log.error("Error getting TR3 Xray Tube A position.");
+        }
+        return false;
+    }
+
+    public int getSelectedBeamline() {
         int bp = 0;
 
-        try{
+        try {
             if (restManager.getVariable(Status.BP1_SELECTED).get("value").getAsBoolean()) {
                 bp = 1;
-            }
-            if (restManager.getVariable(Status.BP2_SELECTED).get("value").getAsBoolean()) {
+            } else if (restManager.getVariable(Status.BP2_SELECTED).get("value").getAsBoolean()) {
                 bp = 2;
-            }
-            if (restManager.getVariable(Status.BP3_SELECTED).get("value").getAsBoolean()) {
+            } else if (restManager.getVariable(Status.BP3_SELECTED).get("value").getAsBoolean()) {
                 bp = 3;
-            }
-            if (restManager.getVariable(Status.BP4_SELECTED).get("value").getAsBoolean()) {
+            } else if (restManager.getVariable(Status.BP4_SELECTED).get("value").getAsBoolean()) {
                 bp = 4;
-            }
-            if (restManager.getVariable(Status.BP5_SELECTED).get("value").getAsBoolean()) {
+            } else if (restManager.getVariable(Status.BP5_SELECTED).get("value").getAsBoolean()) {
                 bp = 5;
-            }
-            if (restManager.getVariable(Status.BP6_SELECTED).get("value").getAsBoolean()) {
+            } else if (restManager.getVariable(Status.BP6_SELECTED).get("value").getAsBoolean()) {
                 bp = 6;
             }
 
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             log.error("Error getting beamline");
         }
@@ -1113,16 +1417,14 @@ public class Controller implements PropertyChangeListener, PropertyChangeProvide
     }
 
 
-
     public boolean isRequestPending() {
         return (beam.beamScheduler.getPendingBeamRequests().size() != 0);
     }
 
-    public boolean isBeamAllocated() {
-        if (beam.beamScheduler.getCurrentBeamAllocation() == null){
+    public static boolean isBeamAllocated() {
+        if (beam.beamScheduler.getCurrentBeamAllocation() == null) {
             return false;
-        }
-        else {
+        } else {
             return true;
         }
     }
@@ -1136,12 +1438,11 @@ public class Controller implements PropertyChangeListener, PropertyChangeProvide
         try {
             if (!restManager.getVariable(Status.TR1_SECURE).isJsonNull()) {
                 return restManager.getVariable(Status.TR1_SECURE).get("value").getAsBoolean();
-            }
-            else if (restManager.getVariable(Status.TR1_SECURE).isJsonNull()) {
+            } else if (restManager.getVariable(Status.TR1_SECURE).isJsonNull()) {
                 return restManager.getVariable(Status.TR1_SECURE).get("value").getAsBoolean();
             }
 
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error(e);
         }
 
@@ -1153,12 +1454,11 @@ public class Controller implements PropertyChangeListener, PropertyChangeProvide
         try {
             if (!restManager.getVariable(Status.TR1_SEARCH_ACTIVE).isJsonNull()) {
                 return restManager.getVariable(Status.TR1_SEARCH_ACTIVE).get("value").getAsBoolean();
-            }
-            else if (restManager.getVariable(Status.TR1_SEARCH_ACTIVE).isJsonNull()) {
+            } else if (restManager.getVariable(Status.TR1_SEARCH_ACTIVE).isJsonNull()) {
                 return restManager.getVariable(Status.TR1_SEARCH_ACTIVE).get("value").getAsBoolean();
             }
 
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error(e);
         }
 
@@ -1170,12 +1470,11 @@ public class Controller implements PropertyChangeListener, PropertyChangeProvide
         try {
             if (!restManager.getVariable(Status.TR2_SECURE).isJsonNull()) {
                 return restManager.getVariable(Status.TR2_SECURE).get("value").getAsBoolean();
-            }
-            else if (restManager.getVariable(Status.TR2_SECURE).isJsonNull()) {
+            } else if (restManager.getVariable(Status.TR2_SECURE).isJsonNull()) {
                 return restManager.getVariable(Status.TR2_SECURE).get("value").getAsBoolean();
             }
 
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error(e);
         }
 
@@ -1187,12 +1486,11 @@ public class Controller implements PropertyChangeListener, PropertyChangeProvide
         try {
             if (!restManager.getVariable(Status.TR2_SEARCH_ACTIVE).isJsonNull()) {
                 return restManager.getVariable(Status.TR2_SEARCH_ACTIVE).get("value").getAsBoolean();
-            }
-            else if (restManager.getVariable(Status.TR2_SEARCH_ACTIVE).isJsonNull()) {
+            } else if (restManager.getVariable(Status.TR2_SEARCH_ACTIVE).isJsonNull()) {
                 return restManager.getVariable(Status.TR2_SEARCH_ACTIVE).get("value").getAsBoolean();
             }
 
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error(e);
         }
 
@@ -1204,12 +1502,11 @@ public class Controller implements PropertyChangeListener, PropertyChangeProvide
         try {
             if (!restManager.getVariable(Status.TR3_SECURE).isJsonNull()) {
                 return restManager.getVariable(Status.TR3_SECURE).get("value").getAsBoolean();
-            }
-            else if (restManager.getVariable(Status.TR3_SECURE).isJsonNull()) {
+            } else if (restManager.getVariable(Status.TR3_SECURE).isJsonNull()) {
                 return restManager.getVariable(Status.TR3_SECURE).get("value").getAsBoolean();
             }
 
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error(e);
         }
 
@@ -1221,12 +1518,11 @@ public class Controller implements PropertyChangeListener, PropertyChangeProvide
         try {
             if (!restManager.getVariable(Status.TR3_SEARCH_ACTIVE).isJsonNull()) {
                 return restManager.getVariable(Status.TR3_SEARCH_ACTIVE).get("value").getAsBoolean();
-            }
-            else if (restManager.getVariable(Status.TR3_SEARCH_ACTIVE).isJsonNull()) {
+            } else if (restManager.getVariable(Status.TR3_SEARCH_ACTIVE).isJsonNull()) {
                 return restManager.getVariable(Status.TR3_SEARCH_ACTIVE).get("value").getAsBoolean();
             }
 
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error(e);
         }
 
@@ -1238,12 +1534,11 @@ public class Controller implements PropertyChangeListener, PropertyChangeProvide
         try {
             if (!restManager.getVariable(Status.TR4_SECURE).isJsonNull()) {
                 return restManager.getVariable(Status.TR4_SECURE).get("value").getAsBoolean();
-            }
-            else if (restManager.getVariable(Status.TR4_SECURE).isJsonNull()) {
+            } else if (restManager.getVariable(Status.TR4_SECURE).isJsonNull()) {
                 return restManager.getVariable(Status.TR4_SECURE).get("value").getAsBoolean();
             }
 
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error(e);
         }
 
@@ -1255,18 +1550,16 @@ public class Controller implements PropertyChangeListener, PropertyChangeProvide
         try {
             if (!restManager.getVariable(Status.TR4_SEARCH_ACTIVE).isJsonNull()) {
                 return restManager.getVariable(Status.TR4_SEARCH_ACTIVE).get("value").getAsBoolean();
-            }
-            else if (restManager.getVariable(Status.TR4_SEARCH_ACTIVE).isJsonNull()) {
+            } else if (restManager.getVariable(Status.TR4_SEARCH_ACTIVE).isJsonNull()) {
                 return restManager.getVariable(Status.TR4_SEARCH_ACTIVE).get("value").getAsBoolean();
             }
 
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error(e);
         }
 
         return false;
     }
-
 
 
     public boolean readyForPowerSave() {
@@ -1325,808 +1618,139 @@ public class Controller implements PropertyChangeListener, PropertyChangeProvide
         return true;
     }
 
-    public void setSlits() {
+    public static void setSlits(double sl1e, double sl2e, double sl3e) {
         try {
 
-            if (SL1E.getPosisionFeedback() < 50.00 && SL1E.getPosisionSetpoint() != 50.0){
-                ecubtcu.slitsGoMm("SL1E", 50.0);
-            }
+            ecubtcu.slitsGoMm("SL1E", sl1e);
+            ecubtcu.slitsGoMm("SL2E", sl2e);
+            ecubtcu.slitsGoMm("SL3E", sl3e);
+
+//            if (SL1E.getPosisionFeedback() < 50.00 && SL1E.getPosisionSetpoint() != 50.0){
+//                ecubtcu.slitsGoMm("SL1E", 50.0);
+//            }
 
 //            if (SL2E.getPosisionFeedback() > 2.00 && SL2E.getPosisionSetpoint() != 1.30){
 //                ecubtcu.slitsGoMm("SL2E", 1.3);
 //            }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void getESSCurrents() {
+    public void getDipoleCurrents(File resultsFile, EcubtcuDipole[] dipoles) {
+        DecimalFormat df = new DecimalFormat("#0.00");
+        try {
+            for (int i = 0; i < dipoles.length; i++) {
+                dipoles[i].getCurrentFeedback();
+            }
+        } catch (NullPointerException e) {
+            log.error("Null ptr at setDipoleCurrents()");
+            e.printStackTrace();
+        }
+    }
 
-       if (ecubtcu.isConnected()) {
+    public void setDipoleCurrents(EcubtcuDipole[] dipoles) {
+        DecimalFormat df = new DecimalFormat("#0.00");
+        try {
+            for (int i = 0; i < dipoles.length; i++) {
+                if (dipoles[i].getCurrentFeedback() >= 100.0) {
+                    ecubtcu.canMagnetSetCurrent(dipoles[i].toString(), (dipoles[i].getCurrentFeedback() / 1.5));
+                    log.info("[POWER SAVE] " + dipoles[i].toString() + " set to " + df.format(dipoles[i].getCurrentFeedback()) + "A");
+                } else if (dipoles[i].getCurrentFeedback() < 100.0 && dipoles[i].getCurrentSetpoint() != 0.0) {
+                    ecubtcu.canMagnetSetCurrent(dipoles[i].toString(), 0.0);
+                    log.info("[POWER SAVE] " + dipoles[i].toString() + " set to 0A");
+                }
+            }
+        } catch (EcubtcuException e) {
+            log.error("ECUBTCU exception " + e);
+            e.printStackTrace();
+        } catch (NullPointerException e) {
+            log.error("Null ptr at setDipoleCurrents()");
+            e.printStackTrace();
+        } finally {
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
-           try {
-               log.warn("B1234E: " + String.valueOf(B1234E.getCurrentFeedback()) + "A");
+    public void getQuadCurrents(File resultsFile, EcubtcuQuadrupole[] quads) {
+        DecimalFormat df = new DecimalFormat("#0.00");
+        try {
+            for (int i = 0; i < quads.length; i++) {
+                quads[i].getCurrentFeedback();
+            }
 
-               log.warn("Q1E: " + String.valueOf(Q1E.getCurrentFeedback()) + "A");
-               log.warn("Q2E: " + String.valueOf(Q2E.getCurrentFeedback()) + "A");
-               log.warn("Q3E: " + String.valueOf(Q3E.getCurrentFeedback()) + "A");
-               log.warn("Q47E: " + String.valueOf(Q47E.getCurrentFeedback()) + "A");
-               log.warn("Q56E: " + String.valueOf(Q56E.getCurrentFeedback()) + "A");
-               log.warn("Q8E: " + String.valueOf(Q8E.getCurrentFeedback()) + "A");
-               log.warn("Q9E: " + String.valueOf(Q9E.getCurrentFeedback()) + "A");
-               log.warn("Q10E: " + String.valueOf(Q10E.getCurrentFeedback()) + "A");
-           }catch (Exception e) {
-               log.error(e);
-           }
-       }
+        } catch (NullPointerException e) {
+            log.error("Null ptr at setQuadCurrents()");
+            e.printStackTrace();
+        }
+    }
+
+    public void setQuadCurrents(EcubtcuQuadrupole[] quads) {
+        DecimalFormat df = new DecimalFormat("#0.00");
+        try {
+            for (int i = 0; i < quads.length; i++) {
+                if (quads[i].getCurrentFeedback() >= 40.0) {
+                    ecubtcu.canMagnetSetCurrent(quads[i].toString(), (quads[i].getCurrentFeedback() / 1.5));
+                    log.info("[POWER SAVE] " + quads[i].toString() + " set to " + df.format(quads[i].getCurrentFeedback()) + "A");
+                } else if (quads[i].getCurrentFeedback() < 40.0 && quads[i].getCurrentSetpoint() != 0.0) {
+                    ecubtcu.canMagnetSetCurrent(quads[i].toString(), 0.0);
+                    log.info("[POWER SAVE] " + quads[i].toString() + " set to 0A");
+                }
+            }
+        } catch (EcubtcuException e) {
+            log.error("ECUBTCU exception " + e);
+            e.printStackTrace();
+        } catch (NullPointerException e) {
+            log.error("Null ptr at setQuadCurrents()");
+            e.printStackTrace();
+        } finally {
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public void setESSCurrents() {
-
         if (!ecubtcu.isConnected()) {
             ecubtcu.connect();
         }
 
-        try {
-            if (B1234E.getCurrentFeedback() >= 100.0) {
-                ecubtcu.canMagnetSetCurrent("B1234E", (B1234E.getCurrentFeedback() / 1.5));
-                //log.warn("B1234E: " + String.valueOf(B1234E.getCurrentFeedback()) + "A");
-            } else if (B1234E.getCurrentFeedback() < 100.0 && B1234E.getCurrentSetpoint() != 0.0){
-                ecubtcu.canMagnetSetCurrent("B1234E", 0.0);
-                log.warn("B1234E set to 0A");
-            }
-
-            if (Q1E.getCurrentFeedback() >= 40.0) {
-                ecubtcu.canMagnetSetCurrent("Q1E" , (Q1E.getCurrentFeedback() / 1.5));
-                //log.warn("Q1E: " + String.valueOf(Q1E.getCurrentFeedback()) + "A");
-            } else if (Q1E.getCurrentFeedback() < 40.0 && Q1E.getCurrentSetpoint() != 0.0){
-                ecubtcu.canMagnetSetCurrent("Q1E", 0.0);
-                log.warn("Q1E set to 0A");
-            }
-
-            if (Q2E.getCurrentFeedback() >= 40.0) {
-                ecubtcu.canMagnetSetCurrent("Q2E" , (Q2E.getCurrentFeedback() / 1.5));
-                //log.warn("Q2E: " + String.valueOf(Q2E.getCurrentFeedback()) + "A");
-            } else if (Q2E.getCurrentFeedback() < 40.0 && Q2E.getCurrentSetpoint() != 0.0){
-                ecubtcu.canMagnetSetCurrent("Q2E", 0.0);
-                log.warn("Q2E set to 0A");
-            }
-
-            if (Q3E.getCurrentFeedback() >= 40.0) {
-                ecubtcu.canMagnetSetCurrent("Q3E" , (Q3E.getCurrentFeedback() / 1.5));
-                //log.warn("Q3E: " + String.valueOf(Q3E.getCurrentFeedback()) + "A");
-            } else if (Q3E.getCurrentFeedback() < 40.0 && Q3E.getCurrentSetpoint() != 0.0){
-                ecubtcu.canMagnetSetCurrent("Q3E", 0.0);
-                log.warn("Q3E set to 0A");
-            }
-
-            if (Q47E.getCurrentFeedback() >= 40.0) {
-                ecubtcu.canMagnetSetCurrent("Q47E" , (Q47E.getCurrentFeedback() / 1.5));
-                //log.warn("Q47E: " + String.valueOf(Q47E.getCurrentFeedback()) + "A");
-            } else if (Q47E.getCurrentFeedback() < 40.0 && Q47E.getCurrentSetpoint() != 0.0){
-                ecubtcu.canMagnetSetCurrent("Q47E", 0.0);
-                log.warn("Q47E set to 0A");
-            }
-
-            if (Q56E.getCurrentFeedback() >= 40.0) {
-                ecubtcu.canMagnetSetCurrent("Q56E" , (Q56E.getCurrentFeedback() / 1.5));
-                //log.warn("Q56E: " + String.valueOf(Q56E.getCurrentFeedback()) + "A");
-            } else if (Q56E.getCurrentFeedback() < 40.0 && Q56E.getCurrentSetpoint() != 0.0){
-                ecubtcu.canMagnetSetCurrent("Q56E", 0.0);
-                log.warn("Q56E set to 0A");
-            }
-
-            if (Q8E.getCurrentFeedback() >= 40.0) {
-                ecubtcu.canMagnetSetCurrent("Q8E" , (Q8E.getCurrentFeedback() / 1.5));
-                //log.warn("Q8E: " + String.valueOf(Q8E.getCurrentFeedback()) + "A");
-            } else if (Q8E.getCurrentFeedback() < 40.0 && Q8E.getCurrentSetpoint() != 0.0){
-                ecubtcu.canMagnetSetCurrent("Q8E", 0.0);
-                log.warn("Q8E set to 0A");
-            }
-
-            if (Q9E.getCurrentFeedback() >= 40.0) {
-                ecubtcu.canMagnetSetCurrent("Q9E" , (Q9E.getCurrentFeedback() / 1.5));
-                //log.warn("Q9E: " + String.valueOf(Q9E.getCurrentFeedback()) + "A");
-            } else if (Q9E.getCurrentFeedback() < 40.0 && Q9E.getCurrentSetpoint() != 0.0){
-                ecubtcu.canMagnetSetCurrent("Q9E", 0.0);
-                log.warn("Q9E set to 0A");
-            }
-
-            if (Q10E.getCurrentFeedback() >= 40.0) {
-                ecubtcu.canMagnetSetCurrent("Q10E" , (Q10E.getCurrentFeedback() / 1.5));
-                //log.warn("Q10E: " + String.valueOf(Q10E.getCurrentFeedback()) + "A");
-            } else if (Q10E.getCurrentFeedback() < 40.0 && Q10E.getCurrentSetpoint() != 0.0){
-                ecubtcu.canMagnetSetCurrent("Q10E", 0.0);
-                log.warn("Q10E set to 0A");
-            }
-
-        }catch (EcubtcuException e) {
-            log.error("ECUBTCU exception " + e);
-            e.printStackTrace();
-        }catch (NullPointerException e){
-            log.error("Null ptr at setESSMagnets");
-            e.printStackTrace();
-        }finally {
-            try {
-                Thread.sleep(2000);
-            }catch (InterruptedException e){
-                e.printStackTrace();
-            }
-        }
+        setDipoleCurrents(ESSDipoles);
+        setQuadCurrents(ESSQuads);
     }
 
     public void setBeamlineCurrents(int bp) {
-        try {
-            switch (bp) {
-                case 1:
-                    if (Q1B1.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q1B1" , (Q1B1.getCurrentFeedback() / 1.5));
-                    } else if (Q1B1.getCurrentFeedback() < 40.0 && Q1B1.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q1B1", 0.0);
-                        log.warn("Q1B1 set to 0A");
-                    }
-                    if (Q2B1.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q2B1" , (Q2B1.getCurrentFeedback() / 1.5));
-                    } else if (Q2B1.getCurrentFeedback() < 40.0 && Q2B1.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q2B1", 0.0);
-                        log.warn("Q2B1 set to 0A");
-                    }
-                    if (Q3B1.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q3B1" , (Q3B1.getCurrentFeedback() / 1.5));
-                    } else if (Q3B1.getCurrentFeedback() < 40.0 && Q3B1.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q3B1", 0.0);
-                        log.warn("Q3B1 set to 0A");
-                    }
-                    if (Q1F1.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q1F1" , (Q1F1.getCurrentFeedback() / 1.5));
-                    } else if (Q1F1.getCurrentFeedback() < 40.0 && Q1F1.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q1F1", 0.0);
-                        log.warn("Q1F1 set to 0A");
-                    }
-                    if (Q2F1.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q2F1" , (Q2F1.getCurrentFeedback() / 1.5));
-                    } else if (Q2F1.getCurrentFeedback() < 40.0 && Q2F1.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q2F1", 0.0);
-                        log.warn("Q2F1 set to 0A");
-                    }
-                    if (Q3F1.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q3F1" , (Q3F1.getCurrentFeedback() / 1.5));
-                    } else if (Q3F1.getCurrentFeedback() < 40.0 && Q3F1.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q3F1", 0.0);
-                        log.warn("Q3F1 set to 0A");
-                    }
-                    if (Q1N1.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q1N1" , (Q1N1.getCurrentFeedback() / 1.5));
-                    } else if (Q1N1.getCurrentFeedback() < 40.0 && Q1N1.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q1N1", 0.0);
-                        log.warn("Q1N1 set to 0A");
-                    }
-                    if (Q2N1.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q2N1" , (Q2N1.getCurrentFeedback() / 1.5));
-                    } else if (Q2N1.getCurrentFeedback() < 40.0 && Q2N1.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q2N1", 0.0);
-                        log.warn("Q2N1 set to 0A");
-                    }
-                    if (B12B1.getCurrentFeedback() >= 100.0) {
-                        ecubtcu.canMagnetSetCurrent("B12B1", (B12B1.getCurrentFeedback() / 1.5));
-                    } else if (B12B1.getCurrentFeedback() < 100.0 && B12B1.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("B12B1", 0.0);
-                        log.warn("B12B1 set to 0A");
-                    }
-                    break;
-                case 2:
-                    if (Q1S1.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q1S1" , (Q1S1.getCurrentFeedback() / 1.5));
-                    } else if (Q1S1.getCurrentFeedback() < 40.0 && Q1S1.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q1S1", 0.0);
-                        log.warn("Q1S1 set to 0A");
-                    }
-                    if (Q2S1.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q2S1" , (Q2S1.getCurrentFeedback() / 1.5));
-                    } else if (Q2S1.getCurrentFeedback() < 40.0 && Q2S1.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q2S1", 0.0);
-                        log.warn("Q2S1 set to 0A");
-                    }
-                    if (Q3S1.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q3S1" , (Q3S1.getCurrentFeedback() / 1.5));
-                    } else if (Q3S1.getCurrentFeedback() < 40.0 && Q3S1.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q3S1", 0.0);
-                        log.warn("Q3S1 set to 0A");
-                    }
-                    if (Q4S1.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q4S1" , (Q4S1.getCurrentFeedback() / 1.5));
-                    } else if (Q4S1.getCurrentFeedback() < 40.0 && Q4S1.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q4S1", 0.0);
-                        log.warn("Q4S1 set to 0A");
-                    }
-                    if (Q5S1.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q5S1" , (Q5S1.getCurrentFeedback() / 1.5));
-                    } else if (Q5S1.getCurrentFeedback() < 40.0 && Q5S1.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q5S1", 0.0);
-                        log.warn("Q5S1 set to 0A");
-                    }
-                    if (Q1B2.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q1B2" , (Q1B2.getCurrentFeedback() / 1.5));
-                    } else if (Q1B2.getCurrentFeedback() < 40.0 && Q1B2.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q1B2", 0.0);
-                        log.warn("Q1B2 set to 0A");
-                    }
-                    if (Q2B2.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q1B2" , (Q1B2.getCurrentFeedback() / 1.5));
-                    } else if (Q1B2.getCurrentFeedback() < 40.0 && Q1B2.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q1B2", 0.0);
-                        log.warn("Q1B2 set to 0A");
-                    }
-                    if (Q3B2.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q3B2" , (Q3B2.getCurrentFeedback() / 1.5));
-                    } else if (Q3B2.getCurrentFeedback() < 40.0 && Q3B2.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q3B2", 0.0);
-                        log.warn("Q3B2 set to 0A");
-                    }
-                    if (Q1F2.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q1F2" , (Q1F2.getCurrentFeedback() / 1.5));
-                    } else if (Q1F2.getCurrentFeedback() < 40.0 && Q1F2.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q1F2", 0.0);
-                        log.warn("Q1F2 set to 0A");
-                    }
-                    if (Q2F2.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q2F2" , (Q2F2.getCurrentFeedback() / 1.5));
-                    } else if (Q2F2.getCurrentFeedback() < 40.0 && Q2F2.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q2F2", 0.0);
-                        log.warn("Q2F2 set to 0A");
-                    }
-                    if (Q3F2.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q3F2" , (Q3F2.getCurrentFeedback() / 1.5));
-                    } else if (Q3F2.getCurrentFeedback() < 40.0 && Q3F2.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q3F2", 0.0);
-                        log.warn("Q3F2 set to 0A");
-                    }
-                    if (Q1N2.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q1N2" , (Q1N2.getCurrentFeedback() / 1.5));
-                    } else if (Q1N2.getCurrentFeedback() < 40.0 && Q1N2.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q1N2", 0.0);
-                        log.warn("Q1N2 set to 0A");
-                    }
-                    if (Q2N2.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q2N2" , (Q2N2.getCurrentFeedback() / 1.5));
-                    } else if (Q2N2.getCurrentFeedback() < 40.0 && Q2N2.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q2N2", 0.0);
-                        log.warn("Q2N2 set to 0A");
-                    }
-                    if (B12B2.getCurrentFeedback() >= 100.0) {
-                        ecubtcu.canMagnetSetCurrent("B12B2", (B12B2.getCurrentFeedback() / 1.5));
-                    } else if (B12B2.getCurrentFeedback() < 100.0 && B12B2.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("B12B2", 0.0);
-                        log.warn("B12B2 set to 0A");
-                    }
-                    break;
-                case 3:
-                    if (Q1S1.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q1S1" , (Q1S1.getCurrentFeedback() / 1.5));
-                    } else if (Q1S1.getCurrentFeedback() < 40.0 && Q1S1.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q1S1", 0.0);
-                        log.warn("Q1S1 set to 0A");
-                    }
-                    if (Q2S1.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q2S1" , (Q2S1.getCurrentFeedback() / 1.5));
-                    } else if (Q2S1.getCurrentFeedback() < 40.0 && Q2S1.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q2S1", 0.0);
-                        log.warn("Q2S1 set to 0A");
-                    }
-                    if (Q3S1.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q3S1" , (Q3S1.getCurrentFeedback() / 1.5));
-                    } else if (Q3S1.getCurrentFeedback() < 40.0 && Q3S1.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q3S1", 0.0);
-                        log.warn("Q3S1 set to 0A");
-                    }
-                    if (Q4S1.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q4S1" , (Q4S1.getCurrentFeedback() / 1.5));
-                    } else if (Q4S1.getCurrentFeedback() < 40.0 && Q4S1.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q4S1", 0.0);
-                        log.warn("Q4S1 set to 0A");
-                    }
-                    if (Q5S1.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q5S1" , (Q5S1.getCurrentFeedback() / 1.5));
-                    } else if (Q5S1.getCurrentFeedback() < 40.0 && Q5S1.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q5S1", 0.0);
-                        log.warn("Q5S1 set to 0A");
-                    }
-                    if (Q1B2.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q1B2" , (Q1B2.getCurrentFeedback() / 1.5));
-                    } else if (Q1B2.getCurrentFeedback() < 40.0 && Q1B2.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q1B2", 0.0);
-                        log.warn("Q1B2 set to 0A");
-                    }
-                    if (Q2B2.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q1B2" , (Q1B2.getCurrentFeedback() / 1.5));
-                    } else if (Q1B2.getCurrentFeedback() < 40.0 && Q1B2.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q1B2", 0.0);
-                        log.warn("Q1B2 set to 0A");
-                    }
-                    if (Q3B2.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q3B2" , (Q3B2.getCurrentFeedback() / 1.5));
-                    } else if (Q3B2.getCurrentFeedback() < 40.0 && Q3B2.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q3B2", 0.0);
-                        log.warn("Q3B2 set to 0A");
-                    }
-                    if (Q1I2.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q1I2" , (Q1I2.getCurrentFeedback() / 1.5));
-                    } else if (Q1I2.getCurrentFeedback() < 40.0 && Q1I2.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q1I2", 0.0);
-                        log.warn("Q1I2 set to 0A");
-                    }
-                    if (Q2I2.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q2I2" , (Q2I2.getCurrentFeedback() / 1.5));
-                    } else if (Q2I2.getCurrentFeedback() < 40.0 && Q2I2.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q2I2", 0.0);
-                        log.warn("Q2I2 set to 0A");
-                    }
-                    if (Q3I2.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q3I2" , (Q3I2.getCurrentFeedback() / 1.5));
-                    } else if (Q3I2.getCurrentFeedback() < 40.0 && Q3I2.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q3I2", 0.0);
-                        log.warn("Q3I2 set to 0A");
-                    }
-                    if (Q4I2.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q4I2" , (Q4I2.getCurrentFeedback() / 1.5));
-                    } else if (Q4I2.getCurrentFeedback() < 40.0 && Q4I2.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q4I2", 0.0);
-                        log.warn("Q4I2 set to 0A");
-                    }
-                    if (Q5I2.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q5I2" , (Q5I2.getCurrentFeedback() / 1.5));
-                    } else if (Q5I2.getCurrentFeedback() < 40.0 && Q5I2.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q5I2", 0.0);
-                        log.warn("Q5I2 set to 0A");
-                    }
-                    if (Q1N2.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q1N2" , (Q1N2.getCurrentFeedback() / 1.5));
-                    } else if (Q1N2.getCurrentFeedback() < 40.0 && Q1N2.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q1N2", 0.0);
-                        log.warn("Q1N2 set to 0A");
-                    }
-                    if (Q2N2.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q2N2" , (Q2N2.getCurrentFeedback() / 1.5));
-                    } else if (Q2N2.getCurrentFeedback() < 40.0 && Q2N2.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q2N2", 0.0);
-                        log.warn("Q2N2 set to 0A");
-                    }
-                    if (B12B2.getCurrentFeedback() >= 100.0) {
-                        ecubtcu.canMagnetSetCurrent("B12B2", (B12B2.getCurrentFeedback() / 1.5));
-                    } else if (B12B2.getCurrentFeedback() < 100.0 && B12B2.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("B12B2", 0.0);
-                        log.warn("B12B2 set to 0A");
-                    }
-                    if (B1I2.getCurrentFeedback() >= 100.0) {
-                        ecubtcu.canMagnetSetCurrent("B1I2", (B1I2.getCurrentFeedback() / 1.5));
-                    } else if (B1I2.getCurrentFeedback() < 100.0 && B1I2.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("B1I2", 0.0);
-                        log.warn("B1I2 set to 0A");
-                    }
-                    if (B2I2.getCurrentFeedback() >= 100.0) {
-                        ecubtcu.canMagnetSetCurrent("B2I2", (B2I2.getCurrentFeedback() / 1.5));
-                    } else if (B2I2.getCurrentFeedback() < 100.0 && B2I2.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("B2I2", 0.0);
-                        log.warn("B2I2 set to 0A");
-                    }
-                    break;
-                case 4:
-                    if (Q1S1.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q1S1" , (Q1S1.getCurrentFeedback() / 1.5));
-                    } else if (Q1S1.getCurrentFeedback() < 40.0 && Q1S1.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q1S1", 0.0);
-                        log.warn("Q1S1 set to 0A");
-                    }
-                    if (Q2S1.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q2S1" , (Q2S1.getCurrentFeedback() / 1.5));
-                    } else if (Q2S1.getCurrentFeedback() < 40.0 && Q2S1.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q2S1", 0.0);
-                        log.warn("Q2S1 set to 0A");
-                    }
-                    if (Q3S1.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q3S1" , (Q3S1.getCurrentFeedback() / 1.5));
-                    } else if (Q3S1.getCurrentFeedback() < 40.0 && Q3S1.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q3S1", 0.0);
-                        log.warn("Q3S1 set to 0A");
-                    }
-                    if (Q4S1.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q4S1" , (Q4S1.getCurrentFeedback() / 1.5));
-                    } else if (Q4S1.getCurrentFeedback() < 40.0 && Q4S1.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q4S1", 0.0);
-                        log.warn("Q4S1 set to 0A");
-                    }
-                    if (Q5S1.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q5S1" , (Q5S1.getCurrentFeedback() / 1.5));
-                    } else if (Q5S1.getCurrentFeedback() < 40.0 && Q5S1.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q5S1", 0.0);
-                        log.warn("Q5S1 set to 0A");
-                    }
-                    if (Q1S2.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q1S2" , (Q1S2.getCurrentFeedback() / 1.5));
-                    } else if (Q1S2.getCurrentFeedback() < 40.0 && Q1S2.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q1S2", 0.0);
-                        log.warn("Q1S2 set to 0A");
-                    }
-                    if (Q2S2.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q2S2" , (Q2S2.getCurrentFeedback() / 1.5));
-                    } else if (Q2S2.getCurrentFeedback() < 40.0 && Q2S2.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q2S2", 0.0);
-                        log.warn("Q2S2 set to 0A");
-                    }
-                    if (Q3S2.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q3S2" , (Q3S2.getCurrentFeedback() / 1.5));
-                    } else if (Q3S2.getCurrentFeedback() < 40.0 && Q3S2.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q3S2", 0.0);
-                        log.warn("Q3S2 set to 0A");
-                    }
-                    if (Q4S2.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q4S2" , (Q4S2.getCurrentFeedback() / 1.5));
-                    } else if (Q4S2.getCurrentFeedback() < 40.0 && Q4S2.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q4S2", 0.0);
-                        log.warn("Q4S2 set to 0A");
-                    }
-                    if (Q5S2.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q5S2" , (Q5S2.getCurrentFeedback() / 1.5));
-                    } else if (Q5S2.getCurrentFeedback() < 40.0 && Q5S2.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q5S2", 0.0);
-                        log.warn("Q5S2 set to 0A");
-                    }
-                    if (Q1B3.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q1B3" , (Q1B3.getCurrentFeedback() / 1.5));
-                    } else if (Q1B3.getCurrentFeedback() < 40.0 && Q1B3.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q1B3", 0.0);
-                        log.warn("Q1B3 set to 0A");
-                    }
-                    if (Q2B3.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q2B3" , (Q2B3.getCurrentFeedback() / 1.5));
-                    } else if (Q2B3.getCurrentFeedback() < 40.0 && Q2B3.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q2B3", 0.0);
-                        log.warn("Q2B3 set to 0A");
-                    }
-                    if (Q3B3.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q3B3" , (Q3B3.getCurrentFeedback() / 1.5));
-                    } else if (Q3B3.getCurrentFeedback() < 40.0 && Q3B3.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q3B3", 0.0);
-                        log.warn("Q3B3 set to 0A");
-                    }
-                    if (Q1F3.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q1F3" , (Q1F3.getCurrentFeedback() / 1.5));
-                    } else if (Q1F3.getCurrentFeedback() < 40.0 && Q1F3.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q1F3", 0.0);
-                        log.warn("Q1F3 set to 0A");
-                    }
-                    if (Q2F3.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q2F3" , (Q2F3.getCurrentFeedback() / 1.5));
-                    } else if (Q2F3.getCurrentFeedback() < 40.0 && Q2F3.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q2F3", 0.0);
-                        log.warn("Q2F3 set to 0A");
-                    }
-                    if (Q3F3.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q3F3" , (Q3F3.getCurrentFeedback() / 1.5));
-                    } else if (Q3F3.getCurrentFeedback() < 40.0 && Q3F3.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q3F3", 0.0);
-                        log.warn("Q3F3 set to 0A");
-                    }
-                    if (B12B3.getCurrentFeedback() >= 100.0) {
-                        ecubtcu.canMagnetSetCurrent("B12B3", (B12B3.getCurrentFeedback() / 1.5));
-                    } else if (B12B3.getCurrentFeedback() < 100.0 && B12B3.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("B12B3", 0.0);
-                        log.warn("B12B3 set to 0A");
-                    }
-                    break;
-                case 5:
-                    if (Q1S1.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q1S1" , (Q1S1.getCurrentFeedback() / 1.5));
-                    } else if (Q1S1.getCurrentFeedback() < 40.0 && Q1S1.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q1S1", 0.0);
-                        log.warn("Q1S1 set to 0A");
-                    }
-                    if (Q2S1.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q2S1" , (Q2S1.getCurrentFeedback() / 1.5));
-                    } else if (Q2S1.getCurrentFeedback() < 40.0 && Q2S1.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q2S1", 0.0);
-                        log.warn("Q2S1 set to 0A");
-                    }
-                    if (Q3S1.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q3S1" , (Q3S1.getCurrentFeedback() / 1.5));
-                    } else if (Q3S1.getCurrentFeedback() < 40.0 && Q3S1.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q3S1", 0.0);
-                        log.warn("Q3S1 set to 0A");
-                    }
-                    if (Q4S1.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q4S1" , (Q4S1.getCurrentFeedback() / 1.5));
-                    } else if (Q4S1.getCurrentFeedback() < 40.0 && Q4S1.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q4S1", 0.0);
-                        log.warn("Q4S1 set to 0A");
-                    }
-                    if (Q5S1.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q5S1" , (Q5S1.getCurrentFeedback() / 1.5));
-                    } else if (Q5S1.getCurrentFeedback() < 40.0 && Q5S1.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q5S1", 0.0);
-                        log.warn("Q5S1 set to 0A");
-                    }
-                    if (Q1S2.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q1S2" , (Q1S2.getCurrentFeedback() / 1.5));
-                    } else if (Q1S2.getCurrentFeedback() < 40.0 && Q1S2.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q1S2", 0.0);
-                        log.warn("Q1S2 set to 0A");
-                    }
-                    if (Q2S2.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q2S2" , (Q2S2.getCurrentFeedback() / 1.5));
-                    } else if (Q2S2.getCurrentFeedback() < 40.0 && Q2S2.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q2S2", 0.0);
-                        log.warn("Q2S2 set to 0A");
-                    }
-                    if (Q3S2.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q3S2" , (Q3S2.getCurrentFeedback() / 1.5));
-                    } else if (Q3S2.getCurrentFeedback() < 40.0 && Q3S2.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q3S2", 0.0);
-                        log.warn("Q3S2 set to 0A");
-                    }
-                    if (Q4S2.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q4S2" , (Q4S2.getCurrentFeedback() / 1.5));
-                    } else if (Q4S2.getCurrentFeedback() < 40.0 && Q4S2.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q4S2", 0.0);
-                        log.warn("Q4S2 set to 0A");
-                    }
-                    if (Q5S2.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q5S2" , (Q5S2.getCurrentFeedback() / 1.5));
-                    } else if (Q5S2.getCurrentFeedback() < 40.0 && Q5S2.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q5S2", 0.0);
-                        log.warn("Q5S2 set to 0A");
-                    }
-                    if (Q1B3.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q1B3" , (Q1B3.getCurrentFeedback() / 1.5));
-                    } else if (Q1B3.getCurrentFeedback() < 40.0 && Q1B3.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q1B3", 0.0);
-                        log.warn("Q1B3 set to 0A");
-                    }
-                    if (Q2B3.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q2B3" , (Q2B3.getCurrentFeedback() / 1.5));
-                    } else if (Q2B3.getCurrentFeedback() < 40.0 && Q2B3.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q2B3", 0.0);
-                        log.warn("Q2B3 set to 0A");
-                    }
-                    if (Q3B3.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q3B3" , (Q3B3.getCurrentFeedback() / 1.5));
-                    } else if (Q3B3.getCurrentFeedback() < 40.0 && Q3B3.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q3B3", 0.0);
-                        log.warn("Q3B3 set to 0A");
-                    }
-                    if (Q1I3.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q1I3" , (Q1I3.getCurrentFeedback() / 1.5));
-                    } else if (Q1I3.getCurrentFeedback() < 40.0 && Q1I3.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q1I3", 0.0);
-                        log.warn("Q1I3 set to 0A");
-                    }
-                    if (Q2I3.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q2I3" , (Q2I3.getCurrentFeedback() / 1.5));
-                    } else if (Q2I3.getCurrentFeedback() < 40.0 && Q2I3.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q2I3", 0.0);
-                        log.warn("Q2I3 set to 0A");
-                    }
-                    if (Q3I3.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q3I3" , (Q3I3.getCurrentFeedback() / 1.5));
-                    } else if (Q3I3.getCurrentFeedback() < 40.0 && Q3I3.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q3I3", 0.0);
-                        log.warn("Q3I3 set to 0A");
-                    }
-                    if (Q4I3.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q4I3" , (Q4I3.getCurrentFeedback() / 1.5));
-                    } else if (Q4I3.getCurrentFeedback() < 40.0 && Q4I3.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q4I3", 0.0);
-                        log.warn("Q4I3 set to 0A");
-                    }
-                    if (Q5I3.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q5I3" , (Q5I3.getCurrentFeedback() / 1.5));
-                    } else if (Q5I3.getCurrentFeedback() < 40.0 && Q5I3.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q5I3", 0.0);
-                        log.warn("Q5I3 set to 0A");
-                    }
-                    if (B12B3.getCurrentFeedback() >= 100.0) {
-                        ecubtcu.canMagnetSetCurrent("B12B3", (B12B3.getCurrentFeedback() / 1.5));
-                    } else if (B12B3.getCurrentFeedback() < 100.0 && B12B3.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("B12B3", 0.0);
-                        log.warn("B12B3 set to 0A");
-                    }
-                    if (B1I3.getCurrentFeedback() >= 100.0) {
-                        ecubtcu.canMagnetSetCurrent("B1I3", (B1I3.getCurrentFeedback() / 1.5));
-                    } else if (B1I3.getCurrentFeedback() < 100.0 && B1I3.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("B1I3", 0.0);
-                        log.warn("B1I3 set to 0A");
-                    }
-                    if (B2I3.getCurrentFeedback() >= 100.0) {
-                        ecubtcu.canMagnetSetCurrent("B2I3", (B2I3.getCurrentFeedback() / 1.5));
-                    } else if (B2I3.getCurrentFeedback() < 100.0 && B2I3.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("B2I3", 0.0);
-                        log.warn("B2I3 set to 0A");
-                    }
-                    break;
-                case 6:
-                    if (Q1S1.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q1S1" , (Q1S1.getCurrentFeedback() / 1.5));
-                    } else if (Q1S1.getCurrentFeedback() < 40.0 && Q1S1.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q1S1", 0.0);
-                        log.warn("Q1S1 set to 0A");
-                    }
-                    if (Q2S1.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q2S1" , (Q2S1.getCurrentFeedback() / 1.5));
-                    } else if (Q2S1.getCurrentFeedback() < 40.0 && Q2S1.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q2S1", 0.0);
-                        log.warn("Q2S1 set to 0A");
-                    }
-                    if (Q3S1.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q3S1" , (Q3S1.getCurrentFeedback() / 1.5));
-                    } else if (Q3S1.getCurrentFeedback() < 40.0 && Q3S1.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q3S1", 0.0);
-                        log.warn("Q3S1 set to 0A");
-                    }
-                    if (Q4S1.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q4S1" , (Q4S1.getCurrentFeedback() / 1.5));
-                    } else if (Q4S1.getCurrentFeedback() < 40.0 && Q4S1.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q4S1", 0.0);
-                        log.warn("Q4S1 set to 0A");
-                    }
-                    if (Q5S1.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q5S1" , (Q5S1.getCurrentFeedback() / 1.5));
-                    } else if (Q5S1.getCurrentFeedback() < 40.0 && Q5S1.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q5S1", 0.0);
-                        log.warn("Q5S1 set to 0A");
-                    }
-                    if (Q1S2.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q1S2" , (Q1S2.getCurrentFeedback() / 1.5));
-                    } else if (Q1S2.getCurrentFeedback() < 40.0 && Q1S2.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q1S2", 0.0);
-                        log.warn("Q1S2 set to 0A");
-                    }
-                    if (Q2S2.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q2S2" , (Q2S2.getCurrentFeedback() / 1.5));
-                    } else if (Q2S2.getCurrentFeedback() < 40.0 && Q2S2.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q2S2", 0.0);
-                        log.warn("Q2S2 set to 0A");
-                    }
-                    if (Q3S2.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q3S2" , (Q3S2.getCurrentFeedback() / 1.5));
-                    } else if (Q3S2.getCurrentFeedback() < 40.0 && Q3S2.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q3S2", 0.0);
-                        log.warn("Q3S2 set to 0A");
-                    }
-                    if (Q4S2.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q4S2" , (Q4S2.getCurrentFeedback() / 1.5));
-                    } else if (Q4S2.getCurrentFeedback() < 40.0 && Q4S2.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q4S2", 0.0);
-                        log.warn("Q4S2 set to 0A");
-                    }
-                    if (Q5S2.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q5S2" , (Q5S2.getCurrentFeedback() / 1.5));
-                    } else if (Q5S2.getCurrentFeedback() < 40.0 && Q5S2.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q5S2", 0.0);
-                        log.warn("Q5S2 set to 0A");
-                    }
-                    if (Q1S3.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q1S3" , (Q1S3.getCurrentFeedback() / 1.5));
-                    } else if (Q1S3.getCurrentFeedback() < 40.0 && Q1S3.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q1S3", 0.0);
-                        log.warn("Q1S3 set to 0A");
-                    }
-                    if (Q2S3.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q2S3" , (Q2S3.getCurrentFeedback() / 1.5));
-                    } else if (Q2S3.getCurrentFeedback() < 40.0 && Q2S3.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q2S3", 0.0);
-                        log.warn("Q2S3 set to 0A");
-                    }
-                    if (Q3S3.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q3S3" , (Q3S3.getCurrentFeedback() / 1.5));
-                    } else if (Q3S3.getCurrentFeedback() < 40.0 && Q3S3.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q3S3", 0.0);
-                        log.warn("Q3S3 set to 0A");
-                    }
-                    if (Q4S3.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q4S3" , (Q4S3.getCurrentFeedback() / 1.5));
-                    } else if (Q4S3.getCurrentFeedback() < 40.0 && Q4S3.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q4S3", 0.0);
-                        log.warn("Q4S3 set to 0A");
-                    }
-                    if (Q5S3.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q5S3" , (Q5S3.getCurrentFeedback() / 1.5));
-                    } else if (Q5S3.getCurrentFeedback() < 40.0 && Q5S3.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q5S3", 0.0);
-                        log.warn("Q5S3 set to 0A");
-                    }
-                    if (Q1B4.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q1B4" , (Q1B4.getCurrentFeedback() / 1.5));
-                    } else if (Q1B4.getCurrentFeedback() < 40.0 && Q1B4.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q1B4", 0.0);
-                        log.warn("Q1B4 set to 0A");
-                    }
-                    if (Q2B4.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q2B4" , (Q2B4.getCurrentFeedback() / 1.5));
-                    } else if (Q2B4.getCurrentFeedback() < 40.0 && Q2B4.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q2B4", 0.0);
-                        log.warn("Q2B4 set to 0A");
-                    }
-                    if (Q3B4.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q3B4" , (Q3B4.getCurrentFeedback() / 1.5));
-                    } else if (Q3B4.getCurrentFeedback() < 40.0 && Q3B4.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q3B4", 0.0);
-                        log.warn("Q3B4 set to 0A");
-                    }
-                    if (Q1G4.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q1G4" , (Q1G4.getCurrentFeedback() / 1.5));
-                    } else if (Q1G4.getCurrentFeedback() < 40.0 && Q1G4.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q1G4", 0.0);
-                        log.warn("Q1G4 set to 0A");
-                    }
-                    if (Q2G4.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q2G4" , (Q2G4.getCurrentFeedback() / 1.5));
-                    } else if (Q2G4.getCurrentFeedback() < 40.0 && Q2G4.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q2G4", 0.0);
-                        log.warn("Q2G4 set to 0A");
-                    }
-                    if (Q3G4.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q3G4" , (Q3G4.getCurrentFeedback() / 1.5));
-                    } else if (Q3G4.getCurrentFeedback() < 40.0 && Q3G4.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q3G4", 0.0);
-                        log.warn("Q3G4 set to 0A");
-                    }
-                    if (Q4G4.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q4G4" , (Q4G4.getCurrentFeedback() / 1.5));
-                    } else if (Q4G4.getCurrentFeedback() < 40.0 && Q4G4.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q4G4", 0.0);
-                        log.warn("Q4G4 set to 0A");
-                    }
-                    if (Q5G4.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q5G4" , (Q5G4.getCurrentFeedback() / 1.5));
-                    } else if (Q5G4.getCurrentFeedback() < 40.0 && Q5G4.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q5G4", 0.0);
-                        log.warn("Q5G4 set to 0A");
-                    }
-                    if (Q1N4.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q1N4" , (Q1N4.getCurrentFeedback() / 1.5));
-                    } else if (Q1N4.getCurrentFeedback() < 40.0 && Q1N4.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q1N4", 0.0);
-                        log.warn("Q1N4 set to 0A");
-                    }
-                    if (Q2N4.getCurrentFeedback() >= 40.0) {
-                        ecubtcu.canMagnetSetCurrent("Q2N4" , (Q2N4.getCurrentFeedback() / 1.5));
-                    } else if (Q2N4.getCurrentFeedback() < 40.0 && Q2N4.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("Q2N4", 0.0);
-                        log.warn("Q2N4 set to 0A");
-                    }
-                    if (B12B4.getCurrentFeedback() >= 100.0) {
-                        ecubtcu.canMagnetSetCurrent("B12B4", (B12B4.getCurrentFeedback() / 1.5));
-                    } else if (B12B4.getCurrentFeedback() < 100.0 && B12B4.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("B12B4", 0.0);
-                        log.warn("B12B4 set to 0A");
-                    }
-                    if (B1G4.getCurrentFeedback() >= 100.0) {
-                        ecubtcu.canMagnetSetCurrent("B1G4", (B1G4.getCurrentFeedback() / 1.5));
-                    } else if (B1G4.getCurrentFeedback() < 100.0 && B1G4.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("B1G4", 0.0);
-                        log.warn("B1G4 set to 0A");
-                    }
-                    if (B2G4.getCurrentFeedback() >= 100.0) {
-                        ecubtcu.canMagnetSetCurrent("B2G4", (B2G4.getCurrentFeedback() / 1.5));
-                    } else if (B2G4.getCurrentFeedback() < 100.0 && B2G4.getCurrentSetpoint() != 0.0){
-                        ecubtcu.canMagnetSetCurrent("B2G4", 0.0);
-                        log.warn("B2G4 set to 0A");
-                    }
-                    break;
-            }
-
-
-        }catch (EcubtcuException e) {
-            log.error("ECUBTCU exception " + e);
-            e.printStackTrace();
-        }catch (NullPointerException e){
-            log.error("Null ptr at setESSMagnets");
-            e.printStackTrace();
-        }finally {
-            try {
-                Thread.sleep(2000);
-            }catch (InterruptedException e){
-                e.printStackTrace();
-            }
+        switch (bp) {
+            case 1:
+                setDipoleCurrents(BP1Dipoles);
+                setQuadCurrents(BP1Quads);
+                break;
+            case 2:
+                setDipoleCurrents(BP2Dipoles);
+                setQuadCurrents(BP2Quads);
+                break;
+            case 3:
+                setDipoleCurrents(BP3Dipoles);
+                setQuadCurrents(BP3Quads);
+                break;
+            case 4:
+                setDipoleCurrents(BP4Dipoles);
+                setQuadCurrents(BP4Quads);
+                break;
+            case 5:
+                setDipoleCurrents(BP5Dipoles);
+                setQuadCurrents(BP5Quads);
+                break;
+            case 6:
+                setDipoleCurrents(BP6Dipoles);
+                setQuadCurrents(BP6Quads);
+                break;
         }
     }
 
@@ -2138,23 +1762,27 @@ public class Controller implements PropertyChangeListener, PropertyChangeProvide
         return currents;
     }
 
-	public void setCurrents(double[] newCurrents){
+    public void setCurrents(double[] newCurrents) {
         log.debug("Is ACU connected ?");
-        if(!acu.isConnected()){
+        if (!acu.isConnected()) {
             log.debug("Will try to connect to ACU");
             acu.connect();
             log.debug("Is connected");
         }
 
         for (int i = 0; i < 4; i++) {
+            //Dampening affect added to P1e Y  (by applying to P1e X due to BPM inversion)
+            if (i == 0) {
+                acu.setTagValue(Status.Magnet_write[i], newCurrents[i] * 0.7);
+            }
             acu.setTagValue(Status.Magnet_write[i], newCurrents[i]);
         }
-		log.debug("New currents sent to 4 magnets");
-	}
+        log.debug("New currents sent to 4 magnets");
+    }
 
-    public void setSafeCurrents(){
+    public void setSafeCurrents() {
         log.debug("Is ACU connected ?");
-        if(!acu.isConnected()){
+        if (!acu.isConnected()) {
             log.debug("Will try to connect to ACU");
             acu.connect();
             log.debug("Is connected");
@@ -2166,14 +1794,12 @@ public class Controller implements PropertyChangeListener, PropertyChangeProvide
         //acu.setTagValue(Status.Key_command, 76);
         log.warn("Safe currents restored to 4 magnets");
     }
-	
-	public String getSiteName()
-	{
-		return siteName ;
-	}
 
-    public static void setFeedbackClient()
-    {
+    public String getSiteName() {
+        return siteName;
+    }
+
+    public static void setFeedbackClient() {
 //        if (feedbackClient != null && feedbackClient.isConnected())
 //       {
 //            feedbackClient.disconnect();
@@ -2206,11 +1832,10 @@ public class Controller implements PropertyChangeListener, PropertyChangeProvide
 //                e.printStackTrace();
 //            }
 //        }
- //       feedbackClient = rtClient;
-    	
-    	if (!feedbackClient.isConnected())
-        {
-    		feedbackClient.setupICompClient();
+        //       feedbackClient = rtClient;
+
+        if (!feedbackClient.isConnected()) {
+            feedbackClient.setupICompClient();
             feedbackClient.connect();
         }
 
@@ -2221,6 +1846,7 @@ public class Controller implements PropertyChangeListener, PropertyChangeProvide
     public void align() {
         Screen screen = new Screen(mScreen);
         aligned = false;
+        String lastMatch = "";
 
         Settings.MinSimilarity = 0.8;
         try {
@@ -2247,8 +1873,11 @@ public class Controller implements PropertyChangeListener, PropertyChangeProvide
 //                        aligned = true;
 //                    }
 
-                    while (null != screen.exists("preparing", 0) || null != screen.exists("preparing2", 0) || null != screen.exists("afterRefresh", 0)) {
-                        log.warn("Found " + screen.getLastMatch().getImageFilename());
+                    while (null != screen.exists("preparing", 0) || null != screen.exists("preparing2", 0) || null != screen.exists("preparing3", 0) || null != screen.exists("afterRefresh", 0)) {
+                        if (lastMatch != screen.getLastMatch().getImageFilename()) {
+                            log.warn("Found " + screen.getLastMatch().getImageFilename());
+                        }
+                        lastMatch = screen.getLastMatch().getImageFilename();
                         robot.delay(200);
                     }
 
@@ -2274,7 +1903,7 @@ public class Controller implements PropertyChangeListener, PropertyChangeProvide
 
 //                if (Gui.checkTolerances()) {
 
-                if (mTolerances[0] >= Math.abs(mPositions[0]) && mTolerances[1] >= Math.abs(mPositions[1]) && mTolerances[2] >= Math.abs(mPositions[2]) && mTolerances[3] >= Math.abs(mPositions[3])) {
+                if (mTolerances[0] >= Math.abs(mPositions[0]) - mTargets[0] && mTolerances[1] >= Math.abs(mPositions[1]) - mTargets[1] && mTolerances[2] >= Math.abs(mPositions[2]) - mTargets[2] && mTolerances[3] >= Math.abs(mPositions[3] - mTargets[3])) {
 
                     log.warn("Positions within tolerance, ending automatic alignment");
 
@@ -2283,7 +1912,9 @@ public class Controller implements PropertyChangeListener, PropertyChangeProvide
                         screen.getLastMatch().click();
                         robot.delay(250);
                         aligned = true;
-                    } else { log.error("Could not find cancel button");}
+                    } else {
+                        log.error("Could not find cancel button");
+                    }
                 } else if (null != screen.exists("apply", 1) && !aligned) {
                     log.warn("Found apply button");
                     screen.getLastMatch().click();
@@ -2293,8 +1924,11 @@ public class Controller implements PropertyChangeListener, PropertyChangeProvide
                         screen.getLastMatch().click();
                         robot.delay(400);
 
-                        while (null != screen.exists("preparing", 1) || null != screen.exists("preparing2", 0) || null != screen.exists("afterRefresh", 1) && !aligned) {
-                            log.warn("Found " + screen.getLastMatch().getImageFilename());
+                        while (null != screen.exists("preparing", 1) || null != screen.exists("preparing2", 0) || null != screen.exists("preparing3", 0) || null != screen.exists("afterRefresh", 1) && !aligned) {
+                            if (lastMatch != screen.getLastMatch().getImageFilename()) {
+                                log.warn("Found " + screen.getLastMatch().getImageFilename());
+                            }
+                            lastMatch = screen.getLastMatch().getImageFilename();
                             robot.delay(200);
                         }
 
@@ -2315,7 +1949,7 @@ public class Controller implements PropertyChangeListener, PropertyChangeProvide
 //                        log.error("color1 = " + color1 + "  color2 = " + color2 + "  color3 = " + color3 + "  color4 = " + color4);
 
 //                        if (color1.getGreen() == 240 && color2.getGreen() == 240 && color3.getGreen() == 240 && color4.getGreen() >= 235 && !aligned) {
-                          if (mTolerances[0] >= mPositions[0] && mTolerances[1] >= mPositions[1] && mTolerances[2] >= mPositions[2] && mTolerances[3] >= mPositions[3]) {
+                        if (mTolerances[0] >= Math.abs(mPositions[0]) - mTargets[0] && mTolerances[1] >= Math.abs(mPositions[1]) - mTargets[1] && mTolerances[2] >= Math.abs(mPositions[2]) - mTargets[2] && mTolerances[3] >= Math.abs(mPositions[3] - mTargets[3])) {
 
                             log.warn("Positions within tolerance, ending automatic alignment");
 
@@ -2407,7 +2041,7 @@ public class Controller implements PropertyChangeListener, PropertyChangeProvide
 //            }
 
 
-        }catch(AWTException e){
+        } catch (AWTException e) {
             e.printStackTrace();
         }
     }
@@ -2426,110 +2060,144 @@ public class Controller implements PropertyChangeListener, PropertyChangeProvide
                 case 0:
                     if (Double.parseDouble(acu.getTagValue(mStatus.Arc_current).toString()) > 0.5) {
                         acu.setTagValue(mStatus.Key_command, 76);
-                        log.warn("Arc Power Supply has been turned OFF.");
+                        log.warn("[BURN-IN] Arc Power Supply has been turned OFF.");
                     }
 
                     if (Double.parseDouble(acu.getTagValue(mStatus.Fil_current).toString()) > 100) {
                         acu.setTagValue(mStatus.Key_command, 75);
-                        log.warn("Filament Power Supply has been turned OFF.");
+                        log.warn("[BURN-IN] Filament Power Supply has been turned OFF.");
                     }
                     break;
                 case 1:
-                    acu.setTagValue(mStatus.Fil_write, 125.001);
+                    acu.setTagValue(mStatus.Fil_write, (double) burnInStep[1]);
                     acu.setTagValue(mStatus.Key_command, 71);
-                    log.warn("Filament Power Supply has been turned ON to 125A.");
+                    log.warn("[BURN-IN] Filament Power Supply has been turned ON to " + String.valueOf(burnInStep[1]) + "A.");
                     break;
                 case 2:
-                    acu.setTagValue(mStatus.Fil_write, 130.001);
-                    log.warn("Filament Power Supply has been set to 130A.");
-                    break;
-                case 3:
-                    acu.setTagValue(mStatus.Fil_write, 135.001);
-                    log.warn("Filament Power Supply has been set to 135A.");
-                    break;
-                case 4:
-                    acu.setTagValue(mStatus.Fil_write, 140.001);
-                    log.warn("Filament Power Supply has been set to 140A.");
-                    break;
-                case 5:
-                    acu.setTagValue(mStatus.Fil_write, 145.001);
-                    log.warn("Filament Power Supply has been set to 145A.");
-                    break;
-                case 6:
-                    acu.setTagValue(mStatus.Fil_write, 150.001);
-                    log.warn("Filament Power Supply has been set to 150A.");
-                    break;
-                case 7:
-                    acu.setTagValue(mStatus.Fil_write, 155.001);
-                    log.warn("Filament Power Supply has been set to 155A.");
-                    break;
-                case 8:
-                    acu.setTagValue(mStatus.Fil_write, 160.001);
-                    log.warn("Filament Power Supply has been set to 160A.");
-                    break;
-                case 9:
-                    acu.setTagValue(mStatus.Fil_write, 165.001);
-                    log.warn("Filament Power Supply has been set to 165A.");
-                    break;
-                case 10:
-                    acu.setTagValue(mStatus.Fil_write, 170.001);
-                    log.warn("Filament Power Supply has been set to 170A.");
-                    break;
-                case 11:
-                    acu.setTagValue(mStatus.Fil_write, 175.001);
-                    log.warn("Filament Power Supply has been set to 175A.");
-                    break;
-                case 12:
-                    acu.setTagValue(mStatus.Fil_write, 180.001);
-                    log.warn("Filament Power Supply has been set to 180A.");
-                    break;
-                case 13:
-                    acu.setTagValue(mStatus.Fil_write, 185.001);
-                    log.warn("Filament Power Supply has been set to 185A.");
-                    break;
-                case 14:
-                    acu.setTagValue(mStatus.Fil_write, 190.001);
-                    log.warn("Filament Power Supply has been set to 190A.");
-                    break;
-                case 15:
-                    acu.setTagValue(mStatus.Fil_write, 195.001);
-                    log.warn("Filament Power Supply has been set to 195A.");
-                    break;
-                case 16:
-                    acu.setTagValue(mStatus.Fil_write, 190.001);
-                    log.warn("Filament Power Supply has been set to 190A.");
-                    break;
-                case 17:
-                    acu.setTagValue(mStatus.Fil_write, 185.001);
-                    log.warn("Filament Power Supply has been set to 185A.");
-                    break;
-                case 18:
-                    acu.setTagValue(mStatus.Fil_write, 180.001);
-                    log.warn("Filament Power Supply has been set to 180A.");
-                    break;
-                case 19:
-                    acu.setTagValue(mStatus.Arc_write, 85.001);
-                    acu.setTagValue(mStatus.Key_command, 72);
-                    log.warn("Arc Power Supply has been turned ON to 85mA.");
-                    break;
-                case 20:
-                    if(!sourceTuning()) {
-                        acu.setTagValue(mStatus.Key_command, 73);
-                        log.warn("Source tuning has been enabled.");
+                    acu.setTagValue(mStatus.Fil_write, (double) burnInStep[2]);
+                    if (isSourceOn()) {
+                        log.warn("[BURN-IN] Filament Power Supply has been set to " + String.valueOf(burnInStep[2]) + "A.");
+                    } else {
+                        acu.setTagValue(mStatus.Key_command, 71);
+                        log.warn("[BURN-IN] Filament Power Supply has been turned ON to " + String.valueOf(burnInStep[2]) + "A.");
                     }
                     break;
-                }
-        }else {
-            log.error("System is in automatic mode, please switch to manual.");
+                case 3:
+                    acu.setTagValue(mStatus.Fil_write, (double) burnInStep[3]);
+                    if (isSourceOn()) {
+                        log.warn("[BURN-IN] Filament Power Supply has been set to " + String.valueOf(burnInStep[3]) + "A.");
+                    } else {
+                        acu.setTagValue(mStatus.Key_command, 71);
+                        log.warn("[BURN-IN] Filament Power Supply has been turned ON to " + String.valueOf(burnInStep[3]) + "A.");
+                    }
+                    break;
+                case 4:
+                    acu.setTagValue(mStatus.Fil_write, (double) burnInStep[4]);
+                    if (isSourceOn()) {
+                        log.warn("[BURN-IN] Filament Power Supply has been set to " + String.valueOf(burnInStep[4]) + "A.");
+                    } else {
+                        acu.setTagValue(mStatus.Key_command, 71);
+                        log.warn("[BURN-IN] Filament Power Supply has been turned ON to " + String.valueOf(burnInStep[4]) + "A.");
+                    }
+                    break;
+                case 5:
+                    acu.setTagValue(mStatus.Fil_write, (double) burnInStep[5]);
+                    if (isSourceOn()) {
+                        log.warn("[BURN-IN] Filament Power Supply has been set to " + String.valueOf(burnInStep[5]) + "A.");
+                    } else {
+                        acu.setTagValue(mStatus.Key_command, 71);
+                        log.warn("[BURN-IN] Filament Power Supply has been turned ON to " + String.valueOf(burnInStep[5]) + "A.");
+                    }
+                    break;
+                case 6:
+                    acu.setTagValue(mStatus.Fil_write, (double) burnInStep[6]);
+                    if (isSourceOn()) {
+                        log.warn("[BURN-IN] Filament Power Supply has been set to " + String.valueOf(burnInStep[6]) + "A.");
+                    } else {
+                        acu.setTagValue(mStatus.Key_command, 71);
+                        log.warn("[BURN-IN] Filament Power Supply has been turned ON to " + String.valueOf(burnInStep[6]) + "A.");
+                    }
+                    break;
+                case 7:
+                    acu.setTagValue(mStatus.Fil_write, (double) burnInStep[7]);
+                    if (isSourceOn()) {
+                        log.warn("[BURN-IN] Filament Power Supply has been set to " + String.valueOf(burnInStep[7]) + "A.");
+                    } else {
+                        acu.setTagValue(mStatus.Key_command, 71);
+                        log.warn("[BURN-IN] Filament Power Supply has been turned ON to " + String.valueOf(burnInStep[7]) + "A.");
+                    }
+                    break;
+                case 8:
+                    acu.setTagValue(mStatus.Fil_write, (double) burnInStep[8]);
+                    if (isSourceOn()) {
+                        log.warn("[BURN-IN] Filament Power Supply has been set to " + String.valueOf(burnInStep[8]) + "A.");
+                    } else {
+                        acu.setTagValue(mStatus.Key_command, 71);
+                        log.warn("[BURN-IN] Filament Power Supply has been turned ON to " + String.valueOf(burnInStep[8]) + "A.");
+                    }
+                    break;
+                case 9:
+                    acu.setTagValue(mStatus.Fil_write, (double) burnInStep[9]);
+                    if (isSourceOn()) {
+                        log.warn("[BURN-IN] Filament Power Supply has been set to " + String.valueOf(burnInStep[9]) + "A.");
+                    } else {
+                        acu.setTagValue(mStatus.Key_command, 71);
+                        log.warn("[BURN-IN] Filament Power Supply has been turned ON to " + String.valueOf(burnInStep[9]) + "A.");
+                    }
+                    break;
+                case 10:
+                    acu.setTagValue(mStatus.Fil_write, (double) burnInStep[10]);
+                    if (isSourceOn()) {
+                        log.warn("[BURN-IN] Filament Power Supply has been set to " + String.valueOf(burnInStep[10]) + "A.");
+                    } else {
+                        acu.setTagValue(mStatus.Key_command, 71);
+                        log.warn("[BURN-IN] Filament Power Supply has been turned ON to " + String.valueOf(burnInStep[10]) + "A.");
+                    }
+                    break;
+                case 11:
+                    acu.setTagValue(mStatus.Arc_write, (double) burnInStep[11]);
+                    acu.setTagValue(mStatus.Key_command, 72);
+                    log.warn("[BURN-IN] Arc Power Supply has been turned ON to " + String.valueOf(burnInStep[11]) + "mA.");
+                    break;
+                case 12:
+                    if (!sourceTuning()) {
+                        if (isArcOn()) {
+                            acu.setTagValue(mStatus.Key_command, 73);
+                            log.warn("[BURN-IN] Source tuning has been enabled.");
+                        } else {
+                            log.warn("[BURN-IN] Source tuning has NOT been enabled because the Arc PS is not on.");
+                        }
+                    }
+                    break;
+            }
+        } else {
+            log.error("[BURN-IN] System is in automatic mode, please switch to manual.");
         }
     }
 
-    public boolean checkForSpark() {
-        if (!mStatus.getBool(Status.S2E_STATUS)) {
-            log.warn("Spark detected");
+    public boolean isArcOn() {
+        if (Float.valueOf(acu.getTagValue(Status.Arc_current).toString()) > 1) {
             return true;
+        } else {
+            return false;
         }
-        return false;
+    }
+
+    public static boolean isSourceOn() {
+        if (Float.valueOf(acu.getTagValue(Status.Fil_current).toString()) > 50) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean sparkDetected() {
+        try {
+            return restManager.getVariable("B0.R1.SKD01.RfSpaDe").getAsBoolean();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     public void stopBPMs() {
@@ -2540,21 +2208,375 @@ public class Controller implements PropertyChangeListener, PropertyChangeProvide
             if (P2E.getOperationMode() == BeamProfileMonitor.OperationMode.OPERATION_MODE_CONTINUOUS_ACQUISITION) {
                 P2E.stopContinuousAcquisition();
             }
-        }catch (EcubtcuNotConnectedException e) {
+        } catch (EcubtcuNotConnectedException e) {
             e.printStackTrace();
-        }catch (EcubtcuException e) {
+        } catch (EcubtcuException e) {
             e.printStackTrace();
         }
     }
 
-    private static class FeedbackConnectionListener implements PropertyChangeListener
-    {
+    public void updateButtonTest() {
+//        beam.xrayCtrl.isMoving();
+        //PmsDevice XRayA = beam.xrayCtrl;
+        //XRayA.
+//        ((RenovatedXrayProxy) XRayA).init();
+//        log.error(((RenovatedXrayProxy) XRayA).isMoving());
+
+//        log.error(beam.xrayCtrl.getLabel());
+//        log.error(beam.xrayCtrl.getMotionVeto());
+//        log.error(beam.xrayCtrl.getLegacyMotionStatus());
+//        log.error(beam.xrayCtrl.isMotionAllowed());
+//        log.error(beam.xrayCtrl.isTargetReached());
+//        log.error(beam.xrayCtrl.isInitialized());
+        //beam.xrayCtrl.softStop();
+
+
+        //beam.xrayCtrl.retract();
+        //beam.xrayCtrl.setActive(false);
+
+
+        //States are UNKNOWN
+        //log.error(beam.xrayCtrl.getRetractableDeviceState());
+        //log.error(beam.xrayCtrl.getState());
+
+//        beam.xrayCtrl.reset();
+//        beam.xrayCtrl.setRetracted(false);
+//        beam.xrayCtrl.setInserted(true);
+//        beam.xrayCtrl.insert();
+//        beam.xrayCtrl.proxyPublish();
+
+    }
+
+    public void trackMagnetFeedbackTR1() throws InterruptedException {
+        Timer timer = new Timer(1000, new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                log.warn("BSS activity is: " + beam.bssController.getCurrentActivityName().toString());
+            }
+        });
+        timer.setRepeats(false);
+
+        while (beam.bssController.getCurrentActivityName() != BssActivityId.PREPARE) {
+            timer.start();
+        }
+
+        timer = new Timer(2000, new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                log.warn("[MAGNETDUMP][FBTR1] Starting csv write.");
+            }
+        });
+        timer.setRepeats(false);
+        timer.start();
+
+        if (resultsFileTR1.isFile()) {
+            csvWriteSetpointsTR1(resultsFileTR1);
+        } else {
+            csvCreateTR1(resultsFileTR1);
+        }
+
+        //Collect while set range is ongoing
+        timer = new Timer(200, new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                csvWriteFeedbacksTR1(resultsFileTR1);
+            }
+        });
+        timer.setRepeats(false);
+
+        while (beam.bssController.getCurrentActivityName() == BssActivityId.PREPARE) {
+            timer.start();
+        }
+
+        while (beam.BAPP1.getIrradiationStatus() == IrradiationStatus.NOT_READY) {
+            timer.start();
+        }
+
+        //DCEU reset was just pressed
+        csvWriteSetpointsTR1(resultsFileTR1);
+
+        //Collect for 3 seconds after set range finishes
+        TR1timer.start();
+
+        timer = new Timer(200, new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                log.warn("[MAGNETDUMP][FBTR1] IrradiationStatus: " + beam.BAPP1.getIrradiationStatus());
+            }
+        });
+        timer.setRepeats(false);
+
+        while (beam.BAPP1.getIrradiationStatus() != IrradiationStatus.IRRADIATING) {
+            timer.start();
+        }
+
+        TR1timer.stop();
+        try (BufferedWriter out = new BufferedWriter(new FileWriter(resultsFileTR1, true))) {
+            out.newLine();
+            out.newLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        log.warn("[MAGNETDUMP][FBTR1] Ending csv write.");
+
+//        timer = new Timer(3000, new AbstractAction() {
+//            @Override
+//            public void actionPerformed(ActionEvent ae) {
+//                TR1timer.stop();
+//                try (BufferedWriter out = new BufferedWriter(new FileWriter(resultsFileTR1, true))) {
+//                    out.newLine();
+//                    out.newLine();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//                log.warn("[MAGNETDUMP][FBTR1] Ending csv write.");
+//            }
+//        });
+//        timer.setRepeats(false);
+//        timer.start();
+    }
+
+    public void trackMagnetFeedbackTR4() throws InterruptedException {
+        Timer timer = new Timer(1000, new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                log.warn("BSS activity is: " + beam.bssController.getCurrentActivityName().toString());
+            }
+        });
+        timer.setRepeats(false);
+
+        while (beam.bssController.getCurrentActivityName() != BssActivityId.PREPARE) {
+            timer.start();
+        }
+
+        timer = new Timer(2000, new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                log.warn("[MAGNETDUMP][GTR4] Starting csv write.");
+            }
+        });
+        timer.setRepeats(false);
+        timer.start();
+
+        if (resultsFileTR4.isFile()) {
+            csvWriteSetpointsTR4(resultsFileTR4);
+        } else {
+            csvCreateTR4(resultsFileTR4);
+        }
+
+        //Collect while set range is ongoing
+        timer = new Timer(200, new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                csvWriteFeedbacksTR4(resultsFileTR4);
+            }
+        });
+        timer.setRepeats(false);
+
+        while (beam.bssController.getCurrentActivityName() == BssActivityId.PREPARE) {
+            timer.start();
+        }
+
+        while (beam.BAPP4.getIrradiationStatus() == IrradiationStatus.NOT_READY) {
+            timer.start();
+        }
+
+        //DCEU reset was just pressed
+        csvWriteSetpointsTR4(resultsFileTR4);
+
+        //Collect for 3 seconds after set range finishes
+        TR4timer.start();
+
+        timer = new Timer(200, new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                log.warn("[MAGNETDUMP][GTR4] IrradiationStatus: " + beam.BAPP4.getIrradiationStatus());
+            }
+        });
+        timer.setRepeats(false);
+
+        while (beam.BAPP4.getIrradiationStatus() != IrradiationStatus.IRRADIATING) {
+            timer.start();
+        }
+
+        TR4timer.stop();
+        try (BufferedWriter out = new BufferedWriter(new FileWriter(resultsFileTR4, true))) {
+            out.newLine();
+            out.newLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        log.warn("[MAGNETDUMP][GTR4] Ending csv write.");
+
+//        timer = new Timer(3000, new AbstractAction() {
+//            @Override
+//            public void actionPerformed(ActionEvent ae) {
+//                TR4timer.stop();
+//                try (BufferedWriter out = new BufferedWriter(new FileWriter(resultsFileTR4, true))) {
+//                    out.newLine();
+//                    out.newLine();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//                log.warn("[MAGNETDUMP][GTR4] Ending csv write.");
+//            }
+//        });
+//        timer.setRepeats(false);
+//        timer.start();
+    }
+
+    private void csvCreateTR1(File newFile) {
+        try (BufferedWriter out = new BufferedWriter(new FileWriter(newFile, true))) {
+            out.write("Magnet,");
+            for (int i = 0; i < TR1Quads.length; i++) {
+                out.write(TR1Quads[i].getName() + ",");
+            }
+            for (int i = 0; i < TR1Dipoles.length; i++) {
+                out.write(TR1Dipoles[i].getName() + ",");
+            }
+            for (int i = 0; i < TR1Steering.length; i++) {
+                out.write(TR1Steering[i].getName() + ",");
+            }
+            out.write(SL1E.getName() + ",");
+            out.write(SL1E.getName() + ",");
+            out.write(SL2E.getName() + ",");
+            out.write(SL2E.getName() + ",");
+        } catch (IOException e) {
+            log.error(e);
+        }
+
+        csvWriteSetpointsTR1(newFile);
+    }
+
+    private void csvWriteSetpointsTR1(File resultsFile) {
+        DecimalFormat df = new DecimalFormat("#0.000");
+        try (BufferedWriter out = new BufferedWriter(new FileWriter(resultsFile, true))) {
+            out.newLine();
+            out.write("Setpoint,");
+            for (int i = 0; i < TR1Quads.length; i++) {
+                out.write(df.format(TR1Quads[i].getCurrentSetpoint()) + ",");
+            }
+            for (int i = 0; i < TR1Dipoles.length; i++) {
+                out.write(df.format(TR1Dipoles[i].getCurrentSetpoint()) + ",");
+            }
+            for (int i = 0; i < TR1Steering.length; i++) {
+                out.write(df.format(TR1Steering[i].getCurrentSetpoint()) + ",");
+            }
+            out.write(df.format(SL1E.getPosisionSetpoint()) + ",");
+            out.write(df.format(SL1E.getMotorSetpoint()) + ",");
+            out.write(df.format(SL2E.getPosisionSetpoint()) + ",");
+            out.write(df.format(SL2E.getMotorSetpoint()) + ",");
+        } catch (IOException e) {
+            log.error(e);
+        }
+    }
+
+    private void csvWriteFeedbacksTR1(File resultsFile) {
+        DecimalFormat df = new DecimalFormat("#0.000");
+        String pattern = "HH:mm:ss:SSS";
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+        String time = simpleDateFormat.format(new Date());
+
+        try (BufferedWriter out = new BufferedWriter(new FileWriter(resultsFile, true))) {
+            out.newLine();
+            out.write("FB@" + time + ",");
+            for (int i = 0; i < TR1Quads.length; i++) {
+                out.write(df.format(TR1Quads[i].getCurrentFeedback()) + ",");
+            }
+            for (int i = 0; i < TR1Dipoles.length; i++) {
+                out.write(df.format(TR1Dipoles[i].getCurrentFeedback()) + ",");
+            }
+            for (int i = 0; i < TR1Steering.length; i++) {
+                out.write(df.format(TR1Steering[i].getCurrentFeedback()) + ",");
+            }
+            out.write(df.format(SL1E.getPosisionFeedback()) + ",");
+            out.write(df.format(SL1E.getMotorFeedback()) + ",");
+            out.write(df.format(SL2E.getPosisionFeedback()) + ",");
+            out.write(df.format(SL2E.getMotorFeedback()) + ",");
+        } catch (IOException e) {
+            log.error(e);
+        }
+    }
+
+    private void csvCreateTR4(File newFile) {
+        try (BufferedWriter out = new BufferedWriter(new FileWriter(newFile, true))) {
+            out.write("Magnet,");
+            for (int i = 0; i < TR4Quads.length; i++) {
+                out.write(TR4Quads[i].getName() + ",");
+            }
+            for (int i = 0; i < TR4Dipoles.length; i++) {
+                out.write(TR4Dipoles[i].getName() + ",");
+            }
+            for (int i = 0; i < TR4Steering.length; i++) {
+                out.write(TR4Steering[i].getName() + ",");
+            }
+            out.write(SL1E.getName() + ",");
+            out.write(SL1E.getName() + ",");
+            out.write(SL2E.getName() + ",");
+            out.write(SL2E.getName() + ",");
+        } catch (IOException e) {
+            log.error(e);
+        }
+
+        csvWriteSetpointsTR4(newFile);
+    }
+
+    private void csvWriteSetpointsTR4(File resultsFile) {
+        DecimalFormat df = new DecimalFormat("#0.000");
+        try (BufferedWriter out = new BufferedWriter(new FileWriter(resultsFile, true))) {
+            out.newLine();
+            out.write("Setpoint,");
+            for (int i = 0; i < TR4Quads.length; i++) {
+                out.write(df.format(TR4Quads[i].getCurrentSetpoint()) + ",");
+            }
+            for (int i = 0; i < TR4Dipoles.length; i++) {
+                out.write(df.format(TR4Dipoles[i].getCurrentSetpoint()) + ",");
+            }
+            for (int i = 0; i < TR4Steering.length; i++) {
+                out.write(df.format(TR4Steering[i].getCurrentSetpoint()) + ",");
+            }
+            out.write(df.format(SL1E.getPosisionSetpoint()) + ",");
+            out.write(df.format(SL1E.getMotorSetpoint()) + ",");
+            out.write(df.format(SL2E.getPosisionSetpoint()) + ",");
+            out.write(df.format(SL2E.getMotorSetpoint()) + ",");
+        } catch (IOException e) {
+            log.error(e);
+        }
+    }
+
+    private void csvWriteFeedbacksTR4(File resultsFile) {
+        DecimalFormat df = new DecimalFormat("#0.000");
+        String pattern = "HH:mm:ss:SSS";
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+        String time = simpleDateFormat.format(new Date());
+
+
+        try (BufferedWriter out = new BufferedWriter(new FileWriter(resultsFile, true))) {
+            out.newLine();
+            out.write("FB@" + time + ",");
+            for (int i = 0; i < TR4Quads.length; i++) {
+                out.write(df.format(TR4Quads[i].getCurrentFeedback()) + ",");
+            }
+            for (int i = 0; i < TR4Dipoles.length; i++) {
+                out.write(df.format(TR4Dipoles[i].getCurrentFeedback()) + ",");
+            }
+            for (int i = 0; i < TR4Steering.length; i++) {
+                out.write(df.format(TR4Steering[i].getCurrentFeedback()) + ",");
+            }
+            out.write(df.format(SL1E.getPosisionFeedback()) + ",");
+            out.write(df.format(SL1E.getMotorFeedback()) + ",");
+            out.write(df.format(SL2E.getPosisionFeedback()) + ",");
+            out.write(df.format(SL2E.getMotorFeedback()) + ",");
+        } catch (IOException e) {
+            log.error(e);
+        }
+    }
+
+    private static class FeedbackConnectionListener implements PropertyChangeListener {
         @Override
-        public void propertyChange(PropertyChangeEvent evt)
-        {
+        public void propertyChange(PropertyChangeEvent evt) {
             if (evt.getPropertyName().equals(BlakEcubtcuFeedbackClient.CONNECTION)
-                    && ((Boolean) evt.getNewValue()).equals(false))
-            {
+                    && ((Boolean) evt.getNewValue()).equals(false)) {
                 log.error("Closing: Connection with RT/Notification server is lost, Blak needs to quit!");
                 //System.exit(0);
             }
@@ -2563,48 +2585,53 @@ public class Controller implements PropertyChangeListener, PropertyChangeProvide
 
 
     @Override
-    public void addPropertyChangeListener(PropertyChangeListener pListener)
-    {
+    public void addPropertyChangeListener(PropertyChangeListener pListener) {
         mPropertyChangeSupport.addPropertyChangeListener(pListener);
     }
 
     @Override
-    public void removePropertyChangeListener(PropertyChangeListener pListener)
-    {
+    public void removePropertyChangeListener(PropertyChangeListener pListener) {
         mPropertyChangeSupport.removePropertyChangeListener(pListener);
     }
 
     @Override
-    public void propertyChange(PropertyChangeEvent pEvent)
-    {
+    public void propertyChange(PropertyChangeEvent pEvent) {
         //log.info("Property change received: %s - Changed from %s to %s", pEvent.getPropertyName(), pEvent.getOldValue(),
-       //         pEvent.getNewValue());
+        //         pEvent.getNewValue());
 
         //if (!mAcquiring)
-       // {
-          //  log.debug("No acquisition for the moment, discarding event");
-          //  return;
+        // {
+        //  log.debug("No acquisition for the moment, discarding event");
+        //  return;
         //}
 
         //if (DegraderBeamStop.DBS_CURRENT.equals(pEvent.getPropertyName()))
         //{
-            //log.debug("Current value changed during acquisition, using this value");
-            //if (!mDeflector.isArcDetected())
-            //{
-                //Double beamCurrent = (Double) pEvent.getNewValue();
-                //log.debug("Beam current value to set: %s", beamCurrent);
-              //  mFilteredBeamCurrent.increment(beamCurrent);
+        //log.debug("Current value changed during acquisition, using this value");
+        //if (!mDeflector.isArcDetected())
+        //{
+        //Double beamCurrent = (Double) pEvent.getNewValue();
+        //log.debug("Beam current value to set: %s", beamCurrent);
+        //  mFilteredBeamCurrent.increment(beamCurrent);
 
-               // log.debug("Sample nbr = %d / %d", mFilteredBeamCurrent.getN(), mNumberOfSamples);
-               // if (mFilteredBeamCurrent.getN() == mNumberOfSamples)
-               // {
-                   // log.debug("All samples captured, completing acquisition...");
-                    //completeBeamCurrentAcquisition();
-               // }
-            //}
+        // log.debug("Sample nbr = %d / %d", mFilteredBeamCurrent.getN(), mNumberOfSamples);
+        // if (mFilteredBeamCurrent.getN() == mNumberOfSamples)
+        // {
+        // log.debug("All samples captured, completing acquisition...");
+        //completeBeamCurrentAcquisition();
+        // }
+        //}
         //}
     }
 
 
     private PropertyChangeSupport mPropertyChangeSupport = new PropertyChangeSupport(this);
+
+
+    public PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
+        PropertySourcesPlaceholderConfigurer properties = new PropertySourcesPlaceholderConfigurer();
+        properties.setLocation(new FileSystemResource("room.properties"));
+        properties.setIgnoreResourceNotFound(false);
+        return properties;
+    }
 }

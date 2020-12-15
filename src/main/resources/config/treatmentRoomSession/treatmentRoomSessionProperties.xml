@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<propertyDefinitions>
+   <component>
+      <name>TSM</name>
+      <propertyDefinition>
+         <name>TreatmentRoomSession</name>
+         <type>STRING</type>
+         <description>Indicates the current status of the session in TCR/TR: 'None'/'Physics'/'Treatment'</description>
+      </propertyDefinition>      
+   </component>   
+</propertyDefinitions>

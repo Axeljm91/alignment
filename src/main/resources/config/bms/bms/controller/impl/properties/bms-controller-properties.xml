@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<propertyDefinitions>
+   <!-- properties of beam access point of BMS. -->
+   <component>
+      <name>BAPBMS</name>
+      <propertyDefinition>
+         <name>currentStateId</name>
+         <type>STRING</type>
+         <indexed>false</indexed>
+         <writable>true</writable>
+         <description>current state id</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>authorized</name>
+         <type>BOOLEAN</type>
+         <indexed>false</indexed>
+         <writable>true</writable>
+         <description>authorized status</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>beamResult</name>
+         <type>ARRAY</type>
+         <indexed>false</indexed>
+         <writable>true</writable>
+         <description>Beam result of irradiation</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>beamProgress</name>
+         <type>ARRAY</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>Beam progress of irradiation</description>
+      </propertyDefinition>
+       <propertyDefinition>
+          <name>beamAllocated</name>
+          <type>BOOLEAN</type>
+          <indexed>false</indexed>
+          <writable>true</writable>
+          <description>whether beam is allocated to this controller</description>
+       </propertyDefinition>
+   </component>
+
+</propertyDefinitions>

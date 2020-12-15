@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<propertyDefinitions>
+   <component>
+      <name>ECUBTCU</name>
+      <propertyDefinition>
+         <name>state</name>
+         <type>INTEGER</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>Current health status of ECUBTCU / 0: booting / 1: initializing / 2: healthy / 3: unhealthy</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>RequestedPosition</name>
+         <type>INTEGER</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>Requested position from the ECU/BTCU</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>Position</name>
+         <type>INTEGER</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>Position from the ECU/BTCU</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>Inserted</name>
+         <type>BOOLEAN</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>Inserted status from the ECU/BTCU</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>Retracted</name>
+         <type>BOOLEAN</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>Retracted status from the ECU/BTCU</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>InsertionStatus</name>
+         <type>INTEGER</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>
+            Insertion status from the ECU/BTCU 0 = correct / 1 = incorrect out / 2 = incorrect in
+         </description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>IseuMode</name>
+         <type>DOUBLE</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>ISEU operating mode from the ECU/BTCU</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>PositionStatus</name>
+         <type>INTEGER</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>Enumerated Position Status from the ECU/BTCU</description>
+      </propertyDefinition>
+   </component>
+</propertyDefinitions>

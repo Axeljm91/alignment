@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                       http://www.springframework.org/schema/beans/spring-beans.xsd
+                       http://www.springframework.org/schema/util
+                       http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <!-- TODO : copy paste from UPEnn, please put in there real values !! -->
+    <util:map id="blpscuInputsMap" map-class="java.util.HashMap" key-type="com.iba.icomp.core.property.PropertyInfo"
+              value-type="com.iba.pts.bms.devices.impl.plc.PLCAddress">
+        <!-- Switching info -->
+        <entry key="blpscu#BLPSCU.BeamlineSelected[1]" value="DB50.DBX81.1" />
+        <entry key="blpscu#BLPSCU.BeamlineSelected[2]" value="DB50.DBX81.2" />
+        <entry key="blpscu#BLPSCU.BeamlineSelected[3]" value="DB50.DBX81.3" />
+        <entry key="blpscu#BLPSCU.BeamlineSelected[4]" value="DB50.DBX81.4" />
+        <entry key="blpscu#BLPSCU.BeamlineSelected[5]" value="DB50.DBX81.5" />
+        <entry key="blpscu#BLPSCU.BeamlineSelected[6]" value="DB50.DBX81.6" />
+        <entry key="blpscu#BLPSCU.BeamlineSelectionEnabled[1]" value="DB50.DBX80.3" />
+        <entry key="blpscu#BLPSCU.BeamlineSelectionEnabled[2]" value="DB50.DBX80.4" />
+        <entry key="blpscu#BLPSCU.BeamlineSelectionEnabled[3]" value="DB50.DBX80.5" />
+        <entry key="blpscu#BLPSCU.BeamlineSelectionEnabled[4]" value="DB50.DBX80.6" />
+        <entry key="blpscu#BLPSCU.BeamlineSelectionEnabled[5]" value="DB50.DBX80.7" />
+        <entry key="blpscu#BLPSCU.BeamlineSelectionEnabled[6]" value="DB50.DBX81.0" />
+        <!-- SMPS info -->
+        <entry key="SMPSEU-BLPSCU-BE#SMPSEU-BLPSCU-BE.BlpscuStatusOk" value="DB50.DBX64.0" />
+        <entry key="SMPSEU-BLPSCU-BE#SMPSEU-BLPSCU-BE.BlpscuStandby" value="DB50.DBX83.1" />
+    </util:map>
+
+</beans>

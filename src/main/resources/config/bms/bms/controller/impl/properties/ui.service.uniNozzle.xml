@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xmlns:util="http://www.springframework.org/schema/util"
+   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd">
+
+   <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+   <!-- Common TCU device settings -->
+   <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+
+   <import resource="classpath:config/bms/bds/devices/impl/tcuDevices.xml"/>
+   <import resource="classpath:config/bms/common/default-container-common.xml"/>
+   <import resource="classpath:xml/config/bms/tcrServiceScreens/ui.service.xml"/>
+
+   <bean id="abstractTcuDeviceEndPoint"  parent="abstractEndPoint" abstract="true">
+      <property name="outputChannel" ref="tcuRpcSender"/>
+   </bean>
+   
+   <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+   <!-- TCU device: dataDaq -->
+   <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+   
+   <!-- Empty proxy used to force data publishing -->
+   <bean id="daqAcqServicePublish" parent="simpleAbstractProxy" class="com.iba.icomp.core.component.EmptyProxy">
+      <property name="name" value="daqAcqServicePublish" />
+      <property name="componentName" value="daqAcqService" />
+   </bean>
+   
+   <bean class="com.iba.icompx.core.component.ExtEndPointProxy">
+      <property name="component" ref="tcuProxy"/>
+      <property name="componentName" value="daqAcqService"/>
+      <property name="intermediary" ref="applicationQueue"/>
+      <property name="outputChannel" ref="notifBdsDevicesSender"/>
+   </bean>
+   
+   <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+   <!-- TCU device -->
+   <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+   
+   <bean id="nozzleCuCompositeDevice" parent="swingProxy">
+      <property name="proxyTargetClass" value="true"/>
+      <property name="target">
+         <bean class="com.iba.pts.bms.tcrServiceScreens.InitializableCompositeDevice">
+            <property name="deviceName" value="Treatment Control Unit"/>
+            <property name="actionModel" ref="nozzleCuActionModel"/>
+            <property name="devices">
+               <bean class="com.iba.icomp.core.config.DynamicAggregatedList">
+                  <property name="elementType" value="com.iba.pts.bms.bds.devices.api.TcuDeviceSwingProxy"/>
+               </bean>
+            </property>
+         </bean>
+      </property>
+   </bean>
+   
+   <bean parent="abstractTcuDeviceEndPoint">
+      <property name="component" ref="tcuProxy"/>
+   </bean>
+   
+   <bean id="swingTcuProxy" parent="swingProxy">
+      <property name="proxyInterfaces" value="com.iba.pts.bms.bds.devices.api.Tcu,
+                                              com.iba.pts.bms.bds.devices.api.TcuDeviceSwingProxy" />
+      <property name="target" ref="tcuProxy" />
+   </bean>
+
+   <bean id="nozzleCuActionModel" class="com.iba.pts.bms.tcrServiceScreens.DeviceActionModel">
+      <constructor-arg ref="callbackUtilityProxy" />
+      <constructor-arg ref="uiBappContainerValueModel" />
+      <constructor-arg ref="swingTsmProxy" />
+      <constructor-arg ref="swingTcuProxy" />
+   </bean>
+
+   <bean id="tcuPanel" class="com.iba.pts.bms.tcrServiceScreens.TcuPanel">
+      <property name="title" value="Treatment Control Unit"/>
+      <property name="valueModel" ref="nozzleCuActionModel" />
+      <property name="domainModel" ref="swingTcuProxy" />
+      <property name="dsUsMode" value="true"/>
+      <property name="ibtr" value="true" />
+   </bean>
+   
+   <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+   <!-- Uniform Scanning Service Irradiation -->
+   <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+   
+   <beans profile="technique=dsus">
+         
+      <bean id="idtConfig" class="com.iba.pts.bms.dosimetry.impl.util.IdtConfig">
+         <property name="therapyCentre" ref="therapyCentre"/>
+         <property name="sitePrefix" value="config/PAT.112/"/>
+         <property name="filenames">
+            <map>
+               <entry key="UNIFORM_SCANNING" value="WobAlgo.csv"/>
+            </map>
+         </property>
+      </bean>   
+   </beans>
+   
+   <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+   <!-- RMEU -->
+   <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+   
+   <beans profile="technique=dsus">
+      
+      <bean parent="abstractTcuDeviceEndPoint">
+         <property name="component" ref="rangeModulator"/>
+      </bean>
+      
+      <bean id="swingTcuRmeu" parent="swingProxy">
+         <property name="proxyInterfaces" value="com.iba.pts.bms.bds.devices.api.RangeModulator,
+                                                 com.iba.pts.bms.bds.devices.api.TcuDeviceSwingProxy" />
+         <property name="target" ref="rangeModulator" />
+      </bean>
+      
+      <bean id="tcuRmeuPanel" class="com.iba.pts.bms.tcrServiceScreens.RangeModulatorPanel">
+         <property name="title" value="Range Modulator"/>
+         <property name="valueModel" ref="nozzleCuActionModel" />
+         <property name="domainModel" ref="swingTcuRmeu" />
+         <property name="tcu" ref="swingTcuProxy" />
+      </bean>
+
+   </beans>
+   
+   <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+   <!-- FSEU -->
+   <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+   
+   <beans profile="technique=dsus">
+      
+      <bean parent="abstractTcuDeviceEndPoint">
+         <property name="component" ref="tcuFseu"/>
+      </bean>
+      
+      <bean id="swingTcuFseu" parent="swingProxy">
+         <property name="proxyInterfaces" value="com.iba.pts.bms.bds.devices.api.FirstScatterer,
+                                                 com.iba.pts.bms.bds.devices.api.TcuDeviceSwingProxy" />
+         <property name="target" ref="tcuFseu" />
+      </bean>
+      
+      <bean id="tcuFseuPanel" class="com.iba.pts.bms.tcrServiceScreens.TcuFseuPanel">
+         <property name="title" value="First Scatterer"/>
+         <property name="valueModel" ref="nozzleCuActionModel" />
+         <property name="domainModel" ref="swingTcuFseu" />
+      </bean>
+
+   </beans>
+      
+   <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+   <!-- SSEU -->
+   <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+   
+   <beans>
+         
+      <bean parent="abstractTcuDeviceEndPoint">
+         <property name="component" ref="tcuSseu"/>
+      </bean>
+      
+      <bean id="swingTcuSseu" parent="swingProxy">
+         <property name="proxyInterfaces" value="com.iba.pts.bms.bds.devices.api.TcuSecondScatterer,
+                                                 com.iba.pts.bms.bds.devices.api.TcuDeviceSwingProxy" />
+         <property name="target" ref="tcuSseu" />
+      </bean>
+      
+      <bean id="tcuSseuPanel" class="com.iba.pts.bms.tcrServiceScreens.TcuSseuPanel">
+         <property name="title" value="Second Scatterer"/>
+         <property name="valueModel" ref="nozzleCuActionModel" />
+         <property name="domainModel" ref="swingTcuSseu" />
+      </bean>
+
+   </beans>
+      
+   <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+   <!-- VCEU -->
+   <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+   
+   <beans>
+         
+      <bean parent="abstractTcuDeviceEndPoint">
+         <property name="component" ref="tcuVceu"/>
+      </bean>
+      
+      <bean id="swingTcuVceu" parent="swingProxy">
+         <property name="proxyInterfaces" value="com.iba.pts.bms.bds.devices.api.TcuVariableCollimator,
+                                                 com.iba.pts.bms.bds.devices.api.TcuDeviceSwingProxy" />
+         <property name="target" ref="tcuVceu" />
+      </bean>
+      
+      <bean id="tcuVceuPanel" class="com.iba.pts.bms.tcrServiceScreens.TcuVceuPanel">
+         <property name="title" value="Variable Collimator"/>
+         <property name="valueModel" ref="nozzleCuActionModel" />
+         <property name="domainModel" ref="swingTcuVceu" />
+      </bean>
+
+   </beans>
+      
+   <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+   <!-- SMEU -->
+   <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+   
+   <beans>
+      
+      <bean parent="abstractTcuDeviceEndPoint">
+         <property name="component" ref="tcuSmeu"/>
+      </bean>
+      
+      <bean id="swingTcuSmeu" parent="swingProxy">
+         <property name="proxyInterfaces" value="com.iba.pts.bms.bds.devices.api.ScanningMagnets,
+                                                 com.iba.pts.bms.bds.devices.api.TcuDeviceSwingProxy" />
+         <property name="target" ref="tcuSmeu" />
+      </bean>
+      
+      <bean id="tcuSmPanel" class="com.iba.pts.bms.tcrServiceScreens.ScanningMagnetsPanel">
+         <property name="title" value="Scanning Magnets"/>
+         <property name="panel30Hz">
+            <bean class="com.iba.pts.bms.tcrServiceScreens.ScanValuesPanel">
+               <constructor-arg value="Scan30Hz"/>
+               <property name="navigationAccessible" value="false"/>
+               <property name="valueModel" ref="nozzleCuActionModel"/>
+               <property name="domainModel" ref="swingTcuSmeu" />
+            </bean>
+         </property>
+         <property name="panel3Hz">
+            <bean class="com.iba.pts.bms.tcrServiceScreens.ScanValuesPanel">
+               <constructor-arg value="Scan3Hz"/>
+               <property name="navigationAccessible" value="false"/>
+               <property name="valueModel" ref="nozzleCuActionModel"/>
+               <property name="domainModel" ref="swingTcuSmeu" />
+            </bean>
+         </property>
+         <property name="valueModel" ref="nozzleCuActionModel" />
+         <property name="domainModel" ref="swingTcuSmeu" />
+         <property name="smpsType" value="${prop:config.bms.smpsType}" />         
+      </bean>
+
+   </beans>
+      
+   <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+   <!-- MLC -->
+   <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+   
+   <beans profile="mlc=true">
+   
+      <!-- TODO move definitions to mlc.true.proxy.xml (and remove the "true") -->
+      <!-- <import resource="classpath:config/bms/bds/devices/impl/mlc.${config.mlc}.proxy.xml"/> -->
+         
+      <bean id="MLC-PROXY" parent="simpleAbstractProxy" class="com.iba.tcs.beam.bds.devices.impl.MlcProxy">
+         <property name="name" value="MLC-PROXY" />
+         <property name="componentName" value="urn:device:mlc:#{bdp}" />
+         <property name="responseTimeOut" value="2000" />
+      </bean>
+      
+      <bean parent="abstractEndPoint">
+         <property name="component" ref="MLC-PROXY"/>
+      </bean>
+   
+      <bean id="swingMlc" parent="swingProxy">
+         <property name="proxyInterfaces" value="com.iba.pts.bms.bds.devices.api.Mlc"/>
+         <property name="target" ref="MLC-PROXY" />
+      </bean>
+   
+      <bean id="mlcCompositeDevice" parent="swingProxy">
+         <property name="proxyTargetClass" value="true"/>
+         <property name="target">
+            <bean class="com.iba.pts.bms.tcrServiceScreens.InitializableCompositeDevice">
+               <property name="deviceName" value="Multileaf Collimator"/>
+               <property name="actionModel" ref="mlcActionModel"/>
+               <property name="devices">
+                  <list>
+                     <ref bean="swingMlc" />
+                  </list>
+               </property>
+            </bean>
+         </property>
+      </bean>
+   
+      <bean id="mlcActionModel" class="com.iba.pts.bms.tcrServiceScreens.DeviceActionModel">
+         <constructor-arg ref="callbackUtilityProxy" />
+         <constructor-arg ref="uiBappContainerValueModel" />
+         <constructor-arg ref="swingTsmProxy" />
+         <constructor-arg ref="swingMlc"/>
+         <constructor-arg value="false"/>
+      </bean>
+   
+      <bean id="mlcPanel" class="com.iba.pts.bms.tcrServiceScreens.MlcPanel">
+         <property name="title" value="Multileaf Collimator"/>
+         <property name="valueModel" ref="mlcActionModel" />
+         <property name="domainModel" ref="swingMlc" />
+      </bean>
+      
+      <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+      <!-- AHUN -->
+      <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+   
+      <beans profile="ahun=true">
+      
+         <bean parent="abstractTcuDeviceEndPoint">
+            <property name="component" ref="tcuAhun"/>
+         </bean>
+   
+         <bean id="swingTcuAhun" parent="swingProxy">
+            <property name="proxyInterfaces" value="com.iba.pts.bms.bds.devices.api.Ahun,
+                                                    com.iba.pts.bms.bds.devices.api.TcuDeviceSwingProxy" />
+            <property name="target" ref="tcuAhun" />
+         </bean>
+      
+         <bean id="tcuAhunPanel" class="com.iba.pts.bms.tcrServiceScreens.TcuAhunPanel">
+            <property name="title" value="Accessories Holder"/>
+            <property name="domainModel" ref="swingTcuAhun" />
+         </bean>
+      
+      </beans>
+   
+   </beans>
+   
+   <!-- ++++++++++++++++++++++++++++++++++++++++++++ -->
+   <!-- Automatic Nozzle Switching (isolation valve) -->
+   <!-- ++++++++++++++++++++++++++++++++++++++++++++ -->
+   
+   <beans profile="ans=true">
+      
+      <import resource="classpath:config/bms/ans/ans.isolationValve.proxy.xml"/>
+
+      <bean id="ansDevicesRackPanel" class="com.iba.pts.bms.tcrServiceScreens.AnsDevicesRackPanel">
+         <property name="title" value="ANS Devices"/>
+         <property name="domainModel" ref="ansCompositeDevices" />
+         <property name="valueModel" ref="ansDevicesActionModel" />
+      </bean>
+
+
+       <bean id="ansDevicesActionModel" class="com.iba.pts.bms.tcrServiceScreens.DeviceActionModel">
+           <constructor-arg ref="uiBappContainerValueModel" />
+           <constructor-arg ref="swingTsmProxy" />
+           <constructor-arg ref="ansCompositeDevices" />
+       </bean>
+
+       <bean id="ansCompositeDevices" class="com.iba.pts.bms.tcrServiceScreens.InitializableCompositeDevice">
+           <property name="deviceName" value="ANS Devices"/>
+           <property name="actionModel" ref="ansDevicesActionModel"/>
+           <property name="devices">
+               <list>
+                   <ref bean="ANSDEVICE-BE-PROXY"/>
+                   <ref bean="ANSVACUUM-BE-PROXY"/>
+               </list>
+           </property>
+         </bean>
+
+
+   </beans>
+
+</beans>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<propertyDefinitions>
+   <component>
+      <name>BssPrepareActivityGuiModel</name>
+      <propertyDefinition>
+         <name>PreparationState</name>
+         <type>STRING</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>Prepare activity state</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>ActivityStatus</name>
+         <type>STRING</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>Prepare activity status</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>KeepAllocation</name>
+         <type>BOOLEAN</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>Keep allocation flag</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>BdsAllowingBeamRequest</name>
+         <type>BOOLEAN</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>Whether BDS allows  beam request</description>
+      </propertyDefinition>
+       <propertyDefinition>
+          <name>TrcsAllowingBeamRequest</name>
+          <type>BOOLEAN</type>
+          <indexed>false</indexed>
+          <writable>false</writable>
+          <description>Whether TRCS allows  beam request</description>
+       </propertyDefinition>
+       <propertyDefinition>
+          <name>SelectedBeamSupplyPoint</name>
+          <type>STRING</type>
+          <indexed>false</indexed>
+          <writable>false</writable>
+          <description>Selected beam supply point</description>
+       </propertyDefinition>
+      <propertyDefinition>
+         <name>AutomaticOperatingMode</name>
+         <type>BOOLEAN</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>Whether BSS Controller is in automatic operating mode</description>
+      </propertyDefinition>
+   </component>
+</propertyDefinitions>

@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ ///////////////////////////////////////////////////////////////////
+  ~ Copyright (c) by Ion Beam Applications S.A.
+  ~ All rights reserved
+  ~ Rue du cyclotron, 3
+  ~ B-1348 Louvain-la-Neuve
+  ~ Tel : +32.10.47.58.11
+  ~ ///////////////////////////////////////////////////////////////////
+  -->
+
+<!--Dictionary of ICOMP properties for the BIREU -->
+
+<propertyDefinitions>
+   <component>
+      <name>BIREU</name>
+      <propertyDefinition>
+         <name>BcmCheckActive</name>
+         <type>BOOLEAN</type>
+         <description>Indicates whether the BCM check (performed by the BIREU) is active.</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>MaxCurrentCheckActive</name>
+         <type>BOOLEAN</type>
+         <description>Indicates whether the Max current check is active.</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>MaxCurrentCheckOk</name>
+         <type>BOOLEAN</type>
+         <description>Indicates whether the Max current check is Ok.</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>TreatmentMode</name>
+         <type>STRING</type>
+         <writable>true</writable>
+         <description>Treatment Mode.</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>BcmReceived</name>
+         <type>BOOLEAN</type>
+         <description>True if the BIREU acknowledges the reception of a new BCM file.</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>BcmFileId</name>
+         <type>STRING</type>
+         <description>The BCM file ID.</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>BinNumber</name>
+         <type>INTEGER</type>
+         <description>Number of bins used in the BIREU. Possible values: 10,25,50,125,250.</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>BcmStartDigit</name>
+         <type>INTEGER</type>
+         <description>The start digit of the BCM file.</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>BcmStopDigit</name>
+         <type>INTEGER</type>
+         <description>The stop digit of the BCM file.</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>IcCycloCurrentNormalizedNbin</name>
+         <type>ARRAY</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>The N_Bin IC Cyclo current normalized values calculated by the BIREU over N-Bins.</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>OriginalBcmFile</name>
+         <type>ARRAY</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>The original BCM file without stop digit.</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>BcmNbin</name>
+         <type>ARRAY</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>The N_Bin BCM normalized values calculated by the BIREU.</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>IcCycloNormalizationFactor</name>
+         <type>DOUBLE</type>
+         <description>The Ic Cyclo normalization factor calculated by the BIREU.</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>BcmError</name>
+         <type>ARRAY</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>The BCM errors: BCM Error [n] = IC Cyclo Normalized[n] - BCM Normalized[n].
+         </description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>BcmAverageError</name>
+         <type>DOUBLE</type>
+         <description>The BCM average error.</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>BcmMaxError</name>
+         <type>DOUBLE</type>
+         <description>The BCM max error.</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>BcmRisingEdgePosition</name>
+         <type>DOUBLE</type>
+         <description>The BCM rising edge position.</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>BcmFallingEdgePosition</name>
+         <type>DOUBLE</type>
+         <description>The BCM falling edge position.</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>IcRisingEdgePosition</name>
+         <type>DOUBLE</type>
+         <description>The IC Cyclo rising edge position.</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>IcFallingEdgePosition</name>
+         <type>DOUBLE</type>
+         <description>The IC Cyclo falling edge position.</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>WidthError</name>
+         <type>DOUBLE</type>
+         <description>The width error.</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>TimeOffset</name>
+         <type>DOUBLE</type>
+         <description>The time offset.</description>
+      </propertyDefinition>
+
+      <propertyDefinition>
+         <name>IcIntegratedCurrent</name>
+         <type>DOUBLE</type>
+         <description>Value of the Ic Cyclo current averaged over 1s.</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>BcmCheckResultOk</name>
+         <type>BOOLEAN</type>
+         <description>True if the result of the BCM check (performed by the BIREU) is OK.</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>WaitingForBeam</name>
+         <type>BOOLEAN</type>
+         <description>True if the BIREU is waiting for the beam: BCM file received, BIREU ready, IcCyclo
+            smaller than Current Threshold BCM check.
+         </description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>MakingCheck</name>
+         <type>BOOLEAN</type>
+         <description>True if the BIREU is performing the check.</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>BireuState</name>
+         <type>String</type>
+         <description>The state of the Bireu: Idle, Ready, BcmCheckStarted, Unknown.</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>TimeBcmCheck</name>
+         <type>DOUBLE</type>
+         <description>Time at which occurs the BCM check. The time is a multiple of 100ms.</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>ErrWarnFlagsBcmCheck</name>
+         <type>ARRAY</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>List of error and warning flags for the Bcm Check.</description>
+      </propertyDefinition>
+
+
+      <!--Additional properties used for GUI -->
+      <propertyDefinition>
+         <name>ToleranceFullLocalBcmCheckHigh</name>
+         <type>DOUBLE</type>
+         <description>Upper threshold for the BCM check error (difference between BCM file and Ic Cyclo).
+         </description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>ToleranceFullLocalBcmCheckLow</name>
+         <type>DOUBLE</type>
+         <description>Lower threshold for the BCM check error (difference between BCM file and Ic Cyclo).
+         </description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>ToleranceFullGlobalBcmCheckHigh</name>
+         <type>DOUBLE</type>
+         <description>Threshold for the BCM check error (difference between BCM file and Ic Cyclo) squared.
+         </description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>ToleranceWidthError</name>
+         <type>LONG</type>
+         <description>Tolerance for the width error.
+         </description>
+      </propertyDefinition>
+
+   </component>
+</propertyDefinitions>

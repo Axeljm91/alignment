@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Configuration with ECUBTCU Daq -->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+    <import resource="classpath:config/icomp/core/daq/daqserver.real.xml" />
+    <import resource="classpath:config/bms/bss/devices/impl/ecubtcuRpc.xml"/>
+    <import resource="classpath:config/PAT.112/beamCommonProcess/daq.ecubtcuMsgDef.xml" />
+    <import resource="classpath:config/PAT.112/beamCommonProcess/daq.ecubtcuFrames.xml" />
+
+    <bean name="daqChannelStream" class="com.iba.icomp.core.io.SocketChannelStream">
+        <constructor-arg value="${prop:bms.bms.daq.address}" />
+        <constructor-arg value="${prop:bms.bms.daq.port}" />
+        <property name="soTimeout" value="2000"/>
+        <property name="tcpNoDelay" value="true" />
+    </bean>
+
+    <bean id="ecubtcuDaqServices" class="com.iba.icomp.core.config.AggregatedList">
+        <property name="lists">
+            <list>
+                <list>
+                    <ref bean="daqAcqService" />    <!-- daq data acquisition -->
+                </list>
+                <ref bean="daqNotifServices" /> <!-- daq notification services -->
+            </list>
+        </property>
+    </bean>
+
+</beans>

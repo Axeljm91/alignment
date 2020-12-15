@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.3.xsd">
+
+	<beans profile="blpscuChecksumValidation=true">
+		<bean id="blpscuFirmwareConverter"
+			class="com.iba.pts.bms.devices.impl.utils.BlpscuAsciiValueConverter" />
+		<bean id="blpscuIntConverter" class="com.iba.pts.bms.devices.impl.utils.BlpscuIntConverter" />
+
+		<util:map id="blpscuReaderChecksumAnalogInputMap" map-class="java.util.HashMap"
+			key-type="com.iba.icomp.core.property.PropertyInfo" value-type="com.iba.pts.bms.devices.impl.plc.PLCAddress">
+			<entry key="blpscu#BLPSCU.SoftwareChecksum"
+				value="DB101.DBD6" />
+			<entry key="blpscu#BLPSCU.HardwareChecksum"
+				value="DB101.DBD2" />
+			<entry key="blpscu#BLPSCU.FirmwareVersion" value="DB1.DBD2" />
+		</util:map>
+
+		<util:map id="blpscuReaderChecksumConverters">
+			<entry key="blpscu#BLPSCU.SoftwareChecksum" value-ref="blpscuIntConverter" />
+			<entry key="blpscu#BLPSCU.HardwareChecksum" value-ref="blpscuIntConverter" />
+			<entry key="blpscu#BLPSCU.FirmwareVersion" value-ref="blpscuFirmwareConverter" />
+		</util:map>
+	</beans>
+
+	<beans profile="blpscuChecksumValidation=false">
+		<util:map id="blpscuReaderChecksumConverters" />
+		<util:map id="blpscuReaderChecksumAnalogInputMap" />
+	</beans>
+
+</beans>

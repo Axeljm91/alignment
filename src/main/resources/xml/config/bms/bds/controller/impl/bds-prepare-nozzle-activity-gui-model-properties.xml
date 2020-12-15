@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="utf-8"?>
+<propertyDefinitions>
+   <component>
+      <name>BdsPrepareNozzleActivityGuiModel</name>
+      <propertyDefinition>
+         <name>ActivityStatus</name>
+         <type>STRING</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>PrepareNozzle activity state</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>PrepareAllowed</name>
+         <type>BOOLEAN</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>Whether the nozzle devices can be prepared</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>CancelAllowed</name>
+         <type>BOOLEAN</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>Whether the nozzle preparation can be canceled</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>TreatmentMode</name>
+         <type>STRING</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>Treatment mode (ds/us/pbs/eye)</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>MlcReady</name>
+         <type>BOOLEAN</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>Whether MLC is ready for irradiation</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>MlcStandaloneMode</name>
+         <type>BOOLEAN</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>Whether the MLC standalone/batch mode is in use</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>MlcStandaloneModeConfirmed</name>
+         <type>BOOLEAN</type>
+         <indexed>false</indexed>
+         <writable>true</writable>
+         <description>Whether the MLC standalone/batch mode is confirmed by the user</description>
+      </propertyDefinition>
+      <propertyDefinition>
+          <name>NozzleAccessories</name>
+          <type>ARRAY</type>
+          <indexed>false</indexed>
+          <writable>false</writable>
+          <description>List of the nozzle accessories used in the irradiation</description>
+       </propertyDefinition>
+       <propertyDefinition>
+          <name>NozzleAccessoriesConfirmed</name>
+          <type>BOOLEAN</type>
+          <indexed>false</indexed>
+          <writable>true</writable>
+          <description>Whether nozzle accessories are confirmed</description>
+       </propertyDefinition>       
+       <propertyDefinition>
+          <name>MlcPresent</name>
+          <type>BOOLEAN</type>
+          <indexed>false</indexed>
+          <writable>false</writable>
+          <description>Whether an MLC is used</description>
+       </propertyDefinition>
+       <propertyDefinition>
+          <name>MlcRetryAllowed</name>
+          <type>BOOLEAN</type>
+          <indexed>false</indexed>
+          <writable>false</writable>
+          <description>Whether resending plan to MLC is allowed</description>
+       </propertyDefinition>
+       <propertyDefinition>
+          <name>AhunPresent</name>
+          <type>BOOLEAN</type>
+          <indexed>false</indexed>
+          <writable>false</writable>
+          <description>Whether an Ahun is used</description>
+       </propertyDefinition>
+       <propertyDefinition>
+          <name>AhunAsRequested</name>
+          <type>BOOLEAN</type>
+          <indexed>false</indexed>
+          <writable>false</writable>
+          <description>Whether a Ahun is as requested</description>
+       </propertyDefinition>
+      <propertyDefinition>
+          <name>DceuInputCableOk</name>
+          <type>BOOLEAN</type>
+          <indexed>false</indexed>
+          <writable>false</writable>
+          <description>Dceu Input Cable Ok State</description>
+       </propertyDefinition>
+      <propertyDefinition>
+          <name>DceuNoInternalFault</name>
+          <type>BOOLEAN</type>
+          <indexed>false</indexed>
+          <writable>false</writable>
+          <description>Dceu No Internal Fault State</description>
+       </propertyDefinition>
+       <propertyDefinition>
+          <name>LowPressureIc1Present</name>
+          <type>BOOLEAN</type>
+          <indexed>false</indexed>
+          <writable>false</writable>
+          <description>Whether a low pressure IC1 is used</description>
+       </propertyDefinition>
+      <propertyDefinition>
+          <name>LowPressureIc1ReadyToStartBeam</name>
+          <type>BOOLEAN</type>
+          <indexed>false</indexed>
+          <writable>false</writable>
+          <description>Low pressure IC1 is ready to start beam</description>
+       </propertyDefinition>
+      <propertyDefinition>
+          <name>VariableCollimatorsXOpen</name>
+          <type>BOOLEAN</type>
+          <indexed>false</indexed>
+          <writable>false</writable>
+          <description>VariableCollimators X Jaws Opened</description>
+       </propertyDefinition>
+      <propertyDefinition>
+          <name>VariableCollimatorsYOpen</name>
+          <type>BOOLEAN</type>
+          <indexed>false</indexed>
+          <writable>false</writable>
+          <description>VariableCollimators Y Jaws Opened</description>
+       </propertyDefinition>
+      <propertyDefinition>
+          <name>SecondScattererPassthrough</name>
+          <type>BOOLEAN</type>
+          <indexed>false</indexed>
+          <writable>false</writable>
+          <description>SecondScatterer in Passthrough</description>
+       </propertyDefinition>
+      <propertyDefinition>
+          <name>IseuChainMode</name>
+          <type>STRING</type>
+          <indexed>false</indexed>
+          <writable>false</writable>
+          <description>Iseu Chain mode</description>
+       </propertyDefinition>
+       <propertyDefinition>
+          <name>TcuEquipInitState</name>
+          <type>BOOLEAN</type>
+          <indexed>false</indexed>
+          <writable>false</writable>
+          <description>TCU in Equip Init state</description>
+       </propertyDefinition>
+       <propertyDefinition>
+         <name>TcuTreatmentMode</name>
+         <type>STRING</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>TCU Treatment mode</description>
+      </propertyDefinition>
+      <propertyDefinition>
+          <name>NozzleDevicesReady</name>
+          <type>BOOLEAN</type>
+          <indexed>false</indexed>
+          <writable>false</writable>
+          <description>Nozzle devices ready (SS,FS,TCU,ISEU,...)</description>
+       </propertyDefinition>
+      <propertyDefinition>
+         <name>RequestedRangeModulatorWheelId</name>
+         <type>STRING</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>Requested range modulator wheel id (FSTR)</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>RangeModulatorWheelAsRequested</name>
+         <type>BOOLEAN</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>Range modulator wheel as requested (FSTR)</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>RequestedRangeModulatorBlockId</name>
+         <type>STRING</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>Requested range modulator block id (FSTR)</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>RangeModulatorBlockAsRequested</name>
+         <type>BOOLEAN</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>Range modulator block as requested (FSTR)</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>RangeModulatorAsRequested</name>
+         <type>BOOLEAN</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>Range modulator as requested (FSTR)</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>BlockAsRequested</name>
+         <type>BOOLEAN</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>Block as requested (FSTR)</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>LollipopsAsRequested</name>
+         <type>BOOLEAN</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>Lollipops as requested (FSTR)</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>DceuAsRequested</name>
+         <type>BOOLEAN</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>DCEU as requested (FSTR)</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>Ic1AsRequested</name>
+         <type>BOOLEAN</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>IC1 as requested (FSTR)</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>Ic2AsRequested</name>
+         <type>BOOLEAN</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>IC2 as requested (FSTR)</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>Ic3AsRequested</name>
+         <type>BOOLEAN</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>IC3 as requested (FSTR)</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>MlicAsRequested</name>
+         <type>BOOLEAN</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>MLIC as requested (FSTR)</description>
+      </propertyDefinition>
+   </component>
+</propertyDefinitions>

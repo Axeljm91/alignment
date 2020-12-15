@@ -28,7 +28,7 @@ public abstract class AbstractBeamProfileMonitor extends AbstractInsertable impl
 
    // TODO : Nb samples configurable et timeout en fct du nb samples
    public static final int MOVEMENT_CHECK_TIMEOUT = 4000;
-   public static final int DEFAULT_PROFILE_ACQUISITION_TIMEOUT = 15000;
+   public static final int DEFAULT_PROFILE_ACQUISITION_TIMEOUT = 7500;
    private int mProfileAcquisitionTimeOut = DEFAULT_PROFILE_ACQUISITION_TIMEOUT;
    private static int mUpdatesCount = 0;
    protected volatile Distribution horizontalChannels;

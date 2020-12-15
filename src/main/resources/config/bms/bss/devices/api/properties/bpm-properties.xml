@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<propertyDefinitions>
+   <component>
+      <name>Bpm</name>
+      <propertyDefinition>
+         <name>Status</name>
+         <type>STRING</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>Status property of the Bpm</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>RequestedOperationMode</name>
+         <type>STRING</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>Requested operation mode property of the Bpm</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>RequestedAcquisitionMode</name>
+         <type>STRING</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>Requested acquisition mode property of the Bpm</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>OperationMode</name>
+         <type>STRING</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>Operation mode property of the Bpm</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>AcquisitionMode</name>
+         <type>STRING</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>Acquisition mode property of the Bpm</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>EcuOperationMode</name>
+         <type>INTEGER</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>Ecu operation mode property of the Bpm</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>EcuAcquisitionMode</name>
+         <type>INTEGER</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>Ecu acquisition mode property of the Bpm</description>
+      </propertyDefinition>
+   </component>
+</propertyDefinitions>

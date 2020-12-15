@@ -37,7 +37,6 @@ public class Status {
     static final public String T2Y_reg      = "B0.X1.SGC02.YRegulOk";
     static final public String DF_current   = "B0.X1.DFA01.Pscfeedbackrv";
     static final public String DF_voltage   = "B0.X1.DFA01.Psvfeedbackrv";
-    // modified to cc sp -AMO
     static final public String MC_current   = "B0.M1.MCA01.Pscfeedbackrv";
     static final public String MC_setpoint  = "B0.M1.MCA01.Pscsprvback";
     static final public String MC_write     = "B0.M1.MCA01.Pscsprv";
@@ -103,6 +102,8 @@ public class Status {
     static final public String BP5_SELECTED         = "E0.__.BLA05.selected";
     static final public String BP6_SELECTED         = "E0.__.BLA06.selected";
 
+    static final public String SMPS_ON              = "E0.__.SPA01.standby";
+
     static final public String[] BPM_names      = new String[]{"BPM 1 X",   "BPM 1 Y",  "BPM 2 X",      "BPM 2 Y"};
     static final public String[] Magnet_names   = new String[]{"Magnet 1 X","Magnet 1 Y", "Magnet 2 X", "Magnet 2 Y"};
     static final public String[] Magnet_names2  = new String[]{"Magnet 1 X","Magnet 1 Y", "Magnet 2 X", "Magnet 2 Y"};
@@ -111,12 +112,12 @@ public class Status {
     static final public String[] Magnet_reg     = new String[]{T1X_reg,     T1Y_reg,    T2X_reg,    T2Y_reg};
     static final public String[] Cyclo_names    = new String[]{"Main Coil (A)", "Yoke Temp (°C)", "Filament (A)", "Arc (mA)", "Arc (V)", "DF (mA)", "DF (V)"};
     static final public String[] Cyclo_read     = new String[]{MC_current, Yoke_temp, Fil_current, Arc_current, Arc_voltage, DF_current, DF_voltage};
-    static final public String[] BLE_names      = {"Degrader BPM", "Beam Stop", "Slit X", "Slit Y", "Second BPM", "ESS Magnets"};
+    static final public String[] BLE_names      = {"ESS Beamstop", "X Slits", "Y Slits", "Momentum Slits", "Scanning Magnets"};
     static final public String[] Prep_names     = {"PCVue: Turn off ESS magnets.", "BCP: Prepare for 10 nA.", "Move degrader to BPM position.", "Retract beam stop.", "Open horizontal slit.", "Open vertical slit.", "Insert second BPM.", "BCREU pulsing beam."};
     static final public String[] DF_names       = new String[]{"Deflector Current"};
     static final public String[] DF_read        = new String[]{DF_current};
     static final public String[] BLE_names2     = new String[]{"Degrader", "Beam Stop", "ESS Magnets"};
-    static final public String[] BCREU_names    = new String[]{"Connection", "Pulse", "State", "Max Beam", "IC Cyclo"};
+    static final public String[] BCREU_names    = new String[]{"Connection", "Pulse", "State", "Beam Prepared", "Beam Out"};
     static final public String[] CycloTuning_names = new String[]{"Radial Probe", "Yoke Temp (°C)", "RF Fwd (kW)", "RF Refl (kW)", "DF (mA)", "DF (V)"};
     static final public String[] CycloTuning_read = new String[]{Radial_probe, Yoke_temp, Fwd_power, Refl_power, DF_current, DF_voltage};
     static final public String[] LLRF_read      = new String[]{VD1_equip, Fil_current, Arc_current, Arc_voltage, CCcurrent2, MC_current, HC1_current, HC2_current};
@@ -130,18 +131,20 @@ public class Status {
 
     static final public int P1E_STATUS   = 0;
 //    static final public int DEGRADER     = 0;
-    static final public int S2E_STATUS   = 1;
-    static final public int SL1E_STATUS  = 2;
-    static final public int SL2E_STATUS  = 3;
-    static final public int P2E_STATUS   = 4;
-    static final public int ESS_MAGNETS  = 5;
-    static final public int BCREU_HW     = 6;
-    static final public int PULSESOURCE  = 7;
+    static final public int S2E_STATUS   = 0;
+    static final public int SL1E_STATUS  = 1;
+    static final public int SL2E_STATUS  = 2;
+    static final public int SL3E_STATUS  = 3;
+    //static final public int P2E_STATUS   = 4;
+    static final public int ESS_MAGNETS  = 4;
+    static final public int SCAN_MAGNETS = 4;
+    static final public int BCREU_HW     = 5;
+    static final public int PULSESOURCE  = 6;
 //    static final public int REGULATION   = 8;
 //    static final public int LOOKUP       = 9;
-    static final public int BCREU_STATE  = 8;
-    static final public int MAX_BEAM     = 9;
-    static final public int IC_CYCLO     = 10;
+    static final public int BCREU_STATE  = 7;
+    static final public int MAX_BEAM     = 8;
+    static final public int IC_CYCLO     = 9;
 
     static final public int FILAMENT     = CYCLO_OFFSET + 2;
     static final public int DF_CURRENT   = CYCLO_OFFSET + 5;
@@ -178,7 +181,7 @@ public class Status {
     static final public DecimalFormat DEC_FORMAT = new DecimalFormat("#.###", (new DecimalFormatSymbols(Locale.US)));
     static final public Color HEALTHY   = IbaColors.BT_GREEN;
     static final public Color WARNING   = IbaColors.YELLOW;
-    static final public Color UNHEALTHY = IbaColors.RED;
+    static final public Color UNHEALTHY = IbaColors.YELLOW;
     static final public Color NO_COLOR  = IbaColors.LT_GRAY;
 
     private boolean mDeflectorWarningDisplayed = false;
@@ -505,6 +508,24 @@ public class Status {
             set(id, status, HEALTHY);
         } else {
             set(id, status, UNHEALTHY);
+        }
+    }
+
+    public void set(int id, Boolean ok) {
+        if (ok) {
+            set(id, ok, UNHEALTHY);
+        } else {
+            set(id, ok, HEALTHY);
+        }
+    }
+
+    public void set(int id, Boolean ok, Color color) {
+        if(id < mNum) {
+            //mStatus[id] = status;
+            mColor[id]  = color;
+            mBool[id]   = (color == HEALTHY);
+        } else {
+            // TODO: Throw error
         }
     }
 

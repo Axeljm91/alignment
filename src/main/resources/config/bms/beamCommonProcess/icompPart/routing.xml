@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+
+<!-- IComP routing.
+     This notably uses:
+       - ioApplicationQueueRouterNotificationMap bean defining the io part of the application queue router notification map
+       - ioEventRouterPointToPointMap bean defining the io part of the event router point-to-point map
+       - ioEventRouterNotificationMap bean defining the io part of the event router notification map
+-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+    <bean id="defaultApplicationQueueRouterPointToPointMap" class="java.util.HashMap">
+        <constructor-arg>
+            <map>
+                <entry key="blpscuProxy" value-ref="blpscuProxy" />
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <bean id="defaultApplicationQueueRouterNotificationMap" class="java.util.HashMap">
+        <constructor-arg>
+            <map>
+                <entry key="blpscu" value-ref="blpscuProxy" />
+                <entry key="urn:device:ecubtcu" value-ref="ecubtcuConfigurator" />
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <bean id="applicationQueueRouter" class="com.iba.pts.bms.common.URNEventRouter">
+        <property name="therapyCentre" ref="therapyCentre"/>
+        <property name="pointToPointRouteMap">
+            <bean class="com.iba.icomp.core.config.AggregatedListMap">
+                <constructor-arg><value>applicationQueueRouter.pointToPointRouteMap</value></constructor-arg>
+                <property name="maps">
+                    <list>
+                        <ref bean="defaultApplicationQueueRouterPointToPointMap"/>
+                        <ref bean="beamlineDevicesApplicationQueueRouterPointToPointMap"/>
+                        <ref bean="smpseuApplicationQueuePointToPointRouteMap"/>
+                        <ref bean="smpsBlpscuApplicationQueuePointToPointRouteMap"/>
+                    </list>
+                </property>
+            </bean>
+        </property>
+        <property name="notificationRouteMap">
+            <bean class="com.iba.icomp.core.config.AggregatedListMap">
+                <constructor-arg><value>applicationQueueRouter.notificationRouteMap</value></constructor-arg>
+                <property name="maps">
+                    <list>
+                        <ref bean="defaultApplicationQueueRouterNotificationMap"/>
+                        <!--ref bean="ioApplicationQueueRouterNotificationMap"/-->
+                        <ref bean="beamlineDevicesApplicationQueueRouterNotificationMap"/>
+                        <ref bean="bpsApplicationQueueNotificationRouteMap"/>
+                        <ref bean="bssCheckApplicationQueueNotificationRouteMap"/>
+                        <ref bean="smpseuApplicationQueueNotificationRouteMap"/>
+                        <ref bean="smpsBlpscuApplicationQueueNotificationRouteMap"/>
+                        <ref bean="mcrBdsScreensAppNotificationRouteMap" />
+                        <ref bean="mcrBssScreensAppNotificationRouteMap" />
+                        <ref bean="bssGatewayApplicationQueueRouterNotificationMap"/>
+                    </list>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="defaultEventRouterPointToPointMap" class="java.util.HashMap">
+        <constructor-arg>
+            <map>
+                <entry key="blpscuProxy" value-ref="applicationQueue" />
+                <entry key="BssHeartBeat" value-ref="nullEventReceiver" />
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <bean id="defaultEventRouterNotificationMap" class="java.util.HashMap">
+        <constructor-arg>
+            <map>
+                <!-- let the Container started event go to the applicationQueue -->
+                <entry key="${prop:container.name}">
+                    <list>
+                        <ref bean="applicationQueue" />
+                        <ref bean="uiQueue" />
+                        <ref bean="daqAcqService" />
+                    </list>
+                </entry>
+                <entry key="blpscu" value-ref="applicationQueue" />
+                <entry key="urn:device:ecubtcu">
+                    <list>
+                        <ref bean="applicationQueue" />
+                        <ref bean="daqAcqService" />
+                        <ref bean="esBtsController" />
+                    </list>
+                </entry>
+                <!-- bssIoModbus is publishing it's state (BssHeartBeat#HeartBeat.Trigger) at startup but nobody is interested inside BCP -->
+                <entry key="BssHeartBeat" value-ref="nullEventReceiver" />
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <bean id="eventRouter" class="com.iba.pts.bms.common.URNEventRouter">
+        <property name="therapyCentre" ref="therapyCentre"/>
+        <property name="pointToPointRouteMap">
+            <bean class="com.iba.icomp.core.config.AggregatedListMap">
+                <constructor-arg><value>applicationQueueRouter.pointToPointRouteMap</value></constructor-arg>
+                <property name="maps">
+                    <list>
+                        <ref bean="defaultEventRouterPointToPointMap"/>
+                        <!--ref bean="ioEventRouterPointToPointMap"/-->
+                        <ref bean="beamlineDevicesEventRouterPointToPointMap"/>
+                        <ref bean="bpsPointToPointRouteMap"/>
+                        <ref bean="smpseuPointToPointRouteMap"/>
+                        <ref bean="smpsBlpscuPointToPointRouteMap"/>
+                        <ref bean="blpscuPointToPointRouteMap" />
+                        <ref bean="mcrTsmEventBusPointToPointRoutingMap" />
+                        <!-- Begin of BMS-8.4 (Eyeline service-only) specific section -->
+                        <ref bean="pointToPointToOpcBridgeRouteMap" />
+                        <!-- End of BMS-8.4 (Eyeline service-only) specific section -->
+                        <ref bean="mcrBdsScreensEventBusPointToPointRouteMap" />
+                    </list>
+                </property>
+            </bean>
+        </property>
+        <property name="notificationRouteMap">
+            <bean class="com.iba.icomp.core.config.AggregatedListMap">
+                <constructor-arg><value>applicationQueueRouter.notificationRouteMap</value></constructor-arg>
+                <property name="maps">
+                    <list>
+                        <ref bean="defaultEventRouterNotificationMap"/>
+                        <ref bean="beamlineDevicesEventRouterNotificationMap"/>
+                        <ref bean="bpsNotificationRouteMap"/>
+                        <ref bean="bssCheckNotificationRouteMap"/>
+                        <ref bean="smpseuNotificationRouteMap"/>
+                        <ref bean="smpsBlpscuNotificationRouteMap"/>
+                        <ref bean="blpscuNotificationRouteMap" />
+                        <ref bean="dataRecorderEventRouterNotificationMap" />
+                        <ref bean="mcrBdsScreensEventBusNotificationRouteMap" />
+                        <ref bean="notificationToOpcBridgeRouteMap" />
+                        <ref bean="mcrTsmEventBusNotificationRoutingMap"/>
+                    </list>
+                </property>
+            </bean>
+        </property>
+        <property name="fallbackEventReceiver" ref="#{'${prop:config.bmsCfg}' == 'simulator' ? 'bcpToBcpSimulatorsSender' : 'nullEventReceiver'}" />
+    </bean>
+
+    <!--   Routing map of the ui (separate swing thread) -->
+
+    <bean id="uiQueueRouter" class="com.iba.pts.bms.common.URNEventRouter" depends-on="therapyCentre">
+        <property name="therapyCentre" ref="therapyCentre"/>
+        <property name="notificationRouteMap">
+            <bean class="com.iba.icomp.core.config.AggregatedListMap">
+                <constructor-arg><value>uiQueue.notificationRouteMap</value></constructor-arg>
+                <property name="maps">
+                    <list>
+                        <map>
+                            <entry key="${prop:container.name}" value-ref="uiContainerProxy"/>
+                        </map>
+                    </list>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="beamlineDevicesApplicationQueueRouterNotificationMap" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+        <property name="targetObject" ref="beamlineConfig"/>
+        <property name="targetMethod" value="getApplicationRouterNotificationMap"/>
+    </bean>
+
+    <bean id="beamlineDevicesApplicationQueueRouterPointToPointMap" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+        <property name="targetObject" ref="beamlineConfig"/>
+        <property name="targetMethod" value="getApplicationRouterPointToPointMap"/>
+    </bean>
+
+    <bean id="beamlineDevicesEventRouterNotificationMap" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+        <property name="targetObject" ref="beamlineConfig"/>
+        <property name="targetMethod" value="getEventRouterNotificationMap"/>
+    </bean>
+
+    <bean id="beamlineDevicesEventRouterPointToPointMap" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+        <property name="targetObject" ref="beamlineConfig"/>
+        <property name="targetMethod" value="getEventRouterPointToPointMap"/>
+    </bean>
+
+</beans>

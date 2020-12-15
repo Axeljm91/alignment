@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="utf-8"?>
+<propertyDefinitions>
+   <!-- TODO : better description and units -->
+   <component>
+      <name>TuneAndIrradiate</name>
+      <propertyDefinition>
+         <name>IrradiationTimeCounter</name>
+         <type>INTEGER</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>Irradiation time</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>LayerIrradiationTimeCounter</name>
+         <type>INTEGER</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>Layer irradiation time</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>MaxIrradiationTime</name>
+         <type>INTEGER</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>Max irradiation time</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>LayerMaxIrradiationTime</name>
+         <type>INTEGER</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>Layer max irradiation time</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>PrimaryDoseToDeliver</name>
+         <type>DOUBLE</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>Primary dose to be delivered [MU]</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>SecondaryDoseToDeliver</name>
+         <type>DOUBLE</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>Secondary dose to be delivered [MU]</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>PrimaryDeliveredDose</name>
+         <type>DOUBLE</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>Primary dose delivered [MU]</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>SecondaryDeliveredDose</name>
+         <type>DOUBLE</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>Secondary dose delivered [MU]</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>BeamDetected</name>
+         <type>BOOLEAN</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>Indicates if beam is detected on ICs</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>LayerIndex</name>
+         <type>INTEGER</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>Index of the current layer (starts at 0 for first layer)</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>NrOfLayers</name>
+         <type>INTEGER</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>Number of layers in the current irradiation session</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>RepaintingType</name>
+         <type>STRING</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>The type of repainting in the current irradiation session</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>PrimaryDoseToDeliverForLayer</name>
+         <type>DOUBLE</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>Primary dose to be delivered for the current layer</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>SecondaryDoseToDeliverForLayer</name>
+         <type>DOUBLE</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>Secondary dose to be delivered for the current layer</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>PrimaryDeliveredDoseForLayer</name>
+         <type>DOUBLE</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>Primary dose delivered for the current layer</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>SecondaryDeliveredDoseForLayer</name>
+         <type>DOUBLE</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>Secondary dose delivered for the current layer</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>RangeInPatient</name>
+         <type>DOUBLE</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>Range in patient</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>IrradiationStatus</name>
+         <type>STRING</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>Status of the current irradiation session</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>TreatmentTerminationStatus</name>
+         <type>STRING</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>States why/how a treatment terminated</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>TreatmentRoomSession</name>
+         <type>STRING</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>States the type of TR session</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>TreatmentMode</name>
+         <type>STRING</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>Treatment mode of the current irradiation session</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>StartAllowed</name>
+         <type>BOOLEAN</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>true if start can be called</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>StopAllowed</name>
+         <type>BOOLEAN</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>true if stop can be called</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>PauseAtIrradiationEnd</name>
+         <type>BOOLEAN</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>true if pause is to be called at end of irradiation</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>DisplayPopups</name>
+         <type>BOOLEAN</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>true if you want to show popups</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>PauseAllowed</name>
+         <type>BOOLEAN</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>true if pause can be called</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>ElementId</name>
+         <type>INTEGER</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>ID of the current Element for PBS irradiation</description>
+      </propertyDefinition>      
+      <propertyDefinition>
+         <name>NrOfElements</name>
+         <type>INTEGER</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>Number of elements for PBS irradiation</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>PauseBetweenLayers</name>
+         <type>BOOLEAN</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>true if option 'pause between layers' is selected</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>PauseBetweenTuning</name>
+         <type>BOOLEAN</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>true if option 'pause between tuning' is selected</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>RepeatTuning</name>
+         <type>BOOLEAN</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>true if option 'repeat tuning' is selected</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>TuningRequired</name>
+         <type>BOOLEAN</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>true if option 'tuning required' is selected</description>
+      </propertyDefinition>
+   </component>
+
+   <component>
+      <name>IComP</name>
+
+      <propertyDefinition>
+         <name>aliveTime</name>
+         <type>LONG</type>
+         <description>Indicates the last time the component was alive.</description>
+      </propertyDefinition>
+
+   </component>
+
+</propertyDefinitions>

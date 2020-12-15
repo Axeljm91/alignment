@@ -50,7 +50,7 @@ public class Main {
 			else
 			{
 				
-				System.out.println("ignore first parameter in startup command line, please make sure the parameter name as this: comm.notif.port=18386");
+				System.out.println("ignore first parameter in startup command line, please make sure the parameter name as this: comm.F.port=18386");
 			}
 		}
 		System.out.println(ClassLoader.getSystemResource(""));
@@ -91,7 +91,7 @@ public class Main {
             	controller.setNotifPort(nPort);
             }
 			Gui mainFrame = new Gui(controller);
-			mainFrame.setTitle("adaPT Assist (" + controller.getSiteName() + " -- Version 1.1)");
+			mainFrame.setTitle("Service Beam GUI (" + controller.getSiteName() + " -- Version 1.4.1)");
 		}catch (Exception e){
 			System.out.println("Error creating Controller :"+e);
             e.printStackTrace();

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+   <!-- list of services specifically used by the ES/BTS Controller -->   
+   <bean id="esBtsServices" class="com.iba.icomp.core.config.AggregatedList">
+      <property name="lists">
+         <list>
+         	<list>
+    	        <ref bean="ecubtcuRpcSender" />
+            </list>
+            <ref bean="blpscuServices" />
+            <bean class="com.iba.icomp.spring.PropertyBasedFactoryBean">
+               <property name="propertyValue" value="simulator"/>
+               <property name="inputObjects">
+                  <map>
+                     <entry key="simulator">
+                        <list/>
+                     </entry>
+                     <entry key="real">
+                        <ref bean="blpscuServices" />
+                     </entry>
+                  </map>
+               </property>
+            </bean>
+         </list>
+      </property>
+   </bean>
+
+	<bean id="esbtsServiceStartedCheckList" class="com.iba.icomp.core.config.AggregatedList">
+		<property name="lists">
+			<list>
+				<bean class="com.iba.icomp.spring.PropertyBasedFactoryBean">
+					<property name="propertyValue" value="${prop:config.bmsCfg}" />
+					<property name="inputObjects">
+						<map>
+							<entry key="simulator">
+								<list>
+									<ref bean="ecubtcuRpcConnectionCheck" />
+									<ref bean="dataDaqConnectionCheck" />
+								</list>
+							</entry>
+							<entry key="real">
+								<list>
+									<ref bean="ecubtcuRpcConnectionCheck" />
+									<ref bean="dataDaqConnectionCheck" />
+									<ref bean="blpscuConnectionCheck" />
+								</list>
+							</entry>
+						</map>
+					</property>
+				</bean>
+				<bean class="com.iba.icompx.core.checks.ComposedCheck">
+					<constructor-arg>
+						<list>
+							<ref bean="blpscuHardwareChecksumCheck" />
+							<ref bean="blpscuSoftwareChecksumCheck" />
+							<ref bean="blpscuFirmwareVersionCheck" />
+						</list>
+					</constructor-arg>
+					<property name="name" value="BlpscuChecksumCheck" />
+					<property name="group" value="ServiceOperational" />
+				</bean>
+			</list>
+		</property>
+	</bean>
+   
+   <bean id="ecubtcuRpcConnectionCheck" class="com.iba.icompx.core.checks.BooleanPropertyInternalCheck">
+      <constructor-arg value="connected" />
+      <property name="name" value="EcubtcuRpcConnectionCheck" />
+      <property name="group" value="BSS"/>
+      <property name="listenedObject" ref="ecubtcuRpcSenderAsynch" />
+   </bean>
+
+   <bean id="dataDaqConnectionCheck" class="com.iba.icompx.core.checks.DelayedBooleanPropertyInternalCheck">
+      <constructor-arg value="connected"/>
+      <property name="container" ref="containerProxy"/>
+      <property name="listenedObject" ref="daqAcqServiceAsynch"/>
+      <property name="name" value="EcubtcuDataDaqConnectionCheck" />
+      <property name="group" value="BSS"/>
+      <property name="timerFactory" ref="timerFactory"/>
+      <property name="startupDurationInSeconds" value="${prop:bms.bds.daq.startupDurationInSeconds}"/>
+   </bean>
+
+	<bean id="blpscuHardwareChecksumCheck" class="com.iba.icompx.core.checks.DelayedBooleanPropertyInternalCheck">
+		<constructor-arg value="hardwareChecksumOk" />
+		<property name="name" value="BlpscuHardwareChecksumCheck" />
+		<property name="listenedObject" ref="blpscuProxy" />
+		<property name="group" value="ServiceOperational" />
+		<property name="container" ref="containerProxy"/>
+        <property name="timerFactory" ref="timerFactory"/>
+        <property name="startupDurationInSeconds" value="${prop:bms.bss.esbts.blpscu.startupDurationInSeconds}"/>
+	</bean>
+	
+	<bean id="blpscuSoftwareChecksumCheck" class="com.iba.icompx.core.checks.DelayedBooleanPropertyInternalCheck">
+		<constructor-arg value="softwareChecksumOk" />
+		<property name="name" value="BlpscuSoftwareChecksumCheck" />
+		<property name="listenedObject" ref="blpscuProxy" />
+		<property name="group" value="ServiceOperational" />
+		<property name="container" ref="containerProxy"/>
+		<property name="timerFactory" ref="timerFactory"/>
+        <property name="startupDurationInSeconds" value="${prop:bms.bss.esbts.blpscu.startupDurationInSeconds}"/>
+	</bean>
+	
+	<bean id="blpscuFirmwareVersionCheck" class="com.iba.icompx.core.checks.DelayedBooleanPropertyInternalCheck">
+		<constructor-arg value="firmwareVersionOk" />
+		<property name="name" value="BlpscuFirmwareVersionCheck" />
+		<property name="listenedObject" ref="blpscuProxy" />
+		<property name="group" value="ServiceOperational" />
+		<property name="container" ref="containerProxy"/>
+		<property name="timerFactory" ref="timerFactory"/>
+        <property name="startupDurationInSeconds" value="${prop:bms.bss.esbts.blpscu.startupDurationInSeconds}"/>
+	</bean>
+</beans>

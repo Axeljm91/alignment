@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="utf-8"?>
+<propertyDefinitions>
+   <!-- properties common to all Variable Collimator devices -->
+   <component>
+      <name>VariableCollimators</name>
+      
+      <propertyDefinition>
+         <name>XVoltFeedback</name>
+         <type>DOUBLE</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>spacing between the two x jaws (Volts)</description>
+      </propertyDefinition>
+
+      <propertyDefinition>
+         <name>YVoltFeedback</name>
+         <type>DOUBLE</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>spacing between the two y jaws (Volts)</description>
+      </propertyDefinition>
+      
+      <propertyDefinition>
+         <name>XVoltFeedbackRedundant</name>
+         <type>DOUBLE</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>spacing between the two x jaws (REDUNDANCY) (Volts)</description>
+      </propertyDefinition>
+      
+      <propertyDefinition>
+         <name>YVoltFeedbackRedundant</name>
+         <type>DOUBLE</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>spacing between the two y jaws (REDUNDANCY) (Volts)</description>
+      </propertyDefinition>
+      
+      <propertyDefinition>
+         <name>XVoltSetpoint</name>
+         <type>DOUBLE</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>returned setpoint between the two x jaws (Volts)</description>
+      </propertyDefinition>
+      
+      <propertyDefinition>
+         <name>YVoltSetpoint</name>
+         <type>DOUBLE</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>returned setpoint between the two y jaws (Volts)</description>
+      </propertyDefinition>
+      
+      <propertyDefinition>
+         <name>XOpenFeedback</name>
+         <type>DOUBLE</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>spacing between the two x jaws (cm)</description>
+      </propertyDefinition>
+      
+      <propertyDefinition>
+         <name>XOpenFeedbackRedundant</name>
+         <type>DOUBLE</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>spacing between the two x jaws (REDUNDANCY) (cm)</description>
+      </propertyDefinition>
+      
+      <propertyDefinition>
+         <name>XOpenSetpoint</name>
+         <type>DOUBLE</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>returned setpoint between the two x jaws (cm)</description>
+      </propertyDefinition>
+      
+      <propertyDefinition>
+         <name>XMaxOpenSetpoint</name>
+         <type>DOUBLE</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>maximum opening of the X jaws (cm)</description>
+      </propertyDefinition>
+      
+      <propertyDefinition>
+         <name>XMinOpenSetpoint</name>
+         <type>DOUBLE</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>minimum opening of the X jaws (cm)</description>
+      </propertyDefinition>
+      
+      <propertyDefinition>
+         <name>YOpenFeedback</name>
+         <type>DOUBLE</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>spacing between the two y jaws (cm)</description>
+      </propertyDefinition>
+      
+      <propertyDefinition>
+         <name>YOpenFeedbackRedundant</name>
+         <type>DOUBLE</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>spacing between the two y jaws (REDUNDANCY) (cm)</description>
+      </propertyDefinition>
+      
+      <propertyDefinition>
+         <name>YOpenSetpoint</name>
+         <type>DOUBLE</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>returned setpoint between the two y jaws (cm)</description>
+      </propertyDefinition>
+      
+      <propertyDefinition>
+         <name>YMaxOpenSetpoint</name>
+         <type>DOUBLE</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>maximum opening of the Y jaws (cm)</description>
+      </propertyDefinition>
+      
+      <propertyDefinition>
+         <name>YMinOpenSetpoint</name>
+         <type>DOUBLE</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>minimum opening of the Y jaws (cm)</description>
+      </propertyDefinition>
+      
+      <propertyDefinition>
+         <name>XInPlace</name>
+         <type>BOOLEAN</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>1:unmatch X status not activated/0:unmatch X status activated</description>
+      </propertyDefinition>
+      
+      <propertyDefinition>
+         <name>YInPlace</name>
+         <type>BOOLEAN</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>1:unmatch Y status not activated/0:unmatch Y status activated</description>
+      </propertyDefinition>
+      
+      <propertyDefinition>
+         <name>XDriverOn</name>
+         <type>BOOLEAN</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>the status of X jaw driver of VCEU</description>
+      </propertyDefinition>
+      
+      <propertyDefinition>
+         <name>YDriverOn</name>
+         <type>BOOLEAN</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>the status of Y jaw driver of VCEU</description>
+      </propertyDefinition>
+
+      <propertyDefinition>
+         <name>YDriverStatusOk</name>
+         <type>BOOLEAN</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>1:driver Y status OK/0:driver Y status not OK</description>
+      </propertyDefinition>
+
+      <propertyDefinition>
+         <name>XDriverStatusOk</name>
+         <type>BOOLEAN</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>1:driver X status OK/0:driver X status not OK</description>
+      </propertyDefinition>
+
+      <propertyDefinition>
+         <name>rawState</name>
+         <type>INTEGER</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>0:uninitialized 1:moving 2:in position 3:failure</description>
+      </propertyDefinition>
+
+      <propertyDefinition>
+         <name>potentiometerCalibA0</name>
+         <type>DOUBLE</type>
+         <indexed>true</indexed>
+         <writable>false</writable>
+         <description>Calib factor of Potentiometers 1-2-3-4 (offset) Volts</description>
+      </propertyDefinition>
+
+      <propertyDefinition>
+         <name>potentiometerCalibA1</name>
+         <type>DOUBLE</type>
+         <indexed>true</indexed>
+         <writable>false</writable>
+         <description>Calib factor of Potentiometers 1-2-3-4 (slope) Volts/cm</description>
+      </propertyDefinition>
+
+      <propertyDefinition>
+         <name>safetyConditionOk</name>
+         <type>BOOLEAN</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>Safety condition (1:OK/0:not OK)</description>
+      </propertyDefinition>
+
+      <propertyDefinition>
+         <name>XNotOpen</name>
+         <type>BOOLEAN</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>0:X jaws opened/1:X opened ls not reached</description>
+      </propertyDefinition>
+
+      <propertyDefinition>
+         <name>YNotOpen</name>
+         <type>BOOLEAN</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>0:Y jaws opened/1:Y opened ls not reached</description>
+      </propertyDefinition>
+
+      <propertyDefinition>
+         <name>XNotClosed</name>
+         <type>BOOLEAN</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>0:X jaws closed/1:X closed ls not reached</description>
+      </propertyDefinition>
+
+      <propertyDefinition>
+         <name>YNotClosed</name>
+         <type>BOOLEAN</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>0:Y jaws closed/1:Y closed ls not reached</description>
+      </propertyDefinition>
+
+   </component>
+
+</propertyDefinitions>

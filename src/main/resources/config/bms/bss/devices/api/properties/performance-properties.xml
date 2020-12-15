@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<propertyDefinitions>
+   <component>
+      <name>Perf</name>
+
+      <propertyDefinition>
+         <name>AcquisitionTime</name>
+         <type>DOUBLE</type>
+         <writable>false</writable>
+         <description>Time in milliseconds between 2acquisitions</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>NumberOfMonitored</name>
+         <type>INTEGER</type>
+         <writable>false</writable>
+         <description>Number of monitored components for performance</description>
+      </propertyDefinition>
+      
+      <propertyDefinition>
+         <name>Names</name>
+         <type>STRING</type>
+         <indexed>true</indexed>
+         <writable>false</writable>
+         <description>Name of monitored components</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>MinTimes</name>
+         <type>DOUBLE</type>
+         <indexed>true</indexed>
+         <writable>false</writable>
+         <description>Minimum acquisition time taken for each monitored component</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>MaxTimes</name>
+         <type>DOUBLE</type>
+         <indexed>true</indexed>
+         <writable>false</writable>
+         <description>Maximum acquisition time taken for each monitored component</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>AvgTimes</name>
+         <type>DOUBLE</type>
+         <indexed>true</indexed>
+         <writable>false</writable>
+         <description>Average acquisition time taken for each monitored component</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>Percentages</name>
+         <type>DOUBLE</type>
+         <indexed>true</indexed>
+         <writable>false</writable>
+         <description>Percentage of acquisition time taken for each monitored component</description>
+      </propertyDefinition>
+
+    </component>
+</propertyDefinitions>

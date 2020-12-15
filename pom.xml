@@ -6,15 +6,15 @@
    <parent>
       <groupId>com.iba.bms</groupId>
       <artifactId>beam</artifactId>
-      <version>8.6.1</version>
+      <version>R8.7.1</version>
    </parent>
 
    <modelVersion>4.0.0</modelVersion>
-   <groupId>com.iba.ialign</groupId>
-   <artifactId>beam-ialign</artifactId>
+   <groupId>com.iba.tcs.beam</groupId>
+   <artifactId>ServiceBeamGUI</artifactId>
    <packaging>jar</packaging>
-   <version>8.x-SNAPSHOT</version>
-   <name>adapt iAlignment component</name>
+   <version>8.7.1-SNAPSHOT</version>
+   <name>Service Beam GUI component</name>
 
    <build>
       <plugins>
@@ -68,6 +68,7 @@
 
 <dependencies>
 
+
         <!-- ICOMP -->
         <dependency>
             <groupId>com.iba.icomp</groupId>
@@ -99,6 +100,11 @@
         <dependency>
             <groupId>com.iba.bms</groupId>
             <artifactId>beam-bms-idt-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.iba.bms</groupId>
+            <artifactId>beam-bds-devices-rpc</artifactId>
         </dependency>
 
         <!-- Runtime Dependencies -->
@@ -149,23 +155,36 @@
             <artifactId>beam-bss-devices-api</artifactId>
         </dependency>
 
-         <dependency>
-            <groupId>com.iba.bms</groupId>
-            <artifactId>bms-common</artifactId>
-            <scope>runtime</scope>
-         </dependency>
+<!--         <dependency>-->
+<!--            <groupId>com.iba.bms</groupId>-->
+<!--            <artifactId>bms-common</artifactId>-->
+<!--            <scope>runtime</scope>-->
+<!--         </dependency>-->
 
          <dependency>
             <groupId>com.iba.bms</groupId>
             <artifactId>bss-controller-impl</artifactId>
-            <scope>runtime</scope>
+            <version>R8.7.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.iba.bms</groupId>
+            <artifactId>bss-controller-api</artifactId>
+            <version>R8.7.1</version>
         </dependency>
 
         <dependency>
             <groupId>com.iba.bms</groupId>
             <artifactId>bds-common-impl</artifactId>
             <scope>runtime</scope>
+            <version>R8.7.1</version>
         </dependency>
+
+<!--    <dependency>-->
+<!--        <groupId>com.iba.bms</groupId>-->
+<!--        <artifactId>bms-tcrServiceScreens-proc</artifactId>-->
+<!--        <version>8.6.x-SNAPSHOT</version>-->
+<!--    </dependency>-->
 
 		<dependency>
 			<groupId>org.jfree</groupId>
@@ -173,14 +192,49 @@
 			<version>1.0.19</version>
 		</dependency>
 
+    <dependency>
+        <groupId>org.jfree</groupId>
+        <artifactId>jcommon</artifactId>
+        <version>1.0.23</version>
+    </dependency>
 
-		
-		
+
+        <!--<dependency>-->
+            <!--<groupId>com.iba.pts.pms</groupId>-->
+            <!--<artifactId>pms-poss-devices-impl</artifactId>-->
+            <!--<version>R8-2.7.3.1</version>-->
+        <!--</dependency>-->
+
+<!--        <dependency>-->
+<!--            <groupId>com.iba.bms</groupId>-->
+<!--            <artifactId>bss-controller-api</artifactId>-->
+<!--            <version>8.6.5</version>-->
+<!--        </dependency>-->
+
+        <dependency>
+            <groupId>com.iba.pts</groupId>
+            <artifactId>pts-pms-controller</artifactId>
+            <version>8.7.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.iba.bms</groupId>
+            <artifactId>beam-access-point-process</artifactId>
+            <version>R8.7.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.iba.pts</groupId>
+            <artifactId>pts-treat-proc</artifactId>
+            <version>8.7.1</version>
+        </dependency>
+
 		<!-- BLAK -->
 		<dependency>
             <groupId>com.iba.blak</groupId>
             <artifactId>blak-blak</artifactId>
-			<version>8.x-SNAPSHOT</version>
+			<version>8.7.x-SNAPSHOT</version>
+            <!--<scope>runtime</scope> -->
         </dependency>
 		
 		
@@ -228,10 +282,10 @@
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.jgoodies</groupId>
-            <artifactId>forms</artifactId>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.jgoodies</groupId>-->
+<!--            <artifactId>forms</artifactId>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>com.iba.bms</groupId>
             <artifactId>beam-bms-dosimetry-impl</artifactId>
@@ -245,33 +299,50 @@
             <artifactId>icompx-relauncher</artifactId>
             <scope>runtime</scope>
         </dependency>
-        <dependency>
-            <groupId>org.jfxvnc</groupId>
-            <artifactId>jfxvnc-ui</artifactId>
-            <version>1.2.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jfxvnc</groupId>
-            <artifactId>jfxvnc-net</artifactId>
-            <version>1.2.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jfxvnc</groupId>
-            <artifactId>jfxvnc-swing</artifactId>
-            <version>1.2.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jfxvnc</groupId>
-            <artifactId>jfxvnc-app</artifactId>
-            <version>1.2.0</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.jfxvnc</groupId>-->
+            <!--<artifactId>jfxvnc-ui</artifactId>-->
+            <!--<version>1.2.0</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>org.jfxvnc</groupId>-->
+            <!--<artifactId>jfxvnc-net</artifactId>-->
+            <!--<version>1.2.0</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>org.jfxvnc</groupId>-->
+            <!--<artifactId>jfxvnc-swing</artifactId>-->
+            <!--<version>1.2.0</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+            <!--<groupId>org.jfxvnc</groupId>-->
+            <!--<artifactId>jfxvnc-app</artifactId>-->
+            <!--<version>1.2.0</version>-->
+        <!--</dependency>-->
 
         <dependency>
             <groupId>com.iba.bms</groupId>
             <artifactId>beam-common-proc</artifactId>
             <scope>runtime</scope>
-            <version>8.6.3</version>
+            <version>R8.7.1</version>
         </dependency>
+
+    <dependency>
+        <groupId>com.iba.pts</groupId>
+        <artifactId>pts-beam-common-process</artifactId>
+        <version>8.7.1</version>
+        <scope>system</scope>
+        <systemPath>${project.basedir}/src/main/resources/pts-beam-common-process.jar</systemPath>
+    </dependency>
+
+    <dependency>
+        <groupId>com.iba.pts</groupId>
+        <artifactId>pts-bms-tcr-service-screens</artifactId>
+        <version>8.7.1</version>
+        <scope>system</scope>
+        <systemPath>${project.basedir}/src/main/resources/pts-bms-tcr-service-screens.jar</systemPath>
+    </dependency>
+
 
     <!-- https://mvnrepository.com/artifact/com.sikulix/sikulixapi -->
     <dependency>
@@ -296,6 +367,37 @@
         <groupId>com.jgoodies</groupId>
         <artifactId>forms</artifactId>
         <version>1.2.1</version>
+    </dependency>
+
+    <dependency>
+        <groupId>net.sf.supercsv</groupId>
+        <artifactId>super-csv</artifactId>
+        <version>2.4.0</version>
+    </dependency>
+
+    <!-- SCD clone -->
+    <dependency>
+        <groupId>com.iba.tcs.beam</groupId>
+        <artifactId>beam-bds-tools-scanning-controller-client</artifactId>
+        <version>8.0.0</version>
+    </dependency>
+
+    <dependency>
+        <groupId>com.iba.tcs.beam</groupId>
+        <artifactId>beam-bds-devices-rpc</artifactId>
+        <version>8.0.0</version>
+    </dependency>
+
+    <dependency>
+        <groupId>com.iba.tcs.beam</groupId>
+        <artifactId>beam-bms-datatypes-api</artifactId>
+        <version>8.0.0</version>
+    </dependency>
+
+    <dependency>
+        <groupId>com.iba.tcs.beam</groupId>
+        <artifactId>beam-bms-datatypes-impl</artifactId>
+        <version>8.0.0</version>
     </dependency>
 
     </dependencies>

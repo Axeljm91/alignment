@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xmlns:context="http://www.springframework.org/schema/context" xmlns:util="http://www.springframework.org/schema/util"
+   xsi:schemaLocation="http://www.springframework.org/schema/beans
+                       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+                       http://www.springframework.org/schema/context
+                       http://www.springframework.org/schema/context/spring-context-3.0.xsd
+                       http://www.springframework.org/schema/util
+                       http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+
+   <context:annotation-config />
+
+   <import resource="classpath:config/icompx/ui/LanguageSelector.xml" />
+
+   <bean id="services" class="com.iba.icomp.core.config.AggregatedList">
+      <constructor-arg value="services" />
+      <property name="lists">
+         <list>
+            <ref bean="applicationQueue" />
+            <ref bean="timerFactory" />
+            <ref bean="synchronousTimerFactory" />
+            <ref bean="autoRestartServiceTimerFactory" />
+            <ref bean="allServices" />
+         </list>
+      </property>
+   </bean>
+
+   <bean id="applicationQueue" class="com.iba.icompx.core.event.DynamicForwardingActiveEventQueue" init-method="start">
+      <property name="name" value="Application Queue" />
+      <property name="eventReceiver" ref="applicationQueueRouter" />
+      <property name="maximumProcessingTime" value="0" />
+   </bean>
+
+   <alias alias="timerFactory" name="applicationTimerFactory" />
+
+   <bean id="synchronousTimerFactory" class="com.iba.icomp.core.timer.SynchronousJavaTimerFactory">
+      <property name="name" value="SyncJavaTf" />
+   </bean>
+
+   <bean id="autoRestartServiceTimerFactory" class="com.iba.icomp.core.timer.SynchronousJavaTimerFactory">
+      <property name="name" value="AutoRestartServiceSyncJavaTf" />
+   </bean>
+
+   <bean id="containerProxyEndPoint" class="com.iba.icompx.core.component.EndPointProxy">
+      <property name="component" ref="containerProxy"/>
+      <property name="intermediary" ref="applicationQueue"/>
+   </bean>
+
+   <bean id="simpleAbstractProxy" abstract="true">
+      <property name="container" ref="containerProxy" />
+      <property name="eventBus" ref="eventBus" />
+      <property name="eventFactory" ref="eventFactory" />
+      <property name="timerFactory" ref="timerFactory" />
+   </bean>
+
+   <bean id="abstractProxy" parent="simpleAbstractProxy" abstract="true">
+      <property name="propertyDefinitionDictionary" ref="propertyDefinitionDictionary" />
+   </bean>
+
+   <bean id="simpleAbstractComponent" abstract="true">
+      <property name="container" ref="containerProxy" />
+      <property name="eventBus" ref="eventBus" />
+      <property name="eventFactory" ref="eventFactory" />
+   </bean>
+
+   <bean id="abstractComponent" parent="simpleAbstractComponent" abstract="true">
+      <property name="propertyDefinitionDictionary" ref="propertyDefinitionDictionary" />
+   </bean>
+
+   <bean id="propertyDefinitionDictionary" class="com.iba.icomp.core.property.XmlPropertyDefinitionDictionary"
+      init-method="load">
+      <property name="xmlResources">
+         <bean class="com.iba.icomp.core.config.ResourceList">
+            <property name="lists">
+               <list>
+                  <ref bean="allProperties" />
+                  <value>classpath:config/icomp/core/container-properties.xml</value>
+               </list>
+            </property>
+         </bean>
+      </property>
+      <property name="propertyFactory">
+         <bean class="com.iba.icomp.core.property.GenericPropertyFactory" />
+      </property>
+   </bean>
+
+   <!-- Standard ExceptionHandler logging the exception -->
+   <bean id="logAndIgnoreExceptionHandler" class="com.iba.icomp.core.util.LogAndIgnoreExceptionHandler" />
+
+   <!-- Swing safe PropertyChangeListener interceptor -->   
+   <bean id="swingDispatchPropertyChangeListenerInterceptor" class="com.iba.icompx.aop.SwingDispatchPropertyChangeListenerInterceptor" />
+
+   <bean id="applicationQueueAsynchMethInterceptor" class="com.iba.icompx.aop.AsynchronousMethodInterceptor">
+      <property name="activeEventQueue" ref="applicationQueue" />
+   </bean>
+
+   <!-- Asynchronous PropertyChangeListener interceptor -->
+   <bean id="asynchPropertyChangeInterceptor" class="com.iba.icompx.aop.AsynchronousPropertyChangeListenerInterceptor">
+      <constructor-arg ref="applicationQueue" />
+   </bean>
+
+   <!-- Parent for all beans using the Asynchronous PropertyChangeListener interceptor -->
+   <bean id="asynchBean" abstract="true" class="org.springframework.aop.framework.ProxyFactoryBean">
+      <property name="interceptorNames" value="asynchPropertyChangeInterceptor" />
+   </bean>
+
+   <bean id="nullEventReceiver" class="com.iba.icomp.core.event.NullEventReceiverService" />
+
+   <bean id="addService" abstract="true" class="com.iba.icomp.core.service.ServiceRegistrar">
+      <constructor-arg ref="container"/>
+   </bean>
+
+   <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+      <property name="staticMethod" value="com.iba.icompx.ui.util.NonModalOptionPane.setContainer"/>
+      <property name="arguments" ref="containerProxy" />
+   </bean>
+
+   <bean id="containerProperties" class="com.iba.icomp.core.config.PropertiesFactoryBeanEx" />
+
+</beans>

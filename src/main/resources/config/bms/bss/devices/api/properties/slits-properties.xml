@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<propertyDefinitions>
+   <component>
+      <name>Slits</name>
+      <propertyDefinition>
+         <name>Width</name>
+         <type>DOUBLE</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>The Slits width (as measured using rot. pot.)</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>LinWidth</name>
+         <type>DOUBLE</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>The Slits width (as measured using the redundant lin. pot.)</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>RequestedWidth</name>
+         <type>DOUBLE</type>
+         <indexed>false</indexed>
+         <writable>true</writable>
+         <description>The Slits requested width</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>RequestedWidthFeedback</name>
+         <type>DOUBLE</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>The Slits requested width feedback</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>Status</name>
+         <type>INTEGER</type>
+         <indexed>false</indexed>
+         <writable>false</writable>
+         <description>The Slits status</description>
+      </propertyDefinition>
+   </component>
+</propertyDefinitions>

@@ -61,6 +61,7 @@
 	</site>
 	<site name="Chicago" location="Chicago, USA" timezone="US/Eastern">
 		<device name="acu230" type="Acu230" ip="10.1.100.41" info="2002;2003"/>
+		<!--device name ="blpscu" type="Acu230" ip="10.1.100.43" info="2000;2001"/-->
 		<device name="smartSocket" type="SmartSocket" ip="10.1.100.10" info="TCS_T12;mcr_mcrhcidg"/>
 		<device name="llrf" type="Llrf" ip="10.1.100.44" info="10001"/>
 		<device name="bcreu" type="BcreuModbus" ip="10.1.100.48" info="502"/>

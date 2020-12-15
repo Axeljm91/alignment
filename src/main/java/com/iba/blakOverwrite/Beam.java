@@ -12,64 +12,69 @@ package com.iba.blakOverwrite;
 import com.csvreader.CsvReader;
 import com.iba.blak.Blak;
 import com.iba.blak.BlakConstants;
-import com.iba.blak.BlakPreferences;
 import com.iba.blak.BpsControllerProxy;
-import com.iba.blak.common.BlakICompClient;
 import com.iba.blak.common.PopupDisplayer;
 import com.iba.blak.common.Utils;
 import com.iba.blak.device.api.EcubtcuException;
+import com.iba.blak.device.api.Magnet;
 import com.iba.blak.device.impl.BcreuFactory.ExtAbstractBcreuProxy;
 import com.iba.blak.scanningcontroller.SCIrradiationController;
 import com.iba.blak.scanningcontroller.ScanningControllerClient;
 import com.iba.icomp.comm.daq.JavaCuDaqService;
+import com.iba.icomp.core.checks.CheckManagerProxy;
 import com.iba.icomp.core.component.AbstractPropertyChangeProvider;
 import com.iba.icomp.core.event.Event;
 import com.iba.icomp.core.event.EventFactoryWithConfirmationEvent;
 import com.iba.icomp.core.event.EventReceiver;
 import com.iba.icomp.core.util.Logger;
+import com.iba.icomp.core.util.handler.ExceptionHandler;
+import com.iba.pts.beam.bms.controller.impl.BeamAccessPointBmsControllerProxy;
+import com.iba.pts.beam.bms.controller.impl.ui.model.TuneAndIrradiateGuiModelProxy;
 import com.iba.pts.bms.bds.common.proxy.SmpsControllerProxy;
+import com.iba.pts.bms.bds.tcu.devices.ScanningMagnetsImpl;
+import com.iba.pts.bms.bds.tcu.devices.TcuIseuChainImpl;
+import com.iba.pts.bms.bds.tcu.devices.TcuSecondScattererImpl;
+import com.iba.pts.bms.bds.tcu.devices.TcuVariableCollimatorsProxyImpl;
 import com.iba.pts.bms.bss.beamscheduler.proxy.BeamSchedulerProxy;
 import com.iba.pts.bms.bss.bps.devices.api.Bcreu;
-import com.iba.pts.bms.bss.bps.devices.api.Llrf;
 import com.iba.pts.bms.bss.bps.devices.impl.DegraderBeamStopProxy;
 import com.iba.pts.bms.bss.bps.devices.impl.LlrfProxy;
-import com.iba.pts.bms.bss.controller.api.BssController;
 import com.iba.pts.bms.bss.controller.proxy.BssControllerProxy;
+import com.iba.pts.bms.bss.esbts.Beamline;
+import com.iba.pts.bms.bss.esbts.BeamlinesInfrastructure;
+import com.iba.pts.bms.bss.esbts.blpscu.impl.BlpscuProxy;
+import com.iba.pts.bms.bss.esbts.controller.impl.EsBtsControllerImpl;
 import com.iba.pts.bms.common.settings.impl.BmsLayerSettings;
 import com.iba.pts.bms.common.settings.impl.BmsSettings;
 import com.iba.pts.bms.common.settings.impl.DefaultBmsLayerSettings;
 import com.iba.pts.bms.common.settings.impl.DefaultBmsSettings;
-import com.iba.pts.bms.common.settings.impl.pbs.DefaultPbsBdsLayerSettings;
-import com.iba.pts.bms.common.settings.impl.pbs.PbsBdsLayerSettings;
-import com.iba.pts.bms.common.settings.impl.pbs.PbsElementType;
-import com.iba.pts.bms.common.settings.impl.pbs.PbsMap;
-import com.iba.pts.bms.common.settings.impl.pbs.PbsMapElement;
-import com.iba.pts.bms.datatypes.api.TreatmentMode;
-import com.iba.pts.bms.datatypes.impl.pbs.PbsEquipmentElement;
+import com.iba.pts.bms.common.settings.impl.pbs.*;
+//import com.iba.pts.bms.common.settings.impl.pbs.PbsEquipmentElement;
 import com.iba.pts.bms.datatypes.impl.pbs.PbsEquipmentMap;
+import com.iba.pts.bms.datatypes.impl.pbs.PbsEquipmentElement;
 import com.iba.pts.bms.datatypes.impl.pbs.PbsSlew;
-import com.iba.pts.bms.datatypes.impl.pbs.PbsSpot;
+import com.iba.pts.bms.common.settings.impl.pbs.PbsSpot;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
-import org.apache.poi.ss.usermodel.charts.ManualLayout;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
+//import com.iba.pts.pms.poss.devices.api.PmsDevice;
+//import com.iba.pts.pms.poss.devices.impl.imaging.RenovatedImagingProxy;
+//import com.iba.pts.pms.poss.devices.impl.retractable.RenovatedXrayProxy;
 
 import com.iba.blak.device.impl.BcreuFactory;
 import com.iba.ialign.Controller;
-import com.iba.pts.bms.datatypes.api.TreatmentMode;
+import com.iba.pts.bms.datatypes.impl.pbs.PbsSlewConstants;
+import com.iba.pts.bms.devices.impl.plc.PLCCommandChannelProxy;
+import com.iba.pts.bms.devices.impl.utils.BlpscuIntConverter;
+import com.iba.pts.treatmentroomsession.TreatmentSessionModeProxy;
 
 
 public class Beam extends AbstractPropertyChangeProvider implements EventReceiver
@@ -86,8 +91,23 @@ public class Beam extends AbstractPropertyChangeProvider implements EventReceive
    public DegraderBeamStopProxy degrader = new DegraderBeamStopProxy();
    public LlrfProxy llrf = new LlrfProxy();
    public JavaCuDaqService daq = new JavaCuDaqService();
+   public BlpscuProxy blpscu = new BlpscuProxy();
+   public PLCCommandChannelProxy blpscuCmdChannelProxy = new PLCCommandChannelProxy();
    public BeamSchedulerProxy beamScheduler = new BeamSchedulerProxy();
-//   public SmpsControllerProxy smpsController = new SmpsControllerProxy();
+   public TuneAndIrradiateGuiModelProxy BAPP1 = new TuneAndIrradiateGuiModelProxy();
+   public TuneAndIrradiateGuiModelProxy BAPP4 = new TuneAndIrradiateGuiModelProxy();
+   public TreatmentSessionModeProxy TSM1 = new TreatmentSessionModeProxy();
+   public TreatmentSessionModeProxy TSM3 = new TreatmentSessionModeProxy();
+   public TcuIseuChainImpl ISEU1 = new TcuIseuChainImpl();
+   public TcuIseuChainImpl ISEU4 = new TcuIseuChainImpl();
+   public EsBtsControllerImpl esBtsController = new EsBtsControllerImpl();
+   public TcuVariableCollimatorsProxyImpl VCEU3 = new TcuVariableCollimatorsProxyImpl();
+   public ScanningMagnetsImpl SMEU3 = new ScanningMagnetsImpl();
+   public TcuSecondScattererImpl SSEU3 = new TcuSecondScattererImpl();
+
+   //public RenovatedXrayProxy xrayCtrl = new RenovatedXrayProxy();
+
+   public SmpsControllerProxy smpsController = new SmpsControllerProxy();
    String MAX_BEAM_CURRENT_PROPERTY = "maxBeamCurrent";
    String BEAM_CONTROL_MODE_PROPERTY = "beamControlMode";
    private int mBeamControlMode;// 0:through ecubtcu; 1: through bcp; 2: through
@@ -391,17 +411,236 @@ public class Beam extends AbstractPropertyChangeProvider implements EventReceive
 
     }
 
+   public void setupVCEU3()
+   {
+      BlakICompNoSiteClient icompClient = Controller.feedbackClient.getICompClient();
+      VCEU3.setName("VCEU-PROXY");
+      VCEU3.setComponentName("urn:device:vc:IBTR3");
+      VCEU3.setEventBus(icompClient.eventBus);
+      VCEU3.setEventFactory(icompClient.eventFactory);
+      VCEU3.setPropertyDefinitionDictionary(icompClient.propertyDefinitionDictionary);
+      VCEU3.setTimerFactory(icompClient.timerFactory);
+      VCEU3.setResponseTimeOut(3000);
+      VCEU3.setToleranceOnSetpointInCm(0.1);
+      VCEU3.setXRayPositionInCm(16.0d);
+
+//      VCEU3.addPropertyChangeListener(new PropertyChangeListener()
+//      {
+//         public void propertyChange(PropertyChangeEvent pEvt)
+//         {
+//            if (JavaCuDaqService.CONNECTED_PROPERTY.equals(pEvt.getPropertyName()))
+//            {
+//               System.out.println(pEvt.toString());
+//            }
+//            if (pEvt.getSource().equals("BEAM-ACCESS-POINT-PROCESS-IBTR3")) {
+//                System.out.println(pEvt.toString());
+//            }
+//         }
+//      });
+   }
+
+   public void setupSMEU3()
+   {
+      BlakICompNoSiteClient icompClient = Controller.feedbackClient.getICompClient();
+      SMEU3.setName("SMEU-PROXY");
+      SMEU3.setComponentName("urn:device:sm:IBTR3");
+      SMEU3.setEventBus(icompClient.eventBus);
+      SMEU3.setEventFactory(icompClient.eventFactory);
+      SMEU3.setPropertyDefinitionDictionary(icompClient.propertyDefinitionDictionary);
+      SMEU3.setTimerFactory(icompClient.timerFactory);
+   }
+
+   public void setupSSEU3()
+   {
+      BlakICompNoSiteClient icompClient = Controller.feedbackClient.getICompClient();
+      SSEU3.setName("SSEU-PROXY");
+      SSEU3.setComponentName("urn:device:ss:IBTR3");
+      SSEU3.setEventBus(icompClient.eventBus);
+      SSEU3.setEventFactory(icompClient.eventFactory);
+      SSEU3.setPropertyDefinitionDictionary(icompClient.propertyDefinitionDictionary);
+      SSEU3.setTimerFactory(icompClient.timerFactory);
+   }
+
+    public void setupTSM1()
+    {
+       BlakICompNoSiteClient icompClient = Controller.feedbackClient.getICompClient();
+       TSM1.setName("TSM1");
+       TSM1.setComponentName("TSM");
+       TSM1.setEventBus(icompClient.eventBus);
+       TSM1.setEventFactory(icompClient.eventFactory);
+       TSM1.setPropertyDefinitionDictionary(icompClient.propertyDefinitionDictionary);
+       TSM1.setTimerFactory(icompClient.timerFactory);
+    }
+
+   public void setupTSM3()
+   {
+      BlakICompNoSiteClient icompClient = Controller.feedbackClient.getICompClient();
+      TSM3.setName("TSM3");
+      TSM3.setComponentName("TSM");
+      TSM3.setEventBus(icompClient.eventBus);
+      TSM3.setEventFactory(icompClient.eventFactory);
+      TSM3.setPropertyDefinitionDictionary(icompClient.propertyDefinitionDictionary);
+      TSM3.setTimerFactory(icompClient.timerFactory);
+   }
+
+   public void setupISEU1()
+   {
+      BlakICompNoSiteClient icompClient = Controller.feedbackClient.getICompClient();
+      ISEU1.setName("ISEU-Proxy");
+      //ISEU1.setComponentName("urn:guimodel:servicescreen:FBTR1");
+      ISEU1.setComponentName("ISA");
+      ISEU1.setEventBus(icompClient.eventBus);
+      ISEU1.setEventFactory(icompClient.eventFactory);
+      ISEU1.setPropertyDefinitionDictionary(icompClient.propertyDefinitionDictionary);
+      ISEU1.setTimerFactory(icompClient.timerFactory);
+   }
+
+   public void setupISEU4()
+   {
+      BlakICompNoSiteClient icompClient = Controller.feedbackClient.getICompClient();
+      ISEU4.setName("ISEU");
+      //ISEU1.setComponentName("urn:guimodel:servicescreen:FBTR1");
+      ISEU4.setComponentName("urn:device:iseuchain:IBTR3");
+      ISEU4.setEventBus(icompClient.eventBus);
+      ISEU4.setEventFactory(icompClient.eventFactory);
+      ISEU4.setPropertyDefinitionDictionary(icompClient.propertyDefinitionDictionary);
+      ISEU4.setTimerFactory(icompClient.timerFactory);
+   }
+
+   public void setupBAPP1()
+   {
+      // BlakICompFeedbackClient icompClient = (BlakICompFeedbackClient)
+      // Blak.feedbackClient;
+//      BlakICompClient icompClient = Blak.feedbackClient.getICompClient();
+      BlakICompNoSiteClient icompClient = Controller.feedbackClient.getICompClient();
+      BAPP1.setName("tuneAndIrradiateGuiModelProxy");
+      BAPP1.setComponentName("urn:guimodel:tuneandirradiate:FBTR1");
+      BAPP1.setEventBus(icompClient.eventBus);
+      BAPP1.setEventFactory(icompClient.eventFactory);
+      BAPP1.setPropertyDefinitionDictionary(icompClient.propertyDefinitionDictionary);
+      BAPP1.setTimerFactory(icompClient.timerFactory);
+
+   }
+
+   public void setupBAPP4()
+{
+   // BlakICompFeedbackClient icompClient = (BlakICompFeedbackClient)
+   // Blak.feedbackClient;
+//      BlakICompClient icompClient = Blak.feedbackClient.getICompClient();
+   BlakICompNoSiteClient icompClient = Controller.feedbackClient.getICompClient();
+   BAPP4.setName("tuneAndIrradiateGuiModelProxy");
+   BAPP4.setComponentName("urn:guimodel:tuneandirradiate:GTR4");
+   BAPP4.setEventBus(icompClient.eventBus);
+   BAPP4.setEventFactory(icompClient.eventFactory);
+   BAPP4.setPropertyDefinitionDictionary(icompClient.propertyDefinitionDictionary);
+   BAPP4.setTimerFactory(icompClient.timerFactory);
+
+}
+
+   public void setupESBTS()
+   {
+      // BlakICompFeedbackClient icompClient = (BlakICompFeedbackClient)
+      // Blak.feedbackClient;
+//      BlakICompClient icompClient = Blak.feedbackClient.getICompClient();
+      BlakICompNoSiteClient icompClient = Controller.feedbackClient.getICompClient();
+
+      esBtsController.setName("esBtsControllerProxy");
+      //esBtsController.setComponentName("esBtsController");
+      esBtsController.setBeamScheduler(beamScheduler);
+      esBtsController.setEventBus(icompClient.eventBus);
+      esBtsController.setEventFactory(icompClient.eventFactory);
+      esBtsController.setPropertyDefinitionDictionary(icompClient.propertyDefinitionDictionary);
+      esBtsController.setTimerFactory(icompClient.timerFactory);
+      CheckManagerProxy bssCheckManager = new CheckManagerProxy();
+      bssCheckManager.setComponentName("CheckManager");
+      bssCheckManager.setPropertyDefinitionDictionary(icompClient.propertyDefinitionDictionary);
+      bssCheckManager.setName("bssCheckManagerProxy");
+      bssCheckManager.setEventBus(icompClient.eventBus);
+      bssCheckManager.setEventFactory(icompClient.eventFactory);
+      bssCheckManager.setTimerFactory(icompClient.timerFactory);
+      esBtsController.setCheckManager(bssCheckManager);
+      List<Beamline> beamlines = new LinkedList<Beamline>();
+      Beamline bp1;
+      esBtsController.setBeamScheduler(beamScheduler);
+//      bp1 = new Beamline("FBTR1", 1, 1, null, null, );
+//      BeamlinesInfrastructure beamlinesInfrastructure = new BeamlinesInfrastructure();
+//      esBtsController.setBeamlinesInfrastructure(beamlinesInfrastructure);
+      //esBtsController.setBeamlinesInfrastructure(new BeamlinesInfrastructure(null));
+
+      //esBtsController.setBeamlinesInfrastructure();
+
+   }
+
+//   public void setupXray()
+//   {
+//      BlakICompNoSiteClient icompClient = Controller.feedbackClient.getICompClient();
+//      xrayCtrl.setName("XRAY_PROXY");
+//      xrayCtrl.setComponentName("XRay");
+//      xrayCtrl.setEventBus(icompClient.eventBus);
+//      xrayCtrl.setEventFactory(icompClient.eventFactory);
+//      xrayCtrl.setPropertyDefinitionDictionary(icompClient.propertyDefinitionDictionary);
+//      xrayCtrl.setTimerFactory(icompClient.timerFactory);
+//
+//   }
+
    public void setupBdsController()
    {
       // BlakICompFeedbackClient icompClient = (BlakICompFeedbackClient)
       // Blak.feedbackClient;
-/*      BlakICompClient icompClient = Blak.feedbackClient.getICompClient();
+      BlakICompNoSiteClient icompClient = Controller.feedbackClient.getICompClient();
       smpsController.setName("smpsControllerProxy");
       smpsController.setComponentName("smpsController");
       smpsController.setEventBus(icompClient.eventBus);
       smpsController.setEventFactory(icompClient.eventFactory);
       smpsController.setPropertyDefinitionDictionary(icompClient.propertyDefinitionDictionary);
-      smpsController.setTimerFactory(icompClient.timerFactory);*/
+      smpsController.setTimerFactory(icompClient.timerFactory);
+   }
+
+   public void setupBLPSCU()
+   {
+      // BlakICompFeedbackClient icompClient = (BlakICompFeedbackClient)
+      // Blak.feedbackClient;
+      BlakICompNoSiteClient icompClient = Controller.feedbackClient.getICompClient();
+      blpscu.setName("BlpscuProxy");
+      blpscu.setComponentName("BLPSCU");
+      blpscu.setEventBus(icompClient.eventBus);
+      blpscu.setEventFactory(icompClient.eventFactory);
+      blpscu.setPropertyDefinitionDictionary(icompClient.propertyDefinitionDictionary);
+      blpscu.setTimerFactory(icompClient.timerFactory);
+      blpscu.setNumberBeamlines(6);
+      blpscu.setTurnOnEssMagnetsCommandId((short)78);
+      blpscu.setTurnOffEssMagnetsCommandId((short)79);
+      blpscu.setTurnOnBeamlineMagnetsCommandsIds(new short[]{102,112,118,268,413,430});
+      blpscu.setTurnOffBeamlineMagnetsCommandsIds(new short[]{103,113,119,269,414,431});
+      blpscu.setSelectBeamlineCommandsIds(new short[]{114,115,116,117,412,429});
+      Map offMagnet = new HashMap<String, Short>();
+      offMagnet.put("Q1N1", 357);
+      offMagnet.put("Q2N1", 359);
+       Map onMagnet = new HashMap<String, Short>();
+       offMagnet.put("Q1N1", 434);
+       offMagnet.put("Q2N1", 436);
+      blpscu.setTurnOffMagnetCommandsIds(offMagnet);
+      blpscu.setTurnOnMagnetCommandsIds(onMagnet);
+      blpscu.setUseSimulator(false);
+      blpscu.setBlpscuCommandChannel(blpscuCmdChannelProxy);
+
+
+      blpscuCmdChannelProxy.setName("PLC-PROXY");
+      blpscuCmdChannelProxy.setComponentName("PLC");
+      blpscuCmdChannelProxy.setEventBus(icompClient.eventBus);
+      blpscuCmdChannelProxy.setEventFactory(icompClient.eventFactory);
+      blpscuCmdChannelProxy.setPropertyDefinitionDictionary(icompClient.propertyDefinitionDictionary);
+      blpscuCmdChannelProxy.setTimerFactory(icompClient.timerFactory);
+      blpscuCmdChannelProxy.setResponseTimeOut(2000);
+      blpscuCmdChannelProxy.setExceptionHandler(new ExceptionHandler() {
+         @Override
+         public boolean handle(Object pSource, String pMessage, Throwable pThrowable, Object... pArguments) {
+            return false;
+         }
+
+      });
+      blpscuCmdChannelProxy.init();
+
    }
 
    public void setupBcreu()
@@ -603,6 +842,8 @@ public class Beam extends AbstractPropertyChangeProvider implements EventReceive
 
                   PbsEquipmentElement e;
 
+                  PbsSlewConstants mConstants = new PbsSlewConstants();
+
                   switch (PbsElementType.values()[Integer.parseInt(
                         csvr.get(dataHeader.indexOf("ELEMENT_TYPE")))])
                   {
@@ -610,7 +851,7 @@ public class Beam extends AbstractPropertyChangeProvider implements EventReceive
                         e = new PbsSpot();
                         break;
                      case SLEW:
-                        e = new PbsSlew();
+                        e = new PbsSlew(mConstants);
                         break;
                      default:// spot
                         e = new PbsSpot();

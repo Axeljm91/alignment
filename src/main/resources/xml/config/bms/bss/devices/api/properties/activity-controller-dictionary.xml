@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<propertyDefinitions>
+
+   <component>
+      <name>ActivityController</name>
+      <propertyDefinition>
+         <name>CurrentActivityName</name>
+         <type>STRING</type>
+         <description>Current activity of the controller.</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>CurrentActivityStatus</name>
+         <type>STRING</type>
+         <description>Current activity status.</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>CancelAllowed</name>
+         <type>BOOLEAN</type>
+         <description>Is cancel allowed.</description>
+      </propertyDefinition>
+   </component>
+   
+</propertyDefinitions>

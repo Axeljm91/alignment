@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<propertyDefinitions>
+   <component>
+      <name>XRay</name>
+      <propertyDefinition>
+         <name>MovingStatus</name>
+         <type>STRING</type>
+         <writable>false</writable>
+         <description>The Moving Status of the xray</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>TargetReached</name>
+         <type>BOOLEAN</type>
+         <writable>false</writable>
+         <description>True if not moving and current position is near enough to target position</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>Inserted</name>
+         <type>BOOLEAN</type>
+         <writable>false</writable>
+         <description>True if xray is inserted</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>Retracted</name>
+         <type>BOOLEAN</type>
+         <writable>false</writable>
+         <description>True if xray is retracted</description>
+      </propertyDefinition>
+
+      <propertyDefinition>
+         <name>NoFailure</name>
+         <type>BOOLEAN</type>
+         <writable>false</writable>
+         <description>True if there is no failure</description>
+      </propertyDefinition>
+
+      <propertyDefinition>
+         <name>ioInsertCmd</name>
+         <type>BOOLEAN</type>
+         <writable>true</writable>
+         <description>True to insert the xray (internal use only)</description>
+      </propertyDefinition>
+      <propertyDefinition>
+         <name>ioRetractCmd</name>
+         <type>BOOLEAN</type>
+         <writable>true</writable>
+         <description>True to retract the xray (internal use only)</description>
+      </propertyDefinition>
+   </component>
+</propertyDefinitions>

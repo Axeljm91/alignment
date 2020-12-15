@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module org.jetbrains.idea.maven.project.MavenProjectsManager.isMavenModule="true" type="JAVA_MODULE" version="4">
+  <component name="FacetManager">
+    <facet type="Spring" name="Spring">
+      <configuration />
+    </facet>
+  </component>
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_8">
+    <output url="file://$MODULE_DIR$/target/classes" />
+    <output-test url="file://$MODULE_DIR$/target/test-classes" />
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/src/main/java" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/main/resources" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/target/generated-resources/versions" type="java-resource" />
+      <excludeFolder url="file://$MODULE_DIR$/target" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="Maven: com.iba.icomp:icompx-ui:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.icomp:icomp-devices-generic:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.jgoodies:validation:2.0.1" level="project" />
+    <orderEntry type="library" name="Maven: com.sun.jlfgr:jlfgr:1.0" level="project" />
+    <orderEntry type="library" name="Maven: commons-lang:commons-lang:2.6" level="project" />
+    <orderEntry type="library" name="Maven: commons-beanutils:commons-beanutils:1.9.2" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.bms:icomp-core-beam-ext:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-context:3.2.16.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-expression:3.2.16.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.icomp:icomp-comm-rpc:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: remotetea:jrpcgen:1.0.7" level="project" />
+    <orderEntry type="library" name="Maven: remotetea:oncrpc:1.0.7" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.bms:beam-bds-controller-api:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.bms:beam-bms-controller-api:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.bms:beam-bms-datatypes-api:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.pts-shared:pts-shared-ui:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: jdt:jdt:2.5" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.icomp:icompx-dicom:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.bms:beam-bms-datatypes-impl:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.pts-shared:pts-snout-management-api:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.pts-shared:pts-snout-management-impl:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.bms:bss-datatypes-api:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.bms:beam-bms-idt-api:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.bms:beam-bds-devices-rpc:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.icomp:icomp-comm-notif:R8.7.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: com.iba.icomp:icompx-aop:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-aop:3.2.16.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: aopalliance:aopalliance:1.0" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: com.iba.icomp:icompx-jmx:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.bms:beam-bms-controller-impl:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.bms:beam-bms-dosimetry-api:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.bms:beam-bds-controller-impl:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.pts-shared:pms-feedback:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.bms:beam-bds-devices-api:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.bms:beam-bss-beamaccesspointctrl-api:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.bms:beam-tools-flanagan:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.icomp:icompx-math:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.bms:icompx-core-beam-ext:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.icomp:icomp-io-modbus-direct-device:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: org.python:jython:2.5.3" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.bms:bms-data-recorder-api:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.bms:bms-data-recorder-proxy:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.bms:beam-bms-devices-api:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.bms:beam-bms-devices-impl:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-jdbc:3.2.16.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-test:3.2.16.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.bms:beam-bms-scanalgo:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.bms:bms-idt-controller-impl:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: net.sf.opencsv:opencsv:2.3" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: com.iba.bms:beam-bss-beamaccesspointctrl-impl:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.bms:bss-controller-proxy:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.bms:beam-bss-devices-impl:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.dekimo:board-backend:A.0.0.22" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.bms:beam-bms-devices-dekimo:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.commons:commons-math3:3.6" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: com.iba.icomp:icomp-io-fetchwrite:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.icomp:icomp-io-modbus-modbus:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.icomp:icomp-comm-cegelec:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.icomp:icomp-io-generic:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: org.jetbrains:annotations:17.0.0" level="project" />
+    <orderEntry type="library" name="Maven: javax.validation:validation-api:2.0.1.Final" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.bms:beam-bss-devices-api:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: org.projectlombok:lombok:1.18.0" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.bms:bss-controller-impl:R8.7.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: com.iba.bms:icomp-io-fetchwrite-beam-ext:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.commons:commons-math:2.2" level="project" />
+    <orderEntry type="library" name="Maven: jfree:jcommon:1.0.16" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.bms:bss-controller-api:R8.7.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: com.iba.bms:bds-common-impl:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.bms:bds-common-api:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: org.jfree:jfreechart:1.0.19" level="project" />
+    <orderEntry type="library" name="Maven: org.jfree:jcommon:1.0.23" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.pts:pts-pms-controller:8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.pts.pms:pms-process-templates-pms-controller:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.pts.pms:pms-process-templates-icomp-part:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.pts.pms:pms-poss-devices-impl:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.icomp:icomp-io-S7:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: libnodave:libnodave:0.8.5-iba3" level="project" />
+    <orderEntry type="library" name="Maven: com.spinn3r:log5j:2.1.3" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.pts.pms:pms-poss-api:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.pts.pms:pms-datatypes-dao-api:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.googlecode.json-simple:json-simple:1.1.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.pts.pms:pms-poss-devices-ui:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.pts.pms:pms-ppvs-devices-impl:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.pts.pms:pms-datatypes-api:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.pts.pms:pms-ppvs-devices-ui:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.pts.pms:pms-ppvs-controller-impl:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.pts.pms:pms-access-point-hp-impl:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.pts.pms:pms-access-point-hp-api:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.pts.pms:pms-access-point-controller-impl:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.icomp:icomp-notif-server:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.pts.pms:pms-access-point-controller-component:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.bms:beam-bds-devices-impl:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.bms:icompx-dicom-beam-ext:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.pts-shared:pts-shared-config:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.bms:beam-access-point-process:R8.7.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: com.iba.bms:bms-idt-dsus:R8.7.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: com.iba.bms:beam-bms-idt-impl-eye:R8.7.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: javax.xml.bind:jaxb-api:2.2.12" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: com.jgoodies:looks:2.2.2" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.bms:bms-ans:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.bms:bds-common-proxy:R8.7.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: com.iba.bms:beam-common-bmeu-bmeu:R8.7.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: com.iba.icomp:icompx-parameter:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.pts-shared:bms-feedback:R8.7.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: com.iba.bms:icompx-legacy-event-reporter-beam-ext:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.icomp:icompx-system-manager:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.pts:pts-treat-proc:8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.icomp:icompx-container:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.icomp:icompx-smi:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.sun.xml.bind:jaxb-core:2.2.11" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.velocity:velocity:1.7" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.bms:bms-treat-proc-bmspart:R8.7.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: com.iba.bms:beam-bms-controller-simulator-impl:R8.7.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: com.iba.bms:beam-bms-controller-simulator-api:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.pts.pms:pms-process-templates-treatment:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.pts.pms:pms-offline-impl:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.pts.pms:pms-controller-api:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.pts.pms:pms-controller-ui:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.pts.pms:pms-controller-models-impl:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.pts.pms:pms-access-point-rpd-ui:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.pts.pms:pms-access-point-rpd-impl:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.pts.pms:pms-controller-impl:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.pts-shared:pts-shared-srcundaq:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.icomp:icomp-io2-fetchwrite:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.icomp:icomp-io2-S7:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.pts.pms:pms-offline-api:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.pts.pms:pms-poss-devices-api:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.pts.pms:pms-pcu-proxy-api:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.pts.pms:pms-ppvs-devices-api:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.pts.pms:pms-ppvs-controller-api:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.pts.pms:pms-kinlib:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.pts.pms:pms-access-point-controller-api:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.pts.pms:pms-utils:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.pts.pms:pms-controller-models-api:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: oracle:oracle:9.0.1.4" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.pts.pms:pms-datatypes-impl:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.pts.pms:pms-datatypes-dao-impl:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.pts.pms:pms-dopa-impl:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.pts.pms:pms-dopa-api:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.pts.pms:pms-process-templates-pms-controller-ui:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.pts.pms:pms-ppvs-controller-ui:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.pts.pms:pms-common-ui:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.tcs.trcs:trcs-treat-proc-trcspart:R8.7.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: com.iba.bms:beam-bms-offline-impl:R8.7.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: com.iba.bms:beam-bms-offline-api:R8.7.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: com.iba.tcs.trcs:trcs-irrad-ctrl-front-end:R8.7.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: com.iba.pts-shared:pts-shared-license-key:R8.7.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: com.iba.tcs.trcs:trcs-common:R8.7.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: commons-digester:commons-digester:2.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: eclipse:jdtcore:3.2.0.v_658" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: net.java.dev.glazedlists:glazedlists_java15:1.9.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: org.aspectj:aspectjweaver:1.8.8" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: com.iba.tcs.trcs:trcs-datatypes-api:R8.7.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: com.iba.tcs.trcs:trcs-datatypes-dao-api:R8.7.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: com.iba.tcs.trcs:trcs-irrad-ctrl-api:R8.7.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: com.iba.tcs.trcs:trcs-irrad-ctrl-interlocksreporter-api:R8.7.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: com.iba.tcs.trcs:trcs-dicom-plan-storer-infra-api:R8.7.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: com.iba.tcs.trcs:trcs-dicom-plan-storer-infra-impl:R8.7.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: com.iba.icomp:icompx-verifier:R8.7.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: jasperreports:jasperreports:3.0.0" level="project" />
+    <orderEntry type="library" name="Maven: xml-apis:xml-apis:1.3.02" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: com.iba.tcs.trcs:trcs-datatypes-impl:R8.7.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: com.iba.tcs.trcs:trcs-icompx-dicom-ext:R8.7.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: com.iba.tcs.trcs:trcs-datatypes-dao-impl:R8.7.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: com.iba.tcs.trcs:trcs-irrad-ctrl-impl:R8.7.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: com.iba.tcs.trcs:trcs-irrad-ctrl-interlocksreporter-impl:R8.7.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: com.iba.tcs.trcs:trcs-db-checker:R8.7.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: com.iba.tcs.trcs:trcs-jmx-interface:R8.7.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: com.iba.tcs.trcs:trcs-datatypes-stub:R8.7.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: com.iba.pts.trcs.tools:trcs-tools-beamdelivery-simulator:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.lowagie:itext:1.3" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.blak:blak-blak:8.7.x-SNAPSHOT" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.xmlrpc:xmlrpc-server:3.1.3" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.xmlrpc:xmlrpc-common:3.1.3" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.ws.commons.util:ws-commons-util:1.0.2" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.xmlrpc:xmlrpc-client:3.1.3" level="project" />
+    <orderEntry type="library" name="Maven: commons-httpclient:commons-httpclient:3.1" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.poi:poi-ooxml:3.14" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.poi:poi-ooxml-schemas:3.14" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.xmlbeans:xmlbeans:2.6.0" level="project" />
+    <orderEntry type="library" name="Maven: stax:stax-api:1.0.1" level="project" />
+    <orderEntry type="library" name="Maven: com.github.virtuald:curvesapi:1.03" level="project" />
+    <orderEntry type="library" name="Maven: jama:jama:1.0.2" level="project" />
+    <orderEntry type="library" name="Maven: net.sourceforge.javacsv:javacsv:2.0" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.bms:beam-bms-scanalgo-tools:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.pt.qacs:qacs-tools-spotemkine:1.0.4" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.icomp:icompx-server-locker:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: org.ini4j:ini4j:0.5.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.pt.qacs:qacs-utils-imrt:1.0.4" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.bms:beam-bss-devices-stub:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.bms:beam-bms-devices-stub:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: jfree:jfreechart:1.0.13" level="project" />
+    <orderEntry type="library" name="Maven: jamod:jamod:1.2rc1-iba-11" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.poi:poi:3.14" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpclient:4.5.2" level="project" />
+    <orderEntry type="library" name="Maven: commons-logging:commons-logging:1.2" level="project" />
+    <orderEntry type="library" name="Maven: commons-codec:commons-codec:1.10" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpcore:4.4.4" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.pts-shared:pts-treatment-room-session:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-beans:3.2.16.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: com.thoughtworks.xstream:xstream:1.4.7" level="project" />
+    <orderEntry type="library" name="Maven: com.jgoodies:binding:2.0.6" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.bms:bms-common:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-orm:3.2.16.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.ibatis:ibatis-sqlmap:2.3.4.726" level="project" />
+    <orderEntry type="library" name="Maven: commons-dbcp:commons-dbcp:1.4" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.pts-shared:pts-shared-umi:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-tx:3.2.16.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpmime:4.5.2" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.icomp:icompx-user-rights-ui:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.icomp:icompx-uitoolkit-philips:R8.7.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: org.hsqldb:hsqldb:2.3.3" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-core:3.2.16.RELEASE" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.icomp:icomp-core:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: xpp3:xpp3:1.1.4c" level="project" />
+    <orderEntry type="library" name="Maven: commons-collections:commons-collections:3.2.2" level="project" />
+    <orderEntry type="library" name="Maven: org.hamcrest:hamcrest-all:1.3" level="project" />
+    <orderEntry type="library" name="Maven: com.googlecode.lambdaj:lambdaj:2.3.3" level="project" />
+    <orderEntry type="library" name="Maven: cglib:cglib-nodep:3.2.1" level="project" />
+    <orderEntry type="library" name="Maven: net.sourceforge.collections:collections-generic:4.01" level="project" />
+    <orderEntry type="library" name="Maven: commons-io:commons-io:2.5" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.bms:beam-bms-dosimetry-impl:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: org.swinglabs:swingx:1.6.1" level="project" />
+    <orderEntry type="library" name="Maven: com.jhlabs:filters:2.0.235" level="project" />
+    <orderEntry type="library" name="Maven: org.swinglabs:swing-worker:1.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.icomp:icompx-user-rights:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.icomp:icompx-dao:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: org.postgresql:postgresql:9.4.1208.jre7" level="project" />
+    <orderEntry type="library" name="Maven: commons-pool:commons-pool:1.6" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.icomp:icompx-core:R8.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.icomp:icomp-io2-generic:R8.7.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: com.iba.icomp:icompx-relauncher:R8.7.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: com.iba.bms:beam-common-proc:R8.7.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: com.iba.bms:bms-mcrServiceScreens:R8.7.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: com.iba.bms:bms-tcrServiceScreens:R8.7.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: com.iba.pts-shared:pts-snout-management-ui:R8.7.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: com.iba.pts-shared:pts-db-checker:R8.7.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: com.iba.bms:bss-gateway-server:R8.7.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: com.iba.bms:bss-gateway-common:R8.7.1" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: javax.mail:mail:1.4.7" level="project" />
+    <orderEntry type="library" scope="RUNTIME" name="Maven: javax.activation:activation:1.1" level="project" />
+    <orderEntry type="module-library">
+      <library name="Maven: com.iba.pts:pts-beam-common-process:8.7.1">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/src/main/resources/pts-beam-common-process.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="Maven: com.iba.pts:pts-bms-tcr-service-screens:8.7.1">
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/src/main/resources/pts-bms-tcr-service-screens.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="library" name="Maven: com.sikulix:sikulixapi:1.1.1" level="project" />
+    <orderEntry type="library" name="Maven: commons-cli:commons-cli:1.3.1" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.commons:commons-exec:1.3" level="project" />
+    <orderEntry type="library" name="Maven: commons-net:commons-net:3.4" level="project" />
+    <orderEntry type="library" name="Maven: com.melloware:jintellitype:1.3.9" level="project" />
+    <orderEntry type="library" name="Maven: com.nativelibs4java:bridj:0.7.0" level="project" />
+    <orderEntry type="library" name="Maven: com.google.android.tools:dx:1.7" level="project" />
+    <orderEntry type="library" name="Maven: com.github.vidstige:jadb:-v1.0-g94ebf38-23" level="project" />
+    <orderEntry type="library" name="Maven: com.sikulix:sikulixlibswin:1.1.1" level="project" />
+    <orderEntry type="library" name="Maven: com.sikulix:sikulix1tigervnc:1.1.1" level="project" />
+    <orderEntry type="library" name="Maven: com.google.code.gson:gson:2.8.5" level="project" />
+    <orderEntry type="library" name="Maven: com.jgoodies:jgoodies-common:1.8.1" level="project" />
+    <orderEntry type="library" name="Maven: com.jgoodies:forms:1.2.1" level="project" />
+    <orderEntry type="library" name="Maven: net.sf.supercsv:super-csv:2.4.0" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.tcs.beam:beam-bds-tools-scanning-controller-client:8.0.0" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.pts.bms:bms-common:8.0.0" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.icomp:icomp-core-beam-ext:8.0.0" level="project" />
+    <orderEntry type="library" name="Maven: smartsocket:ss:5.5.3" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.pts.bms:bms-data-recorder-impl:8.0.0" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.tcs.beam:beam-bms-controller-api:8.0.0" level="project" />
+    <orderEntry type="library" name="Maven: remotetea:jportmap:1.0.7" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.tcs.beam:beam-bds-devices-rpc:8.0.0" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.tcs.beam:beam-bms-datatypes-api:8.0.0" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.tcs.beam:beam-bms-datatypes-impl:8.0.0" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.pts.bms:bss-datatypes-api:8.0.0" level="project" />
+    <orderEntry type="library" name="Maven: com.iba.pts.bms:beam-bms-dosimetry-api:8.0.0" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: junit:junit:4.12" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.hamcrest:hamcrest-core:1.3" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.easymock:easymock:3.4" level="project" />
+    <orderEntry type="library" name="Maven: org.objenesis:objenesis:2.2" level="project" />
+    <orderEntry type="library" name="Maven: log4j:log4j:1.2.17" level="project" />
+    <orderEntry type="library" name="Maven: com.google.code.findbugs:annotations:3.0.1u2" level="project" />
+    <orderEntry type="library" name="Maven: net.jcip:jcip-annotations:1.0" level="project" />
+    <orderEntry type="library" name="Maven: com.google.code.findbugs:jsr305:3.0.1" level="project" />
+  </component>
+</module>

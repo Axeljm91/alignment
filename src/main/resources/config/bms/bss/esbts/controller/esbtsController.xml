@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+
+<!-- This is the ES/BTS Controller Configuration for Spring. -->
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+   <import resource="classpath:config/bms/bss/esbts/controller/blpscu.xml" />
+   <import resource="classpath:config/PAT.112/bssController/blpscu.xml" />
+
+   <!-- BLPSCU proxy -->
+   <bean name="blpscuProxy" parent="abstractProxy" class="com.iba.pts.bms.bss.esbts.blpscu.impl.BlpscuProxy"
+      init-method="initialize">
+      <property name="name" value="blpscuProxy" />
+      <property name="componentName" value="blpscu" />
+      <property name="numberBeamlines">
+         <bean id="beamlinesInfrastructure.numberBeamlines" class="org.springframework.beans.factory.config.PropertyPathFactoryBean" />
+      </property>
+      <property name="turnOnEssMagnetsCommandId" value="${prop:bms.bss.esbts.blpscu.turnOnEssMagnetsCommandId}" />
+      <property name="turnOffEssMagnetsCommandId" value="${prop:bms.bss.esbts.blpscu.turnOffEssMagnetsCommandId}" />
+      <property name="turnOnBeamlineMagnetsCommandsIds" value="${prop:bms.bss.esbts.blpscu.turnOnBeamlineMagnetsCommandsIds}" />
+      <property name="turnOffBeamlineMagnetsCommandsIds" value="${prop:bms.bss.esbts.blpscu.turnOffBeamlineMagnetsCommandsIds}" />
+      <property name="selectBeamlineCommandsIds" value="${prop:bms.bss.esbts.blpscu.selectBeamlineCommandsIds}" />
+      <property name="turnOnMagnetCommandsIds" ref="blpscuTurnOnMagnetCommandsIds" />
+      <property name="turnOffMagnetCommandsIds" ref="blpscuTurnOffMagnetCommandsIds" />
+
+      <property name="blpscuCommandChannel" ref="blpscuCommandChannelProxy" />
+      <property name="useSimulator">
+         <bean class="com.iba.icomp.spring.SimplePropertyBasedFactoryBean">
+            <property name="propertyValue" value="${prop:config.bmsCfg}" />
+            <property name="inputObjects">
+               <map>
+                  <entry key="simulator" value="true" />
+                  <entry key="real" value="false" />
+               </map>
+            </property>
+         </bean>
+      </property>
+      <property name="expectedFirmwareVersion" value="${prop:bms.bss.esbts.blpscu.expectedFirmwareVersion}" />
+	  <property name="expectedHardwareChecksum" value="${prop:bms.bss.esbts.blpscu.expectedHardwareChecksum}" />
+	  <property name="expectedSoftwareChecksum" value="${prop:bms.bss.esbts.blpscu.expectedSoftwareChecksum}" />
+   </bean>
+
+   <!-- ES/BTS Controller -->
+   <bean name="esBtsController" parent="abstractComponent" class="com.iba.pts.bms.bss.esbts.controller.impl.EsBtsControllerImpl">
+      <property name="name" value="esBtsController" />
+      <property name="activities">
+         <list>
+            <bean class="com.iba.pts.bms.bss.esbts.controller.impl.activity.EsBtsIdleActivity">
+               <property name="timerFactory" ref="timerFactory" />
+               <property name="timeoutInMs" value="${prop:bms.bss.esbts.controller.disableBeam.timeout_ms}" />
+            </bean>
+            <bean
+               class="com.iba.pts.bms.bss.esbts.controller.impl.activity.selectbeamline.EsBtsSelectBeamlineActivity">
+               <property name="timerFactory" ref="timerFactory" />
+               <property name="blpscu" ref="blpscuProxy" />
+               <property name="states">
+                  <list>
+                     <bean
+                        class="com.iba.pts.bms.bss.esbts.controller.impl.activity.selectbeamline.state.EsBtsSelectBeamlineDisabledState" />
+                     <bean
+                        class="com.iba.pts.bms.bss.esbts.controller.impl.activity.selectbeamline.state.EsBtsSelectBeamlineTurnOffPowerSuppliesState">
+                        <property name="timeoutInMs"
+                           value="${prop:bms.bss.esbts.controller.selectBeamline.turnOffPowerSupplies.timeout_ms}" />
+                        <property name="analogPsDelayInMs"
+                                  value="${prop:bms.bss.esbts.controller.selectBeamline.turnOffPowerSupplies.analog_ps_delay_ms}" />
+                     </bean>
+                     <bean
+                        class="com.iba.pts.bms.bss.esbts.controller.impl.activity.selectbeamline.state.EsBtsSelectBeamlineSelectPowerSuppliesState">
+                        <property name="timeoutInMs"
+                           value="${prop:bms.bss.esbts.controller.selectBeamline.selectPowerSupplies.timeout_ms}" />
+                     </bean>
+                     <bean
+                        class="com.iba.pts.bms.bss.esbts.controller.impl.activity.selectbeamline.state.EsBtsSelectBeamlineTurnOffPbsPowerSuppliesState">
+                        <property name="timeoutInMs"
+                           value="${prop:bms.bss.esbts.controller.selectBeamline.turnOffPowerSupplies.timeout_ms}" />
+                     </bean>
+                     <bean
+                        class="com.iba.pts.bms.bss.esbts.controller.impl.activity.selectbeamline.state.EsBtsSelectBeamlineTurnOnPowerSuppliesState">
+                        <property name="timeoutInMs"
+                           value="${prop:bms.bss.esbts.controller.selectBeamline.turnOnPowerSupplies.timeout_ms}" />
+                     </bean>
+                     <bean
+                        class="com.iba.pts.bms.bss.esbts.controller.impl.activity.selectbeamline.state.EsBtsSelectBeamlineCanceledState" />
+                     <bean
+                        class="com.iba.pts.bms.bss.esbts.controller.impl.activity.selectbeamline.state.EsBtsSelectBeamlineErrorState" />
+                     <bean
+                        class="com.iba.pts.bms.bss.esbts.controller.impl.activity.selectbeamline.state.EsBtsSelectBeamlineCompleteState" />
+                  </list>
+               </property>
+            </bean>
+            <bean class="com.iba.pts.bms.bss.esbts.controller.impl.activity.EsBtsSetRangeActivity">
+               <property name="timerFactory" ref="timerFactory" />
+               <property name="timeoutInMs" value="${prop:bms.bss.esbts.controller.setRange.timeout_ms}" />
+               <property name="waitTimeWithCyclingInMs" value="${prop:bms.bss.esbts.controller.setRange.waitTimeWithCycling_ms}" />
+               <property name="waitTimesWithoutCyclingRangeSteps" value="${prop:bms.bss.esbts.controller.setRange.waitTimesWithoutCyclingRangeSteps}" />
+               <property name="waitTimesWithoutCyclingInMs" value="${prop:bms.bss.esbts.controller.setRange.waitTimesWithoutCycling_ms}" />
+            </bean>
+            <bean class="com.iba.pts.bms.bss.esbts.controller.impl.activity.EsBtsEnableBeamActivity">
+               <property name="timerFactory" ref="timerFactory" />
+               <property name="timeoutInMs" value="${prop:bms.bss.esbts.controller.enableBeam.timeout_ms}" />
+               <property name="llrf" ref="llrfProxy" />
+               <property name="acu" ref="acuProxy" />
+            </bean>
+            <bean class="com.iba.pts.bms.bss.esbts.controller.impl.activity.EsBtsDisableBeamActivity">
+               <property name="timerFactory" ref="timerFactory" />
+               <property name="timeoutInMs" value="${prop:bms.bss.esbts.controller.disableBeam.timeout_ms}" />
+            </bean>
+            <bean class="com.iba.pts.bms.bss.esbts.controller.impl.activity.EsBtsPrepareWithDeviceSettingsActivity">
+               <property name="timerFactory" ref="timerFactory" />
+               <property name="timeoutInMs"
+                  value="${prop:bms.bss.esbts.controller.EsBtsPrepareWithDeviceSettings.timeout_ms}" />
+            </bean>
+            <bean class="com.iba.pts.bms.bss.esbts.controller.impl.activity.EsBtsSavePowerActivity">
+               <property name="timerFactory" ref="timerFactory" />
+               <property name="beamlinesInfrastructure" ref="beamlinesInfrastructure" />
+            </bean>
+         </list>
+      </property>
+      <property name="beamScheduler" ref="beamScheduler" />
+      <property name="beamlinesInfrastructure" ref="beamlinesInfrastructure" />
+      <property name="criticalChecks" ref="esbtsServiceStartedCheckList" />
+      <property name="checkManager" ref="cyclicCheckManager" />
+      <property name="checksRequiringSetRange">
+         <set>
+            <value>MagnetCurrentWithinToleranceCheck</value>
+            <value>Group3FieldWithinToleranceCheck</value>
+            <value>PowerSupplyHealthCheck</value>
+         </set>
+      </property>
+   </bean>
+
+   <!-- Starts the ES/BTS controller 'power saving' activity when needed. -->
+   <bean id="powerSaver" class="com.iba.pts.bms.bss.esbts.PowerSaverImpl" lazy-init="false">
+      <property name="enabled" value="${prop:bms.bss.esbts.controller.savepower.enabledOnStartup}" />
+      <property name="esbtsController" ref="esBtsController" />
+      <property name="beamScheduler" ref="beamScheduler" />
+   </bean>
+
+</beans>

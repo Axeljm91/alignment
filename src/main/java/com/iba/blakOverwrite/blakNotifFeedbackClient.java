@@ -82,7 +82,9 @@ public class blakNotifFeedbackClient extends BlakEcubtcuFeedbackClient implement
    // alive
    // status
    private static final String BCP_CONTAINER_NAME = "BEAM-COMMON-PROCESS";
+   private static final String BAPP_CONTAINER_NAME = "BEAM-ACCESS-POINT-PROCESS-IBTR3";
    private ContainerMonitor mBcpMonitor = new ContainerMonitor(BCP_CONTAINER_NAME);
+   private ContainerMonitor mBapp3Monitor = new ContainerMonitor(BAPP_CONTAINER_NAME);
    /**
     * The 'alive' status is normally sent every 1s by the BCP, but it sometimes take about 3s.
     */
@@ -95,6 +97,7 @@ public class blakNotifFeedbackClient extends BlakEcubtcuFeedbackClient implement
    // through
    // this
    // channel
+
    // commands
    // to
    //
@@ -115,7 +118,18 @@ public class blakNotifFeedbackClient extends BlakEcubtcuFeedbackClient implement
    private NotifChannelSender mBssDevicesCmdChannelSender;
    private NotifChannelSender mBdsControllCmdChannelSender;
    private NotifChannelSender mBssSchedulerCmdChannelSender;
+   private NotifChannelSender mDevicesCmdChannelSender;
    private NotifChannelSender mLlrfCmdChannelSender;
+   private NotifChannelSender mBlpscuCmdChannelSender;
+   private NotifChannelSender mTuneAndIrradiateTR1Sender;
+   private NotifChannelSender mTuneAndIrradiateTR4Sender;
+   private NotifChannelSender mTcuIseuTR1Sender;
+   private NotifChannelSender mTcuIseuTR4Sender;
+   private NotifChannelSender mVCEU3Sender;
+   private NotifChannelSender mSMEU3Sender;
+   private NotifChannelSender mSSEU3Sender;
+   private NotifChannelSender mTSM1Sender;
+   private NotifChannelSender mTSM3Sender;
    private boolean mDisconnectRequest = false;
    private Receiver mReceiver = new Receiver();
    private EventReceiver mBlakCmdChannelForwarder = new EventForwarder();
@@ -123,8 +137,21 @@ public class blakNotifFeedbackClient extends BlakEcubtcuFeedbackClient implement
    private EventReceiver mBssDevicesCmdChannelForwarder = new EventForwarder();
    private EventReceiver mSmpsControllCmdChannelForwarder = new EventForwarder();
    private EventReceiver mBssSchedulerCmdChannelForwarder = new EventForwarder();
+   private EventReceiver mDevicesCmdChannelForwarder = new EventForwarder();
    private EventReceiver mLlrfCmdChannelForwarder = new EventForwarder();
+   private EventReceiver mBlpscuCmdChannelForwarder = new EventForwarder();
+   private EventReceiver mTuneAndIrradiateTR1Forwarder = new EventForwarder();
+   private EventReceiver mTuneAndIrradiateTR4Forwarder = new EventForwarder();
+   private EventReceiver mTcuIseuTR1Forwarder = new EventForwarder();
+   private EventReceiver mTcuIseuTR4Forwarder = new EventForwarder();
+   private EventReceiver mVCEU3Forwarder = new EventForwarder();
+   private EventReceiver mSMEU3Forwarder = new EventForwarder();
+   private EventReceiver mSSEU3Forwarder = new EventForwarder();
+   private EventReceiver mTSM1Forwarder = new EventForwarder();
+   private EventReceiver mTSM3Forwarder = new EventForwarder();
    private Timer mBCPMonitorTimer;
+   public TherapyCentre tc = new TherapyCentreImpl(
+        BlakPreferences.getCurrentSiteString(BlakConstants.SITE_DESCRIPTION));
    
    private String mNotifServerAddress = "";
    private int 	  mNotifServerPort=16540 ;
@@ -209,10 +236,24 @@ public class blakNotifFeedbackClient extends BlakEcubtcuFeedbackClient implement
       mICompClient.updateAppQueueRouterP2pMap("smpsController", mSmpsControllCmdChannelForwarder);
       mICompClient.updateAppQueueRouterP2pMap("bssController", mBssCmdChannelForwarder);
       mICompClient.updateAppQueueRouterP2pMap("beamScheduler", mBssSchedulerCmdChannelForwarder);
+      mICompClient.updateAppQueueRouterP2pMap("PLC", mBlpscuCmdChannelForwarder);
+      //mICompClient.updateAppQueueRouterP2pMap("BLPSCU", mBlpscuCmdChannelForwarder);
       mICompClient.updateAppQueueRouterP2pMap("BCREU", mBssDevicesCmdChannelForwarder);
       mICompClient.updateAppQueueRouterP2pMap("BcreuComponent", mBssDevicesCmdChannelForwarder);
       mICompClient.updateEventRouterNotifMap(BCP_CONTAINER_NAME, mICompClient.applicationQueue);
       mICompClient.updateAppQueueRouterNotifMap(BCP_CONTAINER_NAME, mBcpMonitor);
+      mICompClient.updateAppQueueRouterP2pMap("XRay", mDevicesCmdChannelForwarder);
+      mICompClient.updateAppQueueRouterP2pMap("urn:guimodel:tuneandirradiate:FBTR1", mTuneAndIrradiateTR1Forwarder);
+      mICompClient.updateAppQueueRouterP2pMap("urn:guimodel:tuneandirradiate:GTR4", mTuneAndIrradiateTR4Forwarder);
+      mICompClient.updateAppQueueRouterP2pMap("ISA", mTcuIseuTR1Forwarder);
+      mICompClient.updateAppQueueRouterP2pMap("urn:device:vc:IBTR3", mVCEU3Forwarder);
+      mICompClient.updateAppQueueRouterP2pMap("urn:device:sm:IBTR3", mSMEU3Forwarder);
+      mICompClient.updateAppQueueRouterP2pMap("urn:device:ss:IBTR3", mSSEU3Forwarder);
+      mICompClient.updateEventRouterNotifMap(BAPP_CONTAINER_NAME, mICompClient.applicationQueue);
+      mICompClient.updateAppQueueRouterNotifMap(BAPP_CONTAINER_NAME, mBapp3Monitor);
+      mICompClient.updateAppQueueRouterP2pMap("urn:device:iseuchain:GTR4", mTcuIseuTR4Forwarder);
+      //mICompClient.updateAppQueueRouterP2pMap("TSM", mTSM1Forwarder);
+      mICompClient.updateAppQueueRouterP2pMap("TSM", mTSM3Forwarder);
    }
 
    @Override
@@ -291,10 +332,21 @@ public class blakNotifFeedbackClient extends BlakEcubtcuFeedbackClient implement
          ((EventForwarder) mBlakCmdChannelForwarder).setEventReceiver(mChannelSender);
          ((EventForwarder) mBssCmdChannelForwarder).setEventReceiver(mBssCmdChannelSender);
          ((EventForwarder) mBssDevicesCmdChannelForwarder).setEventReceiver(mBssDevicesCmdChannelSender);
-//         ((EventForwarder) mSmpsControllCmdChannelForwarder).setEventReceiver(mBdsControllCmdChannelSender);
+         ((EventForwarder) mSmpsControllCmdChannelForwarder).setEventReceiver(mBdsControllCmdChannelSender);
          ((EventForwarder) mBssSchedulerCmdChannelForwarder).setEventReceiver(mBssSchedulerCmdChannelSender);
+         ((EventForwarder) mDevicesCmdChannelForwarder).setEventReceiver(mDevicesCmdChannelSender);
+         ((EventForwarder) mBlpscuCmdChannelForwarder).setEventReceiver(mBlpscuCmdChannelSender);
+         ((EventForwarder) mTuneAndIrradiateTR1Forwarder).setEventReceiver(mTuneAndIrradiateTR1Sender);
+         ((EventForwarder) mTuneAndIrradiateTR4Forwarder).setEventReceiver(mTuneAndIrradiateTR4Sender);
+         ((EventForwarder) mTcuIseuTR1Forwarder).setEventReceiver(mTcuIseuTR1Sender);
+         ((EventForwarder) mTcuIseuTR4Forwarder).setEventReceiver(mTcuIseuTR4Sender);
+         ((EventForwarder) mVCEU3Forwarder).setEventReceiver(mVCEU3Sender);
+         ((EventForwarder) mSMEU3Forwarder).setEventReceiver(mSMEU3Sender);
+         ((EventForwarder) mSSEU3Forwarder).setEventReceiver(mSSEU3Sender);
+         //((EventForwarder) mTSM1Forwarder).setEventReceiver(mTSM1Sender);
+         ((EventForwarder) mTSM3Forwarder).setEventReceiver(mTSM3Sender);
          //((EventForwarder) mLlrfCmdChannelForwarder).setEventReceiver(mLlrfCmdChannelSender);
-//         publishBssProperties();
+         //publishBssProperties();
          
 //         mBCPMonitorTimer = mICompClient.timerFactory.create(mBcpMonitor);
 //         mBCPMonitorTimer.schedule(BCP_MONITOR_TIMEOUT, BCP_MONITOR_TIMEOUT);
@@ -317,10 +369,21 @@ public class blakNotifFeedbackClient extends BlakEcubtcuFeedbackClient implement
       Controller.beam.bssController.proxyPublish();
       // ask for properties of BeamScheduler
       Controller.beam.beamScheduler.proxyPublish();
- //     Blak.beam.smpsController.proxyPublish();
-
+      Controller.beam.smpsController.proxyPublish();
       Controller.beam.llrf.proxyPublish();
+      Controller.beam.blpscuCmdChannelProxy.proxyPublish();
+      Controller.beam.blpscu.proxyPublish();
+      Controller.beam.ISEU1.proxyPublish();
+      Controller.beam.ISEU4.proxyPublish();
+      Controller.beam.BAPP1.proxyPublish();
+      Controller.beam.BAPP4.proxyPublish();
+      Controller.beam.VCEU3.proxyPublish();
+      Controller.beam.SMEU3.proxyPublish();
+      Controller.beam.SSEU3.proxyPublish();
+      //Controller.beam.TSM1.proxyPublish();
+      Controller.beam.TSM3.proxyPublish();
       //Controller.beam.degrader.proxyPublish();
+      //Controller.beam.xrayCtrl.proxyPublish();
    }
 
    private void createServices()
@@ -336,10 +399,20 @@ public class blakNotifFeedbackClient extends BlakEcubtcuFeedbackClient implement
       services.add(createNotifReceiver(ChannelConstants.BLAK_NOTIF));
       services.add(createNotifReceiver(ChannelConstants.BSS_NOTIF));
       services.add(createNotifReceiver(ChannelConstants.BSS_DEVICES_NOTIF));
-      //services.add(createNotifReceiver(ChannelConstants.DEVICES_NOTIF));
+      //services.add(createNotifReceiver("NotificationFromPmsMiscTR4"));
       //services.add(createNotifReceiver(ChannelConstants.DAQ_NOTIF));
-//      services.add(createNotifReceiver(BDS_CONTROLL_NOTIF_CHANNEL_NAME));
+      services.add(createNotifReceiver("BlpscuCommand"));
+      services.add(createNotifReceiver(BDS_CONTROLL_NOTIF_CHANNEL_NAME));
 //      services.add(createNotifReceiver(CONTAINER_FB_CHANNEL_NAME));
+      services.add(createNotifReceiver("bapBmsRemoteUINotif_GTR4"));
+      services.add(createNotifReceiver("bapBmsRemoteUINotif_FBTR1"));
+      //services.add(createNotifReceiver("ISEU"));
+      NotifChannelReceiver vc3 = createNotifReceiver("BdsDevicesNotif-IBTR3");
+      //vc3.setFilter(BAPP_CONTAINER_NAME);
+      services.add(vc3);
+      //services.add(createNotifReceiver("TSMNotifications-FBTR1"));
+      services.add(createNotifReceiver("TSMNotifications-IBTR3"));
+      //services.add(createNotifReceiver("ScanningControllerNotif"));
       services.add(createNotifReceiver(ChannelConstants.BEAM_SCHEDULER_NOTIF));
  //     if (Blak.room.getBdp().length() > 0)
   //    {
@@ -355,10 +428,34 @@ public class blakNotifFeedbackClient extends BlakEcubtcuFeedbackClient implement
       services.add(mBssCmdChannelSender);
       mBssDevicesCmdChannelSender = createNotifSender(ChannelConstants.BSS_DEVICES_COMMAND);
       services.add(mBssDevicesCmdChannelSender);
-//      mBdsControllCmdChannelSender = createNotifSender(BDS_CONTROLL_COMMAND_CHANNEL_NAME);
-//      services.add(mBdsControllCmdChannelSender);
+      mBdsControllCmdChannelSender = createNotifSender(BDS_CONTROLL_COMMAND_CHANNEL_NAME);
+      services.add(mBdsControllCmdChannelSender);
+      mBlpscuCmdChannelSender = createNotifSender("BlpscuCommand");
+      services.add(mBlpscuCmdChannelSender);
+      mTuneAndIrradiateTR1Sender = createNotifSender("bapBmsRemoteUICommand_FBTR1");
+      mTuneAndIrradiateTR4Sender = createNotifSender("bapBmsRemoteUICommand_GTR4");
+      services.add(mTuneAndIrradiateTR1Sender);
+      services.add(mTuneAndIrradiateTR4Sender);
+      mTcuIseuTR1Sender = createNotifSender("McrTcrBdsDevicesCommand-IBTR3");
+      mTcuIseuTR4Sender = createNotifSender("McrTcrBdsDevicesCommand-GTR4");
+      services.add(mTcuIseuTR1Sender);
+      services.add(mTcuIseuTR4Sender);
+      mVCEU3Sender = createNotifSender("BdsDevicesCommand-IBTR3");
+      services.add(mVCEU3Sender);
+      mSMEU3Sender = mVCEU3Sender;
+      mSSEU3Sender = mVCEU3Sender;
+      //mSMEU3Sender = createNotifSender("BdsDevicesCommand-IBTR3");
+      //services.add(mSMEU3Sender);
+      //mSSEU3Sender = createNotifSender("BdsDevicesCommand-IBTR3");
+      //services.add(mSSEU3Sender);
+//      mTSM1Sender = createNotifSender("TSMCommands-FBTR1");
+//      services.add(mTSM1Sender);
+      mTSM3Sender = createNotifSender("TSMCommands-IBTR3");
+      services.add(mTSM3Sender);
       mBssSchedulerCmdChannelSender = createNotifSender(ChannelConstants.BEAM_SCHEDULER_COMMAND);
       services.add(mBssSchedulerCmdChannelSender);
+     // mDevicesCmdChannelSender = createNotifSender("CommandPmsMiscTR4");
+     // services.add(mDevicesCmdChannelSender);
      // mLlrfCmdChannelSender = createNotifSender(ChannelConstants.BSS_DEVICES_COMMAND);
      // services.add(mLlrfCmdChannelSender);
 
@@ -600,6 +697,7 @@ public class blakNotifFeedbackClient extends BlakEcubtcuFeedbackClient implement
          ((EventForwarder) mBssCmdChannelForwarder).setEventReceiver(mBssCmdChannelSender);
          ((EventForwarder) mBssDevicesCmdChannelForwarder).setEventReceiver(mBssDevicesCmdChannelSender);
          ((EventForwarder) mBssSchedulerCmdChannelForwarder).setEventReceiver(mBssSchedulerCmdChannelSender);
+         ((EventForwarder) mBlpscuCmdChannelForwarder).setEventReceiver(mBlpscuCmdChannelSender);
          //((EventForwarder) mLlrfCmdChannelForwarder).setEventReceiver(mLlrfCmdChannelSender);
       }
    }
@@ -869,7 +967,7 @@ public class blakNotifFeedbackClient extends BlakEcubtcuFeedbackClient implement
       public PbsBlackIcDataEventAdapter(ListablePropertyDefinitionDictionary pDictionary)
             throws BeamLineElementNotFoundException
       {
-         TherapyCentre tc = new TherapyCentreImpl(
+         tc = new TherapyCentreImpl(
                BlakPreferences.getCurrentSiteString(BlakConstants.SITE_DESCRIPTION));
          Map<BeamDeliveryPoint, NozzleType> nt = NozzleTypesBuilder.getNozzleTypes(tc,
                BlakPreferences.getCurrentSiteString(BlakConstants.NOZZLE_TYPES));

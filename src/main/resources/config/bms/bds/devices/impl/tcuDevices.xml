@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd">
+
+    <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+    <!-- Common TCU device settings -->
+    <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+
+    <bean id="abstractTcuDevice" parent="simpleAbstractProxy" abstract="true">
+        <property name="responseTimeOut" value="2000" />
+        <property name="eventBus" ref="tcuRpcEventBus" />
+    </bean>
+
+    <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+    <!-- TCU device: RPC -->
+    <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+
+    <bean id="tcuRpcSender" class="com.iba.icomp.comm.rpc.AutoConnectRpcChannelSender">
+        <property name="name" value="TcuRpcSender" />
+        <property name="eventBus" ref="eventBus" />
+        <property name="eventFactory" ref="eventFactory" />
+        <property name="program" value="55555111" />
+        <property name="version" value="1" />
+        <property name="rpcProgramFactory">
+            <bean class="com.iba.icomp.comm.rpc.RpcFileProgramFactory" init-method="load">
+                <property name="prefixes">
+                    <list>
+                        <value>tcu</value>
+                    </list>
+                </property>
+                <property name="resource">
+                    <bean class="org.springframework.core.io.ClassPathResource">
+                        <constructor-arg value="res/com/iba/pts/bms/common/x/tcu.x" />
+                    </bean>
+                </property>
+            </bean>
+        </property>
+        <property name="serverHost" value="10.1.103.51" />
+        <property name="serverPort" value="0" />
+        <property name="containerFilter" value="BMS-TCR-SERVICE-SCREENS-IBTR3" />
+    </bean>
+
+    <!-- EventBus that can be used for beans that send only RPC events to tcu (no other event sended) -->
+    <bean id="tcuRpcEventBus" class="com.iba.icomp.core.event.EventBusToEventReceiver">
+        <constructor-arg ref="tcuRpcSender" />
+    </bean>
+
+    <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+    <!-- RMEU -->
+    <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+
+    <bean id="rangeModulator" class="com.iba.pts.bms.bds.tcu.devices.RangeModulatorImpl" parent="abstractTcuDevice">
+        <property name="name" value="RMEU" />
+        <property name="componentName" value="urn:device:rm:#{bdp}" />
+        <property name="resetLargeWheelTrack" value="${prop:bds.service.ui.reset.rmeu.largeWheelTrack}" />
+    </bean>
+
+    <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+    <!-- FSEU -->
+    <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+
+    <bean id="tcuFseu" class="com.iba.pts.bms.bds.tcu.devices.TcuFseuImpl" parent="abstractTcuDevice">
+        <property name="name" value="FSEU" />
+        <property name="componentName" value="urn:device:fs:#{bdp}" />
+    </bean>
+
+    <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+    <!-- SSEU -->
+    <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+
+    <bean id="tcuSseu" class="com.iba.pts.bms.bds.tcu.devices.TcuSecondScattererImpl" parent="abstractTcuDevice">
+        <property name="name" value="SSEU" />
+        <property name="componentName" value="urn:device:ss:#{bdp}" />
+        <property name="resetPosition" value="${prop:bds.service.ui.reset.sseu.position}" />
+    </bean>
+
+    <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+    <!-- VCEU -->
+    <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+
+    <bean id="tcuVceu" class="com.iba.pts.bms.bds.tcu.devices.TcuVariableCollimatorsProxyImpl" parent="abstractTcuDevice">
+        <property name="name" value="VCEU" />
+        <property name="componentName" value="urn:device:vc:IBTR3" />
+        <property name="XRayPositionInCm" value="17" />
+        <property name="toleranceOnSetpointInCm" value="0.001" />
+    </bean>
+
+    <bean id="tcuProxy" class="com.iba.pts.bms.bds.bapctrl.impl.dsus.tcu.treatmentcontroller.TcuTreatmentControllerImpl"
+          parent="abstractTcuDevice">
+        <property name="name" value="tcu" />
+        <property name="componentName" value="urn:device:tcu:IBTR3" />
+        <property name="ibtr" value="true" />
+        <property name="resetTreatmentMode" value="UNIFORM_SCANNING" />
+        <property name="pbsMode" value="false" />
+    </bean>
+
+    <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+    <!-- SMEU -->
+    <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+
+    <bean id="tcuSmeu" class="com.iba.pts.bms.bds.tcu.devices.ScanningMagnetsImpl" parent="abstractTcuDevice">
+        <property name="name" value="SMEU" />
+        <property name="componentName" value="urn:device:sm:#{bdp}" />
+    </bean>
+
+    <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+    <!-- AHUN -->
+    <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+
+    <beans profile="ahun=true">
+
+        <bean id="tcuAhun" class="com.iba.pts.bms.bds.tcu.devices.AhunProxyImpl" parent="abstractTcuDevice">
+            <property name="name" value="AHUN" />
+            <property name="componentName" value="urn:device:ahun:#{bdp}" />
+        </bean>
+
+    </beans>
+
+    <beans profile="ahun=false">
+
+        <bean id="tcuAhun" class="com.iba.icomp.core.config.NullFactoryBean" />
+
+    </beans>
+
+    <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+    <!-- TCU device -->
+    <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+
+    <beans profile="technique=dsus">
+        <bean id="tcuProxy" class="com.iba.pts.bms.bds.bapctrl.impl.dsus.tcu.treatmentcontroller.TcuTreatmentControllerImpl"
+              parent="abstractTcuDevice">
+            <property name="name" value="tcu" />
+            <property name="componentName" value="urn:device:tcu:IBTR3" />
+            <property name="ibtr" value="true" />
+            <property name="resetTreatmentMode" value="UNIFORM_SCANNING" />
+            <property name="pbsMode" value="false" />
+        </bean>
+    </beans>
+    <beans profile="technique=pbs">
+        <bean id="tcuProxy" class="com.iba.pts.bms.bds.bapctrl.impl.dsus.tcu.treatmentcontroller.TcuTreatmentControllerImpl"
+              parent="abstractTcuDevice">
+            <property name="name" value="tcu" />
+            <property name="componentName" value="urn:device:tcu:IBTR3" />
+            <property name="ibtr" value="true" />
+            <property name="pbsMode" value="true" />
+        </bean>
+    </beans>
+
+</beans>

@@ -1,0 +1,347 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+   <bean id="beamlineConfig" class="com.iba.pts.bms.bss.esbts.config.BeamlineConfig">
+      <constructor-arg index="0" value="classpath:config/PAT.112/beamCommonProcess/beamlineConfig.csv" />
+      <constructor-arg index="1" value="classpath:config/PAT.112/beamCommonProcess/beamlineDevices.csv" />
+      <constructor-arg index="2" value="config/PAT.112/beamCommonProcess/res/" />
+      <constructor-arg index="3" value="false" />
+      <constructor-arg index="4" value="com.iba.pts.bms.bss.esbts.solution.DegraderRangeConverterImpl"/>
+      <constructor-arg index="5" ref="blpscuProxy" />
+      <constructor-arg index="6" ref="ecubtcuRpcSender" />
+      <constructor-arg index="7" ref="bcreuProxy" />
+      <constructor-arg index="8" ref="acuProxy" />
+      <constructor-arg index="9" ref="bireuProxy" />
+      <constructor-arg index="10" ref="applicationQueue" />
+      <constructor-arg index="11" ref="asynchPropertyChangeInterceptor" />
+      <constructor-arg index="12" ref="degraderFactory" />
+      <constructor-arg index="13" ref="slitsFactory" />
+      <constructor-arg index="14" ref="beamStopFactory" />
+      <constructor-arg index="15" ref="bpmFactory" />
+      <constructor-arg index="16" ref="group3Factory" />
+      <constructor-arg index="17" ref="valveFactory" />
+      <constructor-arg index="18" ref="digitalMagnetFactory" />
+      <constructor-arg index="19" ref="analogMagnetFactory" />
+      <constructor-arg index="20" ref="modbusMagnetFactory" />
+      <constructor-arg index="21" ref="modularPowerSupplyFactory" />
+      <constructor-arg index="22" ref="modularSteeringMagnetFactory" />
+      <!-- Modular power supply 'polling events' (provided by Icomp) origin -->
+      <constructor-arg index="23" value="SyncSource" />
+      <constructor-arg index="24" ref="inactiveRangeControlDevicesPerOpticalSolutions" />
+      <constructor-arg index="25" ref="propertyDefinitionDictionary" />
+      <constructor-arg index="26" value="${prop:bms.blpscu.addressFile}" />
+      <constructor-arg index="27" ref="blpscuAnalogInputs" />
+      <constructor-arg index="28" ref="opcActiveEventRouter" />
+      <constructor-arg index="29" ref="daqAcqService" />
+      <constructor-arg index="30" ref="ecubtcuRpcResponseReceiver" />
+      <constructor-arg index="31" ref="ecubtcuRpcSender" />
+      <constructor-arg index="32" ref="mcrBeamDetector" />
+      <constructor-arg index="33" ref="timerFactory" />
+      <constructor-arg index="34" ref="containerProxy" />
+      <constructor-arg index="35" value="1000"/>
+   </bean>
+
+
+   <!--=====================================================================-->
+   <!-- Device Factories                                                    -->
+   <!--=====================================================================-->
+
+   <bean id="degraderFactory" class="com.iba.pts.bms.bss.esbts.config.DegraderFactory">
+      <constructor-arg ref="eventBus" />
+      <constructor-arg ref="eventFactory" />
+      <constructor-arg ref="propertyDefinitionDictionary" />
+      <constructor-arg ref="ecubtcuRpcSender" />
+      <constructor-arg value="ECUBTCU.Position" />
+      <constructor-arg value="ECUBTCU.RequestedPosition" />
+      <constructor-arg value="ECUBTCU.PositionStatus"/>
+      <constructor-arg>
+         <map>
+            <entry key="*#mcr_ecubtcu.xxx.feedbackctrl" value="SSXXX#ECUBTCU.Position" />
+            <entry key="*#mcr_ecubtcu.xxx.stepsetpoint" value="SSXXX#ECUBTCU.RequestedPosition" />
+            <entry key="*#mcr_ecubtcu.xxx.status" value="SSXXX#ECUBTCU.PositionStatus" />
+         </map>
+      </constructor-arg>
+      <constructor-arg value="0" />
+      <constructor-arg value="1175" />
+      <constructor-arg value="22800" />
+   </bean>
+
+   <bean id="slitsFactory" class="com.iba.pts.bms.bss.esbts.config.SlitsFactory">
+      <constructor-arg ref="eventBus" />
+      <constructor-arg ref="eventFactory" />
+      <constructor-arg ref="propertyDefinitionDictionary" />
+      <constructor-arg ref="ecubtcuRpcSender" />
+      <constructor-arg value="Slits.Status" />
+      <constructor-arg value="Slits.Width" />
+      <constructor-arg value="Slits.LinWidth" />
+      <constructor-arg value="Slits.RequestedWidthFeedback" />
+      <constructor-arg>
+         <map>
+	        <entry key="*#mcr_ecubtcu.xxx.status" value="SSXXX#Slits.Status"/>
+            <entry key="*#mcr_ecubtcu.xxx.setpoint" value="SSXXX#Slits.RequestedWidthFeedback"/>
+            <entry key="*#mcr_ecubtcu.xxx.tpot_position" value="SSXXX#Slits.Width"/>
+            <entry key="*#mcr_ecubtcu.xxx.lpot_position" value="SSXXX#Slits.LinWidth"/>
+         </map>
+      </constructor-arg>
+      <constructor-arg value="0.01"/>
+   </bean>
+
+   <bean id="beamStopFactory" class="com.iba.pts.bms.bss.esbts.config.BeamStopFactory">
+      <constructor-arg ref="eventBus" />
+      <constructor-arg ref="eventFactory" />
+      <constructor-arg ref="propertyDefinitionDictionary" />
+      <constructor-arg ref="ecubtcuRpcSender" />
+      <constructor-arg>
+         <map>
+            <entry key="*#mcr_ecubtcu.xxx.instatus" value="SSXXX#ECUBTCU.Inserted" />
+            <entry key="*#mcr_ecubtcu.xxx.outstatus" value="SSXXX#ECUBTCU.Retracted" />
+         </map>
+      </constructor-arg>
+   </bean>
+
+   <bean id="bpmFactory" class="com.iba.pts.bms.bss.esbts.config.BpmFactory">
+      <constructor-arg ref="eventBus" />
+      <constructor-arg ref="eventFactory" />
+      <constructor-arg ref="propertyDefinitionDictionary" />
+      <constructor-arg ref="ecubtcuRpcSender" />
+      <constructor-arg ref="ecubtcuRpcSender" />
+      <constructor-arg value="RetractableDevice.Inserted" />
+      <constructor-arg value="RetractableDevice.Retracted" />
+      <constructor-arg value="ECUBTCU.InsertionStatus" />
+      <constructor-arg>
+         <map>
+            <entry key="*#mcr_ecubtcu.xxx.instatus" value="SSXXX#RetractableDevice.Inserted" />
+            <entry key="*#mcr_ecubtcu.xxx.outstatus" value="SSXXX#RetractableDevice.Retracted" />
+            <entry key="*#mcr_ecubtcu.xxx.state_position" value="SSXXX#ECUBTCU.InsertionStatus" />
+         </map>
+      </constructor-arg>
+   </bean>
+
+   <bean id="group3Factory" class="com.iba.pts.bms.bss.esbts.config.Group3Factory">
+      <constructor-arg ref="eventBus" />
+      <constructor-arg ref="eventFactory" />
+      <constructor-arg ref="propertyDefinitionDictionary" />
+      <constructor-arg value="Group3.Field" />
+      <constructor-arg value="Group3.RawField" />
+      <constructor-arg>
+         <map>
+            <entry key="*#mcr_ecubtcu.xxx.corrected_ffeedback" value="SSXXX#Group3.Field" />
+            <entry key="*#mcr_ecubtcu.xxx.raw_ffeedback" value="SSXXX#Group3.RawField" />
+         </map>
+      </constructor-arg>
+   </bean>
+
+   <bean id="valveFactory" class="com.iba.pts.bms.bss.esbts.config.ValveFactory">
+      <constructor-arg ref="eventBus" />
+      <constructor-arg ref="eventFactory" />
+      <constructor-arg ref="propertyDefinitionDictionary" />
+      <constructor-arg>
+         <map>
+            <entry key="*#mcr_blpscu.xxx_valve.opened" value="SSXXX#Valve.Opened"/>
+            <entry key="*#mcr_blpscu.xxx_valve.closed" value="SSXXX#Valve.Closed"/>
+         </map>
+      </constructor-arg>
+   </bean>
+
+   <bean id="digitalMagnetFactory" class="com.iba.pts.bms.bss.esbts.config.DigitalMagnetFactory">
+      <constructor-arg ref="eventBus" />
+      <constructor-arg ref="eventFactory" />
+      <constructor-arg ref="propertyDefinitionDictionary" />
+      <constructor-arg ref="ecubtcuRpcSender" />
+      <constructor-arg ref="blpscuProxy" />
+      <constructor-arg value="Magnet.Current" />
+      <constructor-arg value="Magnet.RequestedCurrent" />
+      <constructor-arg value="Magnet.RegulationOk" />
+      <constructor-arg value="Magnet.InternalInterlockOk" />
+      <constructor-arg value="Magnet.WaterflowOk" />
+      <constructor-arg value="Magnet.ThermalSwitchOk" />
+      <constructor-arg value="Magnet.PowerStatus" />
+      <constructor-arg value="Magnet.LocalControlMode" />
+      <constructor-arg value="Magnet.CurrentSetpointFeedback" />
+      <constructor-arg value="Magnet.Field" />
+      <constructor-arg value="Magnet.RequestedField" />
+      <constructor-arg>
+         <map>
+            <entry key="*#mcr_ecubtcu.xxx.csetpoint" value="SSXXX#Magnet.CurrentSetpointFeedback"/>
+            <entry key="*#mcr_ecubtcu.xxx.cfeedback" value="SSXXX#Magnet.Current"/>
+            <entry key="*#mcr_ecubtcu.xxx.ffeedback" value="SSXXX#Magnet.Field"/>
+            <entry key="*#mcr_blpscu.xxx.regulok" value="SSXXX#Magnet.RegulationOk"/>
+            <entry key="*#mcr_blpscu.xxx.internalok" value="SSXXX#Magnet.InternalInterlockOk"/>
+            <entry key="*#mcr_blpscu.xxx.waterflow" value="SSXXX#Magnet.WaterflowOk"/>
+            <entry key="*#mcr_blpscu.xxx.thermalsw" value="SSXXX#Magnet.ThermalSwitchOk"/>
+            <entry key="*#mcr_blpscu.xxx.status" value="SSXXX#Magnet.PowerStatus"/>
+            <entry key="*#mcr_blpscu.xxx.ctrlmode" value="SSXXX#Magnet.LocalControlMode"/>
+         </map>
+      </constructor-arg>
+   </bean>
+
+   <bean id="analogMagnetFactory" class="com.iba.pts.bms.bss.esbts.config.AnalogMagnetFactory">
+      <constructor-arg ref="eventBus" />
+      <constructor-arg ref="eventFactory" />
+      <constructor-arg ref="propertyDefinitionDictionary" />
+      <constructor-arg ref="ecubtcuRpcSender" />
+      <constructor-arg ref="blpscuProxy" />
+      <constructor-arg value="Magnet.Current" />
+      <constructor-arg value="Magnet.RequestedCurrent" />
+      <constructor-arg value="Magnet.RegulationOk" />
+      <constructor-arg value="Magnet.InternalInterlockOk" />
+      <constructor-arg value="Magnet.WaterflowOk" />
+      <constructor-arg value="Magnet.ThermalSwitchOk" />
+      <constructor-arg value="Magnet.PowerStatus" />
+      <constructor-arg value="Magnet.LocalControlMode" />
+      <constructor-arg value="Magnet.CurrentSetpointFeedback" />
+      <constructor-arg>
+         <map>
+            <entry key="*#mcr_ecubtcu.xxx.csetpoint" value="SSXXX#Magnet.CurrentSetpointFeedback"/>
+            <entry key="*#mcr_ecubtcu.xxx.cfeedback" value="SSXXX#Magnet.Current"/>
+            <entry key="*#mcr_blpscu.xxx.regulok" value="SSXXX#Magnet.RegulationOk"/>
+            <entry key="*#mcr_blpscu.xxx.internalok" value="SSXXX#Magnet.InternalInterlockOk"/>
+            <entry key="*#mcr_blpscu.xxx.waterflow" value="SSXXX#Magnet.WaterflowOk"/>
+            <entry key="*#mcr_blpscu.xxx.thermalsw" value="SSXXX#Magnet.ThermalSwitchOk"/>
+            <entry key="*#mcr_blpscu.xxx.status" value="SSXXX#Magnet.PowerStatus"/>
+            <entry key="*#mcr_blpscu.xxx.ctrlmode" value="SSXXX#Magnet.LocalControlMode"/>
+         </map>
+      </constructor-arg>
+   </bean>
+
+   <bean id="modbusMagnetFactory" class="com.iba.pts.bms.bss.esbts.config.ModbusMagnetFactory">
+      <constructor-arg ref="eventBus" />
+      <constructor-arg ref="eventFactory" />
+      <constructor-arg ref="propertyDefinitionDictionary" />
+      <constructor-arg ref="ecubtcuRpcSender" />
+      <constructor-arg value="Magnet.Current" />
+      <constructor-arg value="Magnet.RequestedCurrent" />
+      <constructor-arg value="Magnet.RegulationOk" />
+      <constructor-arg value="Magnet.InternalInterlockOk" />
+      <constructor-arg value="Magnet.WaterflowOk" />
+      <constructor-arg value="Magnet.ThermalSwitchOk" />
+      <constructor-arg value="Magnet.PowerStatus" />
+      <constructor-arg value="Magnet.LocalControlMode" />
+      <constructor-arg value="Magnet.CurrentSetpointFeedback" />
+      <constructor-arg value="ModbusMagnet.RegulationOk" />
+      <constructor-arg value="ModbusMagnet.InternalInterlockOk" />
+      <constructor-arg value="ModbusMagnet.OnStandby" />
+      <constructor-arg value="ModbusMagnet.LocalControlMode" />
+      <constructor-arg>
+         <map>
+            <entry key="*#mcr_ecubtcu.xxx.csetpoint" value="SSXXX#Magnet.CurrentSetpointFeedback"/>
+            <entry key="*#mcr_ecubtcu.xxx.cfeedback" value="SSXXX#Magnet.Current"/>
+            <entry key="*#mcr_ecubtcu.xxx.regulok" value="SSXXX#ModbusMagnet.RegulationOk"/>
+            <entry key="*#mcr_ecubtcu.xxx.internalok" value="SSXXX#ModbusMagnet.InternalInterlockOk"/>
+            <entry key="*#mcr_ecubtcu.xxx.nofailure" value="SSXXX#ModbusMagnet.NoFailure"/> <!-- Unused, internalOk used instead -->
+            <entry key="*#mcr_ecubtcu.xxx.status" value="SSXXX#ModbusMagnet.OnStandby"/>
+            <entry key="*#mcr_ecubtcu.xxx.ctrlmode" value="SSXXX#ModbusMagnet.LocalControlMode"/>
+            <entry key="*#mcr_ecubtcu.xxx.waterflow" value="SSXXX#Magnet.WaterflowOk"/>
+            <entry key="*#mcr_ecubtcu.xxx.thermalsw" value="SSXXX#Magnet.ThermalSwitchOk"/>
+         </map>
+      </constructor-arg>
+   </bean>
+
+   <!--  Modular Power Supply -->
+
+   <bean id="modularPowerSupplyFactory" class="com.iba.pts.bms.bss.esbts.config.ModularPowerSupplyFactory">
+      <constructor-arg ref="eventBus" />
+      <constructor-arg ref="eventFactory" />
+      <constructor-arg ref="propertyDefinitionDictionary" />
+      <constructor-arg ref="containerProxy" />
+      <constructor-arg value="ModularPowerSupply.ModeConv" />
+      <constructor-arg value="ModularPowerSupply.SetpointConv" />
+      <constructor-arg value="ModularPowerSupply.OutputVoltageConv" />
+      <constructor-arg value="ModularPowerSupply.OutputCurrentConv" />
+      <constructor-arg value="ModularPowerSupply.StatusConv" />
+      <constructor-arg value="ModularPowerSupply.IoOkConv" />
+      <constructor-arg value="ModularPowerSupply.InterlockOkConv" />
+      <constructor-arg value="ModularPowerSupply.VideoConv" />
+      <constructor-arg value="ModularPowerSupply.LocalRemote" />
+      <constructor-arg value="ModularPowerSupply.AlarmList" />
+      <constructor-arg ref="esBtsServices" />
+   </bean>
+   
+   <bean id="modularSteeringMagnetFactory" class="com.iba.pts.bms.bss.esbts.config.ModularSteeringMagnetFactory">
+      <constructor-arg ref="eventBus" />
+      <constructor-arg ref="eventFactory" />
+      <constructor-arg ref="propertyDefinitionDictionary" />
+      <constructor-arg value="Magnet.Current" />
+      <constructor-arg value="Magnet.RequestedCurrent" />
+      <constructor-arg value="Magnet.RegulationOk" />
+      <constructor-arg value="Magnet.InternalInterlockOk" />
+      <constructor-arg value="Magnet.WaterflowOk" />
+      <constructor-arg value="Magnet.ThermalSwitchOk" />
+      <constructor-arg value="Magnet.PowerStatus" />
+      <constructor-arg value="Magnet.LocalControlMode" />
+      <constructor-arg value="Magnet.CurrentSetpointFeedback" />
+   </bean>
+   
+   
+   <!--=====================================================================-->
+   <!-- RPC sender to Ecubtcu                                               -->
+   <!--=====================================================================-->
+   
+   <bean id="ecubtcuRpcSender"
+      class="com.iba.tcs.beam.bss.devices.impl.gateway.rpc.EcubtcuRpcSender">
+      <!-- ECUBTCU connection parameters -->
+      <constructor-arg value="ecubtcuRpcSender" />                          <!-- Service name -->
+      <constructor-arg value="ecubtcu" />       <!-- routing is generated inside BeamlineConfig -->
+      <constructor-arg ref="eventBus" />                           <!-- EventBus -->
+      <constructor-arg ref="eventFactory" />                       <!-- EventFactory -->
+      <constructor-arg value="10.1.100.40" />     <!-- CU hostname -->
+      <constructor-arg value="0" />         <!-- Port number -->
+      <constructor-arg value="classpath:x/ecubtcu.x" />  <!-- Rpc program file -->
+      <constructor-arg value="55555111" />    <!-- Rpc program id -->
+      <constructor-arg value="1" />      <!-- Rpc program version -->
+     
+      <!-- don't handle exceptions so that service stops if an exception is thrown -->
+      <property name="exceptionHandler">
+         <bean class="com.iba.icomp.core.util.handler.LogExceptionHandler">
+            <property name="handleExceptions" value="false" />
+         </bean>
+      </property>
+      
+   </bean>
+
+   <bean id="ecubtcuRpcSenderAsynch" class="org.springframework.aop.framework.ProxyFactoryBean">
+      <property name="proxyInterfaces" value="com.iba.icomp.core.util.Connected"/>
+      <property name="target" ref="ecubtcuRpcSender"/>
+      <property name="interceptorNames" value="asynchPropertyChangeInterceptor"/>
+   </bean>
+
+
+   <!--=====================================================================-->
+   <!-- Beamline cyclic checks                                              -->
+   <!--=====================================================================-->
+
+   <bean id="beamlineCheckList" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+      <property name="targetObject" ref="beamlineConfig"/>
+      <property name="targetMethod" value="getCyclicChecks"/>
+   </bean>
+   
+   
+   <!--=====================================================================-->
+   <!-- Beamlines Infrastructure                                            -->
+   <!--=====================================================================-->
+
+   <bean name="beamlinesInfrastructure" class="com.iba.pts.bms.bss.esbts.BeamlinesInfrastructure">
+      <constructor-arg ref="beamlinesList"/>
+   </bean>
+
+   <bean id="beamlinesList" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+      <property name="targetObject" ref="beamlineConfig"/>
+      <property name="targetMethod" value="getBeamlines"/>
+   </bean>
+
+   <bean id="degrader" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+      <property name="targetObject" ref="beamlineConfig"/>
+      <property name="targetMethod" value="getDegrader"/>
+   </bean>
+   
+   <bean id="essBeamStop" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+      <property name="targetObject" ref="beamlinesInfrastructure"/>
+      <property name="targetMethod" value="getEssBeamStop"/>
+   </bean>
+
+</beans>

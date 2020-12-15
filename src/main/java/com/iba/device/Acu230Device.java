@@ -238,6 +238,7 @@ public class Acu230Device extends Device
 			} 
 			catch (IOException e) 
 			{
+				e.printStackTrace();
 				log.error("Error during the connection :"+this+", "+e.getMessage());
 				disconnect();
 				return;

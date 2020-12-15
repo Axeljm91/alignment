@@ -67,6 +67,36 @@ public class Rest extends TimerTask {
         }
     }
 
+    public JsonObject setVariable(String variable) throws Exception {
+        if(variable == null) {
+            return null;
+        } else {
+            String USER_AGENT = "Mozilla/5.0";
+            //String url = "http://127.0.0.1:4567/opc/" + variable.replace(".", "/");
+            String url = "http://10.1.100.119:4567/opc/" + variable.replace(".", "/");
+            URL obj = new URL(url);
+            HttpURLConnection con = (HttpURLConnection)obj.openConnection();
+            con.setRequestMethod("PUT");
+            con.setRequestProperty("User-Agent", USER_AGENT);
+            int responseCode = con.getResponseCode();
+            //System.out.println("\nSending 'GET' request to URL : " + url);
+            //System.out.println("Response Code : " + responseCode);
+            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+            StringBuffer response = new StringBuffer();
+
+            String inputLine;
+            while((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+
+            in.close();
+            //System.out.println(response.toString());
+            JsonObject objet = (new JsonParser()).parse(response.toString()).getAsJsonObject();
+            //System.out.println(objet.get("value").getAsString());
+            return objet;
+        }
+    }
+
     public void run() {
         Iterator var2 = this.trends.iterator();
 

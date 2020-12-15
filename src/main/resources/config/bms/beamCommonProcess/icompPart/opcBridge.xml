@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+      http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+    <import resource="classpath:config/PAT.112/beamCommonProcess/opcBridge.xml" />
+
+    <!-- OPC Access services ************************************************** -->
+
+    <bean id="opcAccessService" class="com.iba.icomp.comm.cegelec.CegelecAccessService">
+        <property name="name" value="OpcBridge" />
+        <property name="serviceController">
+            <bean
+                    class="com.iba.icomp.core.service.AllOrNothingServiceController">
+                <property name="services">
+                    <bean class="java.util.LinkedList">
+                        <constructor-arg>
+                            <list>
+                                <ref bean="opcChannelSender" />
+                                <ref bean="opcChannelReceiver" />
+                                <ref bean="opcActiveEventRouter" />
+                            </list>
+                        </constructor-arg>
+                    </bean>
+                </property>
+            </bean>
+        </property>
+        <property name="server">
+            <bean class="com.iba.icomp.core.io.SocketChannelStreamAcceptor">
+                <property name="address" value="${prop:comm.opc.address}" />
+                <property name="port" value="${prop:comm.opc.port}" />
+                <property name="tcpNoDelay" value="true" />
+            </bean>
+        </property>
+    </bean>
+
+    <!-- Senders and receivers ********************************************************* -->
+
+    <bean id="opcMessageFactory" class="com.iba.pts.bms.bss.cegelec.CegelecMessageFactory" />
+
+    <bean id="opcChannelSender" class="com.iba.icomp.comm.cegelec.CegelecChannelSender">
+        <property name="name" value="OpcChannelSender" />
+        <property name="pollTimeout" value="500" />
+        <property name="channelStream" ref="opcAccessService" />
+        <property name="messageFactory" ref="opcMessageFactory" />
+    </bean>
+
+    <bean id="opcChannelReceiver" class="com.iba.icomp.comm.cegelec.CegelecChannelReceiver">
+        <property name="name" value="OpcChannelReceiver" />
+        <property name="channelStream" ref="opcAccessService" />
+        <property name="receiver" ref="messageRouter" />
+        <property name="messageFactory" ref="opcMessageFactory" />
+    </bean>
+
+    <!-- The converters ********************************************************** -->
+
+    <bean id="eventToMessage" class="com.iba.pts.bms.bss.cegelec.CuEventToMessage"
+          init-method="initialize">
+        <property name="timerFactory" value="#{daqAcqService.timerFactory}" />
+        <property name="converterMap" ref="bmsEventToMessageMap" />
+        <property name="receiver" ref="opcChannelSender" />
+        <property name="messageDefinitions" ref="daqMessageDefinitions" />
+        <property name="defaultPropertyDefinition"
+                  value="#{daqPropertyDefinitionDictionary.getPropertyDefinition('CUDaq.LegacyVariable')}" />
+        <property name="inferers">
+            <list>
+                <ref bean="generalInference"/>
+                <bean class="com.iba.pts.bms.bss.cegelec.inference.BcreuModeInferer">
+                    <constructor-arg value="mcr_ecubtcu.iseu.mode" />
+                    <constructor-arg value="mcr_bcp.iseu.modbus_status" />
+                </bean>
+            </list>
+        </property>
+        <property name="activityTimeout" value="${prop:comm.daq.bridge.activity.timeout}" />
+        <property name="activityInferenceMap">
+            <map>
+                <entry key="mcr_ecubtcu.sw.alive_counter" value="ecubtcualivestatus" />
+            </map>
+        </property>
+    </bean>
+
+    <bean id="generalInference" class="com.iba.pts.bms.bss.cegelec.inference.GeneralInference">
+        <property name="rules" ref="inferenceRules" />
+        <property name="initialValues">
+            <bean class="com.iba.icomp.core.config.AggregatedMap">
+                <constructor-arg value="inference.rulesMap" />
+                <property name="maps">
+                    <list>
+                        <map>
+                            <entry key="mcr_rtieecubtcu.beamline.setrange_enabled" value="#{new Boolean(true)}" />
+                            <entry key="mcr_rtiescu.s2e.out_enabled" value="#{new Boolean(true)}" />
+                        </map>
+                        <ref bean="initialInferencesMap" />
+                    </list>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="messageToEvent"
+          class="com.iba.pts.bms.bss.cegelec.MessageToEvent">
+        <property name="eventFactory" ref="eventFactory" />
+        <property name="eventOrigin" value="opc" />
+        <property name="eventBus" ref="eventBus" />
+        <property name="dictionary" ref="propertyDefinitionDictionary" />
+
+        <property name="publishTargets">
+            <set>
+                <value>daqAcqService</value>
+            </set>
+        </property>
+
+        <property name="requestMap">
+            <bean class="com.iba.icomp.core.config.AggregatedMap">
+                <constructor-arg>
+                    <value>messageToEvent.requestMap</value>
+                </constructor-arg>
+                <property name="maps">
+                    <list>
+                        <ref bean="bmsMessageToEventRequestMap" />
+                    </list>
+                </property>
+            </bean>
+        </property>
+
+        <property name="converterMap">
+            <bean class="com.iba.icomp.core.config.AggregatedMap">
+                <constructor-arg>
+                    <value>messageToEvent.pointToPointRouteMap</value>
+                </constructor-arg>
+                <property name="maps">
+                    <list>
+                        <ref bean="bmsMessageToEventConverterMap" />
+                    </list>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+    <!-- All parts marked BMS-8.4 (Eyeline service-only) only must be removed when full Eyeline is added -->
+
+    <!-- Begin of BMS-8.4 (Eyeline service-only) specific section -->
+    <bean id="eventToMessageUnwrapper" class="com.iba.icomp.comm.cegelec.WrapEventToMessage">
+        <property name="messageFactory" ref="opcMessageFactory" />
+        <property name="receiver" ref="opcChannelSender" />
+    </bean>
+
+    <bean id="messageToEventWrapper" class="com.iba.icomp.comm.cegelec.WrapMessageToEvent">
+        <property name="eventBus" ref="eventBus" />
+        <property name="eventFactory" ref="eventFactory" />
+        <property name="eventOrigin" value="CegelecMessageWrapper" />
+        <property name="eventTarget" value="CegelecMessageUnwrapper" />
+    </bean>
+    <!-- End of BMS-8.4 (Eyeline service-only) specific section -->
+
+    <bean id="messageRouter" class="com.iba.icomp.comm.cegelec.MessageRouter">
+        <property name="consumers">
+            <list>
+                <ref bean="rpcCmdDispatcher"/>
+                <ref bean="plcCmdDispatcher"/>
+                <ref bean="messageToEvent" />
+                <ref bean="messageToEventWrapper" /> <!-- BMS-8.4 (Eyeline service-only) specific -->
+            </list>
+        </property>
+    </bean>
+
+    <!-- Message consumers ******************************************************* -->
+
+    <bean id="rpcCmdDispatcher" class="com.iba.pts.bms.bss.cegelec.CegelecRpcCmdDispatcher">
+        <property name="rpcProgram" value="${prop:bms.ecubtcu.programId}"/>
+        <property name="rpcVersion" value="${prop:bms.ecubtcu.version}"/>
+        <property name="rpcProgramFactory">
+            <bean class="com.iba.icomp.comm.rpc.RpcFileProgramFactory" init-method="load">
+                <property name="prefixes">
+                    <list>
+                        <value>ecubtcu</value>
+                    </list>
+                </property>
+                <property name="resource" value="${prop:bms.ecubtcu.rpcResource}"/>
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="plcCmdDispatcher" class="com.iba.pts.bms.bss.cegelec.CegelecPlcCmdDispatcher"
+          init-method="initialize">
+        <property name="blpscuCommandChannel" ref="blpscuCommandChannelProxy" />
+    </bean>
+
+    <!-- Instanciation of the event-bus *************************************  -->
+
+    <bean id="opcActiveEventRouter" class="com.iba.icomp.core.event.ForwardingRoutingService">
+        <property name="name" value="RoutingService" />
+        <property name="eventReceiver" ref="bridgeEventRouter" />
+    </bean>
+
+    <bean id="bridgeEventRouter" class="com.iba.icomp.core.event.DefaultEventRouter">
+        <property name="pointToPointRouteMap" ref="bridgeEventRouterPointToPointRouteMap" />
+
+        <property name="notificationRouteMap" ref="bridgeEventRouterNotificationRouteMap" />
+
+        <property name="fallbackEventReceiver">
+            <bean class="com.iba.icomp.core.event.filter.EventFromContainerFilter">
+                <property name="delegate">
+                    <bean class="com.iba.icomp.core.event.EventLogger">
+                        <property name="level" value="WARN" />
+                        <property name="message" value="Event not routed: " />
+                    </bean>
+                </property>
+                <property name="container" value="${prop:container.name}" />
+                <property name="filterOut" value="true" />
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="bridgeEventRouterNotificationRouteMap" class="com.iba.icomp.core.config.AggregatedListMap">
+        <property name="maps">
+            <list>
+                <ref bean="cuDaqEventRouterNotificationRouteMap"/>
+                <util:map>
+                    <entry key="BCREU" value-ref="eventToMessage" />
+                    <entry key="DEGRADER" value-ref="eventToMessage" />
+                </util:map>
+                <!-- Begin of BMS-8.4 (Eyeline service-only) specific section -->
+                <util:map>
+                    <entry key="CegelecMessageWrapper" value-ref="cegelecMessagesSender" />
+                    <entry key="CegelecMessageUnwrapper" value-ref="eventToMessageUnwrapper" />
+                </util:map>
+                <!-- End of BMS-8.4 (Eyeline service-only) specific section -->
+            </list>
+        </property>
+    </bean>
+
+    <bean id="bridgeEventRouterPointToPointRouteMap" class="com.iba.icomp.core.config.AggregatedListMap">
+        <property name="maps">
+            <list>
+                <ref bean="blpscuPointToPointRouteMap"/>
+                <!-- Begin of BMS-8.4 (Eyeline service-only) specific section -->
+                <util:map>
+                    <entry key="CegelecMessageWrapper" value-ref="eventToMessageUnwrapper" />
+                    <entry key="CegelecMessageUnwrapper" value-ref="cegelecMessagesSender" />
+                </util:map>
+                <!-- End of BMS-8.4 (Eyeline service-only) specific section -->
+            </list>
+        </property>
+    </bean>
+
+    <bean id="notificationToOpcBridgeRouteMap" class="java.util.HashMap">
+        <constructor-arg>
+            <util:map>
+                <entry key="BCREU" value-ref="opcActiveEventRouter" />
+                <entry key="DEGRADER" value-ref="opcActiveEventRouter" />
+                <!-- Begin of BMS-8.4 (Eyeline service-only) specific section -->
+                <entry key="CegelecMessageWrapper" value-ref="opcActiveEventRouter" />
+                <entry key="CegelecMessageUnwrapper" value-ref="opcActiveEventRouter" />
+                <!-- End of BMS-8.4 (Eyeline service-only) specific section -->
+            </util:map>
+        </constructor-arg>
+    </bean>
+
+    <!-- Begin of BMS-8.4 (Eyeline service-only) specific section -->
+    <bean id="pointToPointToOpcBridgeRouteMap" class="java.util.HashMap">
+        <constructor-arg>
+            <util:map>
+                <entry key="CegelecMessageWrapper" value-ref="opcActiveEventRouter" />
+                <entry key="CegelecMessageUnwrapper" value-ref="opcActiveEventRouter" />
+            </util:map>
+        </constructor-arg>
+    </bean>
+    <!-- End of BMS-8.4 (Eyeline service-only) specific section -->
+
+    <!-- The dynamic configuration ************************************************ -->
+
+    <bean id="cuDaqEventRouterNotificationRouteMap"
+          class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+        <property name="targetObject" ref="eventToMessage"/>
+        <property name="targetMethod" value="getNotificationRouteMap"/>
+    </bean>
+
+    <bean id="bmsEventToMessageMap" class="java.util.HashMap">
+        <constructor-arg>
+            <map>
+                <entry key="BCREU#Bcreu.Status" value="mcr_bcp.iseu.modbus_status#LONG" />
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <bean id="bmsMessageToEventRequestMap" class="java.util.HashMap"/>
+
+    <bean id="bmsMessageToEventConverterMap" class="java.util.HashMap"/>
+
+</beans>

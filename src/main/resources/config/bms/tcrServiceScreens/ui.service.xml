@@ -1,0 +1,539 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xmlns:util="http://www.springframework.org/schema/util"
+   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd">
+
+   <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+   <!-- Common setup -->
+   <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+
+   <bean id="notifBdsDevicesReceiver" parent="parentNotifChannelReceiver">
+      <property name="name" value="notifBdsDevicesReceiver" />
+      <property name="channel"
+         value="BdsDevicesNotif-IBTR3" />
+   </bean>
+
+   <bean id="notifBdsDevicesSender" parent="parentNotifChannelSender">
+      <property name="name" value="notifBdsDevicesSender" />
+      <property name="channel"
+         value="BdsDevicesCommand-IBTR3" />
+   </bean>
+
+   <bean id="mcrTcrNotifBdsDevicesReceiver" parent="parentNotifChannelReceiver">
+      <property name="name" value="mcrTcrNotifBdsDevicesReceiver" />
+      <property name="channel"
+         value="McrTcrBdsDevicesNotif-IBTR3" />
+   </bean>
+
+   <bean id="mcrTcrNotifBdsDevicesSender" parent="parentNotifChannelSender">
+      <property name="name" value="mcrTcrNotifBdsDevicesSender" />
+      <property name="channel"
+         value="McrTcrBdsDevicesCommand-IBTR3" />
+   </bean>
+
+   <bean id="bappTcrServiceScreensReceiver" parent="parentNotifChannelReceiver">
+      <property name="name" value="bappTcrServiceScreensReceiver" />
+      <property name="channel"
+         value="BappTcrServiceScreensNotif-IBTR3" />
+   </bean>
+
+   <bean id="bappTcrServiceScreensSender" parent="parentNotifChannelSender">
+      <property name="name" value="bappTcrServiceScreensSender" />
+      <property name="channel"
+         value="BappTcrServiceScreensCommand-IBTR3" />
+   </bean>
+
+   <bean id="abstractEndPoint" abstract="true" class="com.iba.icompx.core.component.EndPointProxy">
+      <property name="inputChannel" ref="notifBdsDevicesReceiver" />
+      <property name="intermediary" ref="applicationQueue" />
+      <property name="outputChannel" ref="notifBdsDevicesSender" />
+   </bean>
+
+   <bean id="swingDispatchPropertyChangeListenerInterceptor" class="com.iba.icompx.aop.SwingDispatchPropertyChangeListenerInterceptor" />
+
+   <bean id="swingProxy" class="org.springframework.aop.framework.ProxyFactoryBean" abstract="true">
+      <property name="interceptorNames"
+         value="swingDispatchPropertyChangeListenerInterceptor,applicationQueueAsynchMethInterceptor" />
+   </bean>
+
+   <bean id="callbackUtilityProxy" class="org.springframework.aop.framework.ProxyFactoryBean">
+      <property name="interceptorNames" value="applicationQueueAsynchMethInterceptor" />
+      <property name="proxyInterfaces" value="com.iba.icomp.core.component.CallbackUtility" />
+      <property name="target">
+         <bean class="com.iba.icomp.core.component.CallbackUtilityImpl" />
+      </property>
+   </bean>
+
+   <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+   <!-- GUI frame and main panel -->
+   <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+
+   <bean id="tcrServiceScreensPanel" class="com.iba.icompx.ui.service.ServiceUiMainPanel">
+      <!-- PRS-72902 -->
+      <property name="bannerPanel" ref="tcrBannerPanel" />
+   </bean>
+
+   <bean id="tcrServiceScreensFrame" class="com.iba.icompx.ui.panel.GenericFrame2">
+      <constructor-arg value="{prop:bms.tcrServiceScreens.screenId}" />
+      <constructor-arg value="${prop:bms.tcrServiceScreens.visible}" />
+      <property name="contentPane" ref="tcrServiceScreensPanel" />
+      <property name="title" value="Nozzle Service Screens" />
+      <property name="container" ref="uiContainerProxy" />
+      <property name="screenNumber" value="${prop:bms.tcrServiceScreens.screenNb}" />
+   </bean>
+
+   <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+   <!-- Overview -->
+   <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+
+   <bean id="overviewPanel" class="com.iba.pts.bms.tcrServiceScreens.OverviewPanel">
+      <property name="title" value="Overview" />
+      <property name="valueModel" ref="uiBappContainerValueModel" />
+      <property name="icsValueModel" ref="nozzleCuActionModel" />
+      <property name="treatmentSessionModeHolder" ref="swingTsmProxy" />
+      <property name="domainModel">
+         <bean class="com.iba.icomp.core.config.DynamicAggregatedList">
+            <property name="elementType" value="com.iba.pts.bms.tcrServiceScreens.InitializableCompositeDevice" />
+         </bean>
+      </property>
+      <property name="therapyCentre" ref="therapyCentre" />
+      <property name="timerFactory" ref="uiTimerFactory" />
+      <property name="tcuBootingTimeoutInMs" value="${prop:bms.tcu.booting_timeout_ms}" />
+      <property name="dsUsMode" value="#{'dsus'.equals('${prop:config.technique}')}"/>
+   </bean>
+
+   <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+   <!-- TSM proxy -->
+   <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+
+   <import resource="classpath:config/treatmentRoomSession/holder/tsmNotifConsumer.xml" />
+
+   <bean id="swingTsmProxy" parent="swingProxy">
+      <property name="proxyInterfaces" value="com.iba.pts.treatmentroomsession.TreatmentSessionModeHolder" />
+      <property name="target" ref="tsmProxy" />
+   </bean>
+
+   <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+   <!-- BAPP proxy -->
+   <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+
+   <bean id="bappContainerProxy" parent="simpleAbstractProxy" class="com.iba.icomp.core.component.EmptyProxy">
+      <property name="name" value="bappProxyForPublishing" />
+      <property name="componentName" value="BEAM-ACCESS-POINT-PROCESS-IBTR3" />
+   </bean>
+
+   <bean parent="abstractEndPoint">
+      <property name="component" ref="bappContainerProxy" />
+   </bean>
+
+   <bean id="uiBappContainerValueModel" class="com.iba.icompx.ui.binding.ContainerValueModel">
+      <property name="container" ref="uiBappContainerProxy" />
+      <property name="timerFactory" ref="uiTimerFactory" />
+      <property name="alivePeriodMs" value="2000" />
+      <property name="checkPeriodMs" value="500" />
+   </bean>
+
+   <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+   <!-- ServiceScreenGuiModel -->
+   <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+
+   <bean id="serviceScreenGuiModelProxy" parent="simpleAbstractProxy" class="com.iba.pts.bms.common.ServiceScreenGuiModelProxy">
+      <property name="name" value="serviceScreenGuiModelProxy" />
+      <property name="componentName" value="urn:guimodel:servicescreen:IBTR3" />
+   </bean>
+
+   <bean parent="abstractEndPoint">
+      <property name="component" ref="serviceScreenGuiModelProxy" />
+      <property name="intermediary" ref="applicationQueue" />
+      <property name="inputChannel" ref="mcrTcrNotifBdsDevicesReceiver" />
+      <property name="outputChannel" ref="mcrTcrNotifBdsDevicesSender" />
+   </bean>
+
+   <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+   <!-- Nozzle specific devices -->
+   <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+
+   <import resource="classpath:config/bms/tcrServiceScreens/ui.service.uniNozzle.xml" />
+
+   <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+   <!-- Ion Source Chain -->
+   <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+
+   <beans>
+
+      <import resource="classpath:config/bms/bds/devices/impl/ionSourceChain.xml" />
+
+      <bean id="ionSourceChainPanel" class="com.iba.pts.bms.tcrServiceScreens.IonSourceChainPanel">
+         <property name="title" value="Ion Source Chain" />
+         <property name="valueModel" ref="nozzleCuActionModel" />
+         <property name="domainModel" ref="swingIonSourceChain" />
+      </bean>
+
+   </beans>
+
+   <beans profile="bmsNozzleType=dedNozzle">
+
+      <bean parent="abstractEndPoint">
+         <property name="component" ref="ionSourceChain" />
+      </bean>
+
+      <bean id="swingIonSourceChain" parent="swingProxy">
+         <property name="proxyInterfaces"
+            value="com.iba.tcs.beam.bds.devices.api.IonSourceChain,
+                                                 com.iba.pts.bms.bds.devices.api.BdsioDeviceSwingProxy" />
+         <property name="target" ref="ionSourceChain" />
+      </bean>
+
+   </beans>
+
+   <beans profile="bmsNozzleType=uniNozzle">
+
+      <bean parent="abstractTcuDeviceEndPoint">
+         <property name="component" ref="ionSourceChain" />
+      </bean>
+
+      <bean id="swingIonSourceChain" parent="swingProxy">
+         <property name="proxyInterfaces"
+            value="com.iba.tcs.beam.bds.devices.api.IonSourceChainExt,
+                                                 com.iba.pts.bms.bds.devices.api.TcuDeviceSwingProxy" />
+         <property name="target" ref="ionSourceChain" />
+      </bean>
+
+   </beans>
+
+   <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+   <!-- Dose Counter -->
+   <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+
+   <beans>
+
+      <import resource="classpath:config/bms/bds/devices/impl/doseCounter.xml" />
+
+      <bean id="doseCounterPanel" class="com.iba.pts.bms.tcrServiceScreens.DceuPanel">
+         <property name="title" value="Dose Counter" />
+         <property name="valueModel" ref="nozzleCuActionModel" />
+         <property name="domainModel" ref="swingDoseCounter" />
+      </bean>
+
+   </beans>
+
+   <beans profile="bmsNozzleType=dedNozzle">
+
+      <bean id="swingDoseCounter" parent="swingProxy">
+         <property name="proxyInterfaces"
+            value="com.iba.tcs.beam.bds.devices.api.DoseCounter,
+                                                 com.iba.pts.bms.bds.devices.api.BdsioDeviceSwingProxy" />
+         <property name="target" ref="doseCounter" />
+      </bean>
+
+      <bean parent="abstractEndPoint">
+         <property name="component" ref="doseCounter" />
+      </bean>
+
+   </beans>
+
+   <beans profile="bmsNozzleType=uniNozzle">
+
+      <bean id="swingDoseCounter" parent="swingProxy">
+         <property name="proxyInterfaces"
+            value="com.iba.tcs.beam.bds.devices.api.TcuDoseCounter,
+                                                 com.iba.pts.bms.bds.devices.api.TcuDeviceSwingProxy" />
+         <property name="target" ref="doseCounter" />
+      </bean>
+
+      <bean parent="abstractTcuDeviceEndPoint">
+         <property name="component" ref="doseCounter" />
+      </bean>
+
+   </beans>
+
+   <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+   <!-- Ionization Chamber -->
+   <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+
+   <beans>
+
+      <import resource="classpath:config/bms/bds/devices/impl/ionizationChamber.xml" />
+
+      <bean id="icX1Panel" class="com.iba.pts.bms.tcrServiceScreens.IonizationChamberChannelsPanel">
+         <property name="guiModel" ref="serviceScreenGuiModelProxy" />
+         <property name="navigationAccessible" value="false" />
+         <property name="domainModel" ref="swingIonizationChamber" />
+         <property name="icElement" value="x1" />
+         <property name="containerUiProxy" ref="uiContainerProxy" />
+      </bean>
+
+      <bean id="icY1Panel" class="com.iba.pts.bms.tcrServiceScreens.IonizationChamberChannelsPanel">
+         <property name="guiModel" ref="serviceScreenGuiModelProxy" />
+         <property name="navigationAccessible" value="false" />
+         <property name="domainModel" ref="swingIonizationChamber" />
+         <property name="icElement" value="y1" />
+         <property name="containerUiProxy" ref="uiContainerProxy" />
+      </bean>
+
+      <bean id="icX2Panel" class="com.iba.pts.bms.tcrServiceScreens.IonizationChamberChannelsPanel">
+         <property name="guiModel" ref="serviceScreenGuiModelProxy" />
+         <property name="navigationAccessible" value="false" />
+         <property name="domainModel" ref="swingIonizationChamber" />
+         <property name="icElement" value="x2" />
+         <property name="containerUiProxy" ref="uiContainerProxy" />
+      </bean>
+
+      <bean id="icY2Panel" class="com.iba.pts.bms.tcrServiceScreens.IonizationChamberChannelsPanel">
+         <property name="guiModel" ref="serviceScreenGuiModelProxy" />
+         <property name="navigationAccessible" value="false" />
+         <property name="domainModel" ref="swingIonizationChamber" />
+         <property name="icElement" value="y2" />
+         <property name="containerUiProxy" ref="uiContainerProxy" />
+      </bean>
+
+      <bean id="icDosimetryPanel" class="com.iba.pts.bms.tcrServiceScreens.IonizationChamberDosimetryPanel">
+         <property name="guiModel" ref="serviceScreenGuiModelProxy" />
+         <property name="navigationAccessible" value="false" />
+         <property name="domainModel" ref="swingIonizationChamber" />
+      </bean>
+
+   </beans>
+
+   <beans profile="technique=dsus">
+
+      <bean parent="abstractTcuDeviceEndPoint">
+         <property name="component" ref="ionizationChamber" />
+         <property name="inputChannel" ref="mcrTcrNotifBdsDevicesReceiver" />
+         <property name="outputChannel" ref="mcrTcrNotifBdsDevicesSender" />
+      </bean>
+
+      <bean id="rangeVerifierPanel" class="com.iba.pts.bms.tcrServiceScreens.RangeVerifierPanel">
+         <property name="navigationAccessible" value="false" />
+         <property name="domainModel" ref="swingIonizationChamber" />
+         <property name="containerUiProxy" ref="uiContainerProxy" />
+      </bean>
+
+      <bean id="icSettingsPanel" class="com.iba.pts.bms.tcrServiceScreens.IonizationChambersSettingsPanel">
+         <property name="title" value="IC Settings" />
+         <property name="domainModel" ref="swingIonizationChamber" />
+         <property name="valueModel" ref="nozzleCuActionModel" />
+         <property name="ibtr" value="true" />
+      </bean>
+
+      <beans profile="ibtr=false">
+         <bean class="com.iba.icompx.core.component.ExtEndPointProxy">
+            <property name="component" ref="ionizationChamber" />
+            <property name="componentName" value="urn:device:ic1:#{bsp}" />
+            <property name="intermediary" ref="applicationQueue" />
+            <property name="inputChannel" ref="bappTcrServiceScreensReceiver" />
+            <property name="outputChannel" ref="bappTcrServiceScreensSender" />
+         </bean>
+
+         <!-- the bean ionizationChamber is a simple DsUsIonizationChamber -->
+         <bean id="swingIonizationChamber" parent="swingProxy">
+            <property name="proxyInterfaces"
+               value="com.iba.pts.bms.bds.devices.api.DsUsIonizationChamber, com.iba.pts.bms.bds.devices.api.TcuDeviceSwingProxy" />
+            <property name="target" ref="ionizationChamber" />
+         </bean>
+
+         <bean id="icProfilesPanel" class="com.iba.pts.bms.tcrServiceScreens.IonizationChamberPanel">
+            <property name="guiModel" ref="serviceScreenGuiModelProxy" />
+            <property name="title" value="IC Profiles" />
+            <property name="x1Panel" ref="icX1Panel" />
+            <property name="y1Panel" ref="icY1Panel" />
+            <property name="x2Panel" ref="icX2Panel" />
+            <property name="y2Panel" ref="icY2Panel" />
+            <property name="rvPanel" ref="rangeVerifierPanel" />
+            <property name="dosimetryPanel" ref="icDosimetryPanel" />
+         </bean>
+      </beans>
+
+      <beans profile="ibtr=true">
+         <bean class="com.iba.icompx.core.component.ExtEndPointProxy">
+            <property name="component" ref="ionizationChamber" />
+            <property name="componentName" value="urn:device:ic1:#{bsp30}" />
+            <property name="intermediary" ref="applicationQueue" />
+            <property name="inputChannel" ref="bappTcrServiceScreensReceiver" />
+            <property name="outputChannel" ref="bappTcrServiceScreensSender" />
+         </bean>
+
+         <bean class="com.iba.icompx.core.component.ExtEndPointProxy">
+            <property name="component" ref="ionizationChamber" />
+            <property name="componentName" value="urn:device:ic1:#{bsp90}" />
+            <property name="intermediary" ref="applicationQueue" />
+            <property name="inputChannel" ref="bappTcrServiceScreensReceiver" />
+            <property name="outputChannel" ref="bappTcrServiceScreensSender" />
+         </bean>
+
+         <!-- override bean ionizationChamber with a implementation supporting IC1Bis for service screens -->
+         <bean id="ionizationChamber" parent="abstractTcuDevice"
+            class="com.iba.pts.bms.bds.devices.impl.DsUsIonizationChamberWithIc1BisSupportProxy">
+            <property name="name" value="IonizationChamber" />
+            <property name="componentName" value="urn:device:ic:#{bdp}" />
+            <constructor-arg ref="icStripConfig" />
+            <constructor-arg ref="therapyCentre" />
+            <constructor-arg value="${prop:bds.service.ui.reset.ic1.fastAbortLevel}" />
+            <constructor-arg value="${prop:bds.service.ui.reset.ic2.fastAbortLevel}" />
+            <constructor-arg value="${prop:bds.service.ui.reset.ic3.fastAbortLevel}" />
+            <constructor-arg value="${prop:bds.service.ui.reset.rv.fastAbortLevel}" />
+            <constructor-arg value="${prop:bds.service.ui.reset.ic1.highVoltage}" />
+            <constructor-arg value="${prop:bds.service.ui.reset.ic2.highVoltage}" />
+            <constructor-arg value="${prop:bds.service.ui.reset.ic3.highVoltage}" />
+            <constructor-arg value="${prop:bds.service.ui.reset.ic2.presetDoseCount}" />
+            <constructor-arg value="${prop:bds.service.ui.reset.ic3.presetDoseCount}" />
+            <constructor-arg value="${prop:bds.service.ui.reset.ic1Bis.fastAbortLevel}" />
+            <constructor-arg value="${prop:bds.service.ui.reset.ic1Bis.highVoltage}" />
+            <constructor-arg value="${prop:bds.service.ui.reset.tcu.driftAcquisitionDuration}" />
+         </bean>
+
+         <bean id="swingIonizationChamber" parent="swingProxy">
+            <property name="proxyInterfaces"
+               value="com.iba.pts.bms.bds.devices.api.DsUsIonizationChamberWithIc1BisSupport, com.iba.pts.bms.bds.devices.api.TcuDeviceSwingProxy" />
+            <property name="target" ref="ionizationChamber" />
+         </bean>
+
+         <bean id="icX1PanelBis" class="com.iba.pts.bms.tcrServiceScreens.IonizationChamberChannelsPanel">
+            <property name="guiModel" ref="serviceScreenGuiModelProxy" />
+            <property name="navigationAccessible" value="false" />
+            <property name="domainModel" ref="swingIonizationChamber" />
+            <property name="icElement" value="x1Bis" />
+            <property name="containerUiProxy" ref="uiContainerProxy" />
+         </bean>
+
+         <bean id="icY1PanelBis" class="com.iba.pts.bms.tcrServiceScreens.IonizationChamberChannelsPanel">
+            <property name="guiModel" ref="serviceScreenGuiModelProxy" />
+            <property name="navigationAccessible" value="false" />
+            <property name="domainModel" ref="swingIonizationChamber" />
+            <property name="icElement" value="y1Bis" />
+            <property name="containerUiProxy" ref="uiContainerProxy" />
+         </bean>
+
+         <bean id="icProfilesPanel" class="com.iba.pts.bms.tcrServiceScreens.IonizationChamberPanel">
+            <property name="guiModel" ref="serviceScreenGuiModelProxy" />
+            <property name="title" value="IC Profiles" />
+            <property name="x1Panel" ref="icX1Panel" />
+            <property name="y1Panel" ref="icY1Panel" />
+            <property name="x1BisPanel" ref="icX1PanelBis" />
+            <property name="y1BisPanel" ref="icY1PanelBis" />
+            <property name="x2Panel" ref="icX2Panel" />
+            <property name="y2Panel" ref="icY2Panel" />
+            <property name="rvPanel" ref="rangeVerifierPanel" />
+            <property name="dosimetryPanel" ref="icDosimetryPanel" />
+            <property name="tcu" ref="swingTcuProxy" />
+         </bean>
+      </beans>
+   </beans>
+
+   <beans profile="technique=pbs">
+
+      <bean parent="abstractEndPoint">
+         <property name="component" ref="ionizationChamber" />
+         <property name="inputChannel" ref="mcrTcrNotifBdsDevicesReceiver" />
+      </bean>
+
+      <bean id="swingIonizationChamber" parent="swingProxy">
+         <property name="proxyInterfaces" value="com.iba.pts.bms.bds.devices.api.PbsIonizationChamber" />
+         <property name="target" ref="ionizationChamber" />
+      </bean>
+
+      <bean id="icProfilesPanel" class="com.iba.pts.bms.tcrServiceScreens.IonizationChamberPanel">
+         <property name="guiModel" ref="serviceScreenGuiModelProxy" />
+         <property name="title" value="IC Profiles" />
+         <property name="x1Panel" ref="icX1Panel" />
+         <property name="y1Panel" ref="icY1Panel" />
+         <property name="x2Panel" ref="icX2Panel" />
+         <property name="y2Panel" ref="icY2Panel" />
+         <property name="dosimetryPanel" ref="icDosimetryPanel" />
+      </bean>
+
+   </beans>
+
+   <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+   <!-- UBTI -->
+   <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+
+   <beans profile="ubti=true">
+
+      <!-- TODO move definitions to ubti.true.proxy.xml (and remove the "true") -->
+      <!-- <import resource="classpath:config/bms/bds/devices/impl/ubti.${config.ubti}.proxy.xml"/> -->
+
+      <bean id="UBTI-PROXY" parent="simpleAbstractProxy" class="com.iba.tcs.beam.bds.devices.impl.UbtiProxy">
+         <property name="name" value="UBTI-PROXY" />
+         <property name="componentName" value="urn:device:ubti:#{bdp}" />
+         <property name="responseTimeOut" value="2000" />
+      </bean>
+
+      <bean parent="abstractEndPoint">
+         <property name="component" ref="UBTI-PROXY" />
+      </bean>
+
+      <bean id="swingUbti" parent="swingProxy">
+         <property name="proxyInterfaces" value="com.iba.tcs.beam.bds.devices.api.Ubti" />
+         <property name="target" ref="UBTI-PROXY" />
+      </bean>
+
+      <bean id="ubtiCompositeDevice" parent="swingProxy">
+         <property name="proxyTargetClass" value="true" />
+         <property name="target">
+            <bean class="com.iba.pts.bms.tcrServiceScreens.InitializableCompositeDevice">
+               <property name="deviceName" value="Beam triggering" />
+               <property name="actionModel" ref="ubtiActionModel" />
+               <property name="devices">
+                  <list>
+                     <ref bean="swingUbti" />
+                  </list>
+               </property>
+            </bean>
+         </property>
+      </bean>
+
+      <bean id="ubtiActionModel" class="com.iba.pts.bms.tcrServiceScreens.DeviceActionModel">
+         <constructor-arg ref="callbackUtilityProxy" />
+         <constructor-arg ref="uiBappContainerValueModel" />
+         <constructor-arg ref="swingTsmProxy" />
+         <constructor-arg ref="swingUbti" />
+      </bean>
+
+      <bean id="ubtiPanel" class="com.iba.pts.bms.tcrServiceScreens.UbtiPanel">
+         <property name="title" value="Beam Triggering" />
+         <property name="valueModel" ref="ubtiActionModel" />
+         <property name="domainModel" ref="swingUbti" />
+         <property name="treatmentModes" value="#{beamDeliveryPoint.getSupportedTreatmentModes()}" />
+      </bean>
+
+   </beans>
+
+   <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+   <!-- eIDEU -->
+   <!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+   <beans profile="bmsNozzleType=dedNozzle,bmsNozzleType=comNozzle">
+      <beans profile="bms.dedSnout=true">
+         <import resource="classpath:config/bms/bds/devices/impl/eideu/eideu.proxy.xml" />
+         <bean id="eIdeuPanel" class="com.iba.pts.bms.tcrServiceScreens.EIdeuPanel">
+            <property name="title" value="eIDEU" />
+            <property name="domainModel" ref="swingEIdeu" />
+         </bean>
+
+         <!-- swing safe proxy of the eIDEU proxy to be used by GUI -->
+         <bean id="swingEIdeu" parent="swingProxy">
+            <property name="proxyInterfaces" value="com.iba.pts.bms.bds.devices.api.EIdeu" />
+            <property name="target" ref="EIDEU-PROXY" />
+         </bean>
+
+         <bean id="eIdeuActionModel" class="com.iba.pts.bms.tcrServiceScreens.DeviceActionModel">
+            <constructor-arg ref="callbackUtilityProxy" />
+            <constructor-arg ref="uiBappContainerValueModel" />
+            <constructor-arg ref="swingTsmProxy" />
+            <constructor-arg ref="swingEIdeu" />
+         </bean>
+
+         <bean id="eIdeuCompositeDevice" class="com.iba.pts.bms.tcrServiceScreens.InitializableCompositeDevice">
+            <property name="deviceName" value="eIDEU" />
+            <property name="actionModel" ref="eIdeuActionModel" />
+            <property name="devices">
+               <list>
+                  <ref bean="swingEIdeu" />
+               </list>
+            </property>
+         </bean>
+      </beans>
+   </beans>
+</beans>
